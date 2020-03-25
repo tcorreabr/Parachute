@@ -1,0 +1,15 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Parachute
+Comment=Windows and desktops from above
+Type=Service
+Icon=preferences-system-windows-effect-presentwindows
+X-Plasma-API=declarativescript
+X-Plasma-MainScript=ui/main.qml
+X-KDE-PluginInfo-Author=Tiago de O. Corrêa
+X-KDE-PluginInfo-Email=tcorreabr@gmail.com
+X-KDE-PluginInfo-Name=Parachute
+X-KDE-PluginInfo-Version=0.5
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true
+X-KDE-ServiceTypes=KWin/Script
