@@ -10,7 +10,7 @@ This *Kwin QML/Javascript* script was inspired by the excellent work of several 
 
 The most promising feature isn't implemented yet. I think that the possibility of working with *Plasma Activities* in a faster and more natural way can be game changing in their daily use. In the future, this script may allow you to insert/delete activities, move windows between them, etc. For now, it works with *Virtual Desktops* and just ignores activities because I think some changes in *Kwin's* source code may be needed for the support.
 
-Developed and tested in *Plasma* 5.18.
+Developed and tested in *Plasma* 5.18, but not ready for daily use.
 
 Not tested on *Wayland*. I'm pretty sure it doesn't work on it.
 
