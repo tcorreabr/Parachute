@@ -32,6 +32,7 @@ You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin
 * Not tested on *Wayland*. I'm pretty sure it doesn't work on it.
 * If you are going to contribute to the code, please contact me first so that we don't have duplicate work. Unless it's a small contribution.
 * If you are using "Slide" animation to switch desktops, you may want to switch to "Desktop Cube Animation" to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
+* For now, you have to [click on a empty desktop to show the backgrounds](https://github.com/tcorreabr/Parachute/issues/6).
 
 ## Possible improvements
 

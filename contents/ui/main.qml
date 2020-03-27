@@ -143,15 +143,15 @@ Window {
             currentScreenItem.height = screenRect.height;
 
             // Get desktop windowId to show backgrounds
-            let screenModelIndex = clientsByScreen.index(currentScreen, 0);
-            for (var currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
-                let clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
-                let client = clientsByScreen.data(clientModelIndex);
-                if (client.desktopWindow) { //} && client.activities.length === 1) {
-                    // let activityIndex = workspace.activities.indexOf(client.activities[0]);
-                    screensRepeater.itemAt(currentScreen).desktopThumbnail.winId = client.windowId;
-                }
-            }
+            // let screenModelIndex = clientsByScreen.index(currentScreen, 0);
+            // for (var currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
+            //     let clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
+                // let client = clientsByScreen.data(clientModelIndex);
+                // if (client.desktopWindow) { //} && client.activities.length === 1) {
+                //     // let activityIndex = workspace.activities.indexOf(client.activities[0]);
+                //     screensRepeater.itemAt(currentScreen).desktopThumbnail.winId = client.windowId;
+                // }
+            // }
 
             // Update desktops
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
