@@ -19,7 +19,7 @@ The most promising feature isn't implemented yet. I think that the possibility o
   cd Parachute
   kpackagetool5 --type KWin/Script --install .
   ```
-  
+
 ## Usage
 
 After activate the script in *Kwin Scripts* window you can use the default registered global shortcut (Ctrl+Alt+W) to show/hide *Parachute*.
@@ -33,6 +33,7 @@ You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin
 * If you are going to contribute to the code, please contact me first so that we don't have duplicate work. Unless it's a small contribution.
 * If you are using "Slide" animation to switch desktops, you may want to switch to "Desktop Cube Animation" to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
 * For now, you have to [click on a empty desktop to show the backgrounds](https://github.com/tcorreabr/Parachute/issues/6).
+* You can use Kwin global shortcuts normally while using this script. To navigate between your desktops for example.
 
 ## Possible improvements
 
