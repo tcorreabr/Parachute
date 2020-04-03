@@ -5,11 +5,9 @@ import org.kde.kwin 2.0 as KWinComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 Item {
+// Rectangle {
     id: clientItem
-
-    property alias selectedFrame: selectedFrame
-    property alias clientDecorations: clientDecorations
-    property alias clientThumbnail: clientThumbnail
+    // color: "brown"
 
     property bool isAnimating: xAnimation.running || yAnimation.running || widthAnimation.running || heightAnimation.running
     property var client: model.client
@@ -24,60 +22,47 @@ Item {
     property real calculatedWidth
     property real calculatedHeight
 
-    Item {
+    Behavior on x {
+        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        NumberAnimation { id: xAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+    }
+
+    Behavior on y {
+        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        NumberAnimation { id: yAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+    }
+
+    Behavior on width {
+        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        NumberAnimation { id: widthAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+    }
+
+    Behavior on height {
+        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        NumberAnimation { id: heightAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+    }
+
+    PlasmaCore.FrameSvgItem {
         id: selectedFrame
-
-        PlasmaCore.FrameSvgItem {
-            anchors.fill : parent
-            imagePath: "widgets/viewitem"
-            prefix: "hover"
-            visible: big && !isAnimating && selectedFrameHoverHandler.hovered && !mainWindow.dragging
-        }
-
-        HoverHandler {
-            id: selectedFrameHoverHandler
-        }
-
-        TapHandler {
-            acceptedButtons: Qt.AllButtons
-
-            onTapped: {
-                if (!big) return;
-                mainWindow.clientTapped = true;
-
-                switch (eventPoint.event.button) {
-                    case Qt.LeftButton:
-                        mainWindow.selectedClient = client;
-                        mainWindow.toggleActive();
-                        break;
-                    case Qt.MiddleButton:
-                        clientItem.client.closeWindow();
-                        break;
-                    case Qt.RightButton:
-                        if (mainWindow.workWithActivities)
-                            if (clientItem.client.activities.length === 0)
-                                clientItem.client.activities.push(desktopItem.activity);
-                            else
-                                clientItem.client.activities = [];
-                        else
-                            if (clientItem.client.desktop === -1)
-                                clientItem.client.desktop = desktopItem.desktopIndex;
-                            else
-                                clientItem.client.desktop = -1;
-                        break;
-                }
-            }
-        }
+        anchors.fill : parent
+        imagePath: "widgets/viewitem"
+        prefix: "hover"
+        visible: big && !isAnimating && mainWindow.selectedClientItem === clientItem  && !mainWindow.dragging
+        opacity: 0.4
     }
 
     Item {
         id: clientDecorations
-        height: mainWindow.clientDecorationsHeight
+        height: desktopItem.clientsDecorationsHeight
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: clientThumbnail.width * 0.8
+        anchors.top: parent.top
+        anchors.topMargin: desktopItem.clientsPadding
         visible: big && !isAnimating && !clientThumbnail.Drag.active
 
         RowLayout {
             id: rowLayout
-            x: (parent.width - width) / 2
+            anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height
             spacing: 10
 
@@ -109,7 +94,7 @@ Item {
                     id: closeButton
                     anchors.fill: parent
                     icon.name: "window-close"
-                    visible: selectedFrameHoverHandler.hovered && !mainWindow.dragging
+                    visible: selectedFrame.visible // selectedFrameHoverHandler.hovered && !mainWindow.dragging
                     hoverEnabled: false
                     radius: height / 2
                     focusPolicy: Qt.NoFocus
@@ -122,7 +107,9 @@ Item {
 
     Item {
         id: dragPlaceholder
-        x: calculatedX; y: calculatedY; width: calculatedWidth; height: calculatedHeight
+        anchors.fill: parent
+        anchors.margins: desktopItem.clientsPadding
+        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
 
         DragHandler {
             id: myDragHandler
@@ -137,6 +124,9 @@ Item {
 
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
+        anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
+        anchors.margins: desktopItem.clientsPadding
+        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
         wId: clientItem.client.internalId
         clipTo: screenItem
         clip: true
@@ -144,6 +134,7 @@ Item {
         Drag.source: clientItem.client
         antialiasing: false
         smooth: false
+        // fillColor: "green"
         // visible: mainWindow.activated
         
         states: State {
@@ -151,31 +142,11 @@ Item {
             PropertyChanges {
                 target: clientThumbnail
                 width: 250; height: 250; clip: false
-                Drag.hotSpot.x: width / 2
-                Drag.hotSpot.y: height / 2
-                x: calculatedX + myDragHandler.centroid.position.x - width / 2
-                y: calculatedY + myDragHandler.centroid.position.y - height / 2
+                Drag.hotSpot.x: clientThumbnail.width / 2
+                Drag.hotSpot.y: clientThumbnail.height / 2
+                x: desktopItem.clientsPadding + myDragHandler.centroid.position.x - clientThumbnail.width / 2
+                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + myDragHandler.centroid.position.y - clientThumbnail.height / 2
             }
-        }
-
-        Behavior on x {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && !mainWindow.dragging
-            NumberAnimation { id: xAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
-        }
-
-        Behavior on y {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && !mainWindow.dragging
-            NumberAnimation { id: yAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
-        }
-
-        Behavior on width {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && !mainWindow.dragging
-            NumberAnimation { id: widthAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
-        }
-
-        Behavior on height {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && !mainWindow.dragging
-            NumberAnimation { id: heightAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
         }
     }
 

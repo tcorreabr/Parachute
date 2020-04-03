@@ -14,18 +14,15 @@ Window {
     property bool activated: false
     property bool configBlurBackground: true
     property bool dragging: false
-    property bool clientTapped: false // Qt bug: TapHandlers's eventInput.accepted = true doesn't stop propagation
     property bool workWithActivities: false // Waiting for write access to client.activities, for now always work with virtual desktops
     property bool shouldRequestActivate: true
     property bool desktopsInitialized: false
-    property var selectedClient: null
+    property var selectedClientItem: null
     property var outsideSelectedClient: null
-    property real clientDecorationsHeight: 22
     property real animationsDuration: units.longDuration + units.shortDuration * 2
     property int noAnimation: 0 // Const to disable animations
     property int easingType
     property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) : workspace.currentDesktop - 1
-
 
     Item {
         id: keyboardHandler
@@ -59,13 +56,11 @@ Window {
 
         // Return if any big desktop is animating
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-            for (let currentDesktop = 0; currentDesktop < screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.count; currentDesktop++)
-                if (screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.isAnimating())
-                    return;
+            if (screensRepeater.itemAt(currentScreen).bigDesktopsTopMarginAnimation.running) return;
 
         if (mainWindow.activated) {
             shouldRequestActivate = false;
-            workspace.activeClient = mainWindow.selectedClient !== null ? mainWindow.selectedClient : mainWindow.outsideSelectedClient;
+            workspace.activeClient = mainWindow.selectedClientItem !== null ? mainWindow.selectedClientItem.client : mainWindow.outsideSelectedClient;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -75,7 +70,7 @@ Window {
         } else {
             mainWindow.requestActivate();
             mainWindow.activated = true;
-            mainWindow.selectedClient = null;
+            mainWindow.selectedClientItem = null;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -144,7 +139,7 @@ Window {
 
             // Get desktop windowId to show backgrounds
             // let screenModelIndex = clientsByScreen.index(currentScreen, 0);
-            // for (var currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
+            // for (let currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
             //     let clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
                 // let client = clientsByScreen.data(clientModelIndex);
                 // if (client.desktopWindow) { //} && client.activities.length === 1) {

@@ -14,6 +14,9 @@ Item {
     property bool big: false
     property int bigDesktopMargin: 40
 
+    property int clientsDecorationsHeight: big ? 22 : 0
+    property int clientsPadding: big ? 10 : 0
+
     onBigDesktopMarginChanged: {
         if (bigDesktopMargin === 0 && mainWindow.easingType === Easing.InExpo) {
             if (mainWindow.activated) {
@@ -27,7 +30,7 @@ Item {
 
     Behavior on bigDesktopMargin {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: bigDesktopMarginAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Rectangle {
@@ -65,28 +68,6 @@ Item {
                 PropertyChanges { target: colorizeRect; color: "#500055FF"; }
             }
         ]
-    }
-
-    HoverHandler {
-        id: desktopItemHoverHandler
-    }
-
-    TapHandler {
-        acceptedButtons: Qt.AllButtons
-
-        onTapped: {
-            if (mainWindow.clientTapped) {
-                mainWindow.clientTapped = false;
-                return;
-            }
-
-            if (big) {
-                mainWindow.selectedClient = null;
-                mainWindow.toggleActive();
-            } else {
-                workspace.currentDesktop = desktopIndex + 1;
-            }
-        }
     }
 
     DropArea {
@@ -149,12 +130,30 @@ Item {
         }
     }
 
-    Repeater {
-        id: clientsRepeater
-        model: clientsModel
+    Item {
+        id: clientsArea
+        anchors.fill: parent
+        anchors.margins: 10
 
-        onItemAdded: rearrangeClients();
-        onItemRemoved: rearrangeClients();
+        Repeater {
+            id: clientsRepeater
+            model: clientsModel
+
+            onItemAdded: rearrangeClients();
+            onItemRemoved: rearrangeClients();
+        }
+
+        HoverHandler {
+            id: desktopItemHoverHandler
+            enabled: big && !bigDesktopMarginAnimation.running && !mainWindow.dragging
+
+            onPointChanged: {
+                if (point.position.x !== 0 && point.position.y !== 0 && mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y))
+                    mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);
+            }
+
+            onHoveredChanged: if (!hovered) mainWindow.selectedClientItem = null;
+        }
     }
 
     function rearrangeClients() {
@@ -164,75 +163,45 @@ Item {
     }
 
     function calculateTransformations() {
+        if (clientsRepeater.count < 1) return;
+
         mainWindow.easingType = mainWindow.noAnimation;
         bigDesktops.anchors.topMargin = bigDesktops.parent.height / 6;
         bigDesktopMargin = 40;
 
-        if (clientsRepeater.count < 1) return;
-        let clientsCount = clientsRepeater.count;
-        const CLIENTS_PADDING = 10;
-        const DESKTOP_PADDING = 10;
-
-        const clientsAreaWidth = desktopItem.width - DESKTOP_PADDING * 2;
-        const clientsAreaHeight = desktopItem.height - DESKTOP_PADDING * 2;
-
         // Calculate the number of rows and columns
+        let clientsCount = clientsRepeater.count;
         let columns = Math.floor(Math.sqrt(clientsCount));
-        let addToColumns = Math.floor(clientsAreaWidth / clientsAreaHeight);
+        let addToColumns = Math.floor(clientsArea.width / clientsArea.height);
         (columns + addToColumns >= clientsCount) ? columns = clientsCount : columns += addToColumns;
         let rows = Math.ceil(clientsCount / columns);
         while ((columns - 1) * rows >= clientsCount) columns--;
 
         // Calculate client's geometry transformations
-        let gridItemWidth = Math.floor(clientsAreaWidth / columns);
-        let gridItemHeight = Math.floor(clientsAreaHeight / rows);
-        let newThumbWidth = desktopItem.big ? gridItemWidth - CLIENTS_PADDING * 2 : gridItemWidth;
-        let newThumbHeight = desktopItem.big ? gridItemHeight - CLIENTS_PADDING * 2 - mainWindow.clientDecorationsHeight : gridItemHeight;
-        let newThumbRatio = newThumbWidth / newThumbHeight;
+        let gridItemWidth = Math.floor(clientsArea.width / columns);
+        let gridItemHeight = Math.floor(clientsArea.height / rows);
+        let gridItemRatio = gridItemWidth / gridItemHeight;
 
         let currentClient = 0;
         for (var row = 0; row < rows; row++) {
             for (var column = 0; column < columns; column++) {
                 let clientItem = clientsRepeater.itemAt(currentClient);
-                let gridItemX = DESKTOP_PADDING + column * gridItemWidth;
-                let gridItemY = DESKTOP_PADDING + row * gridItemHeight;
-                let scale;
 
-                // this is here to avoid "non-NOTIFYable properties” warning
-                clientItem.originalX = clientItem.client.x - screenItem.x;
-                clientItem.originalY = clientItem.client.y - screenItem.y;
-                clientItem.originalWidth = clientItem.client.width;
-                clientItem.originalHeight = clientItem.client.height;
+                clientItem.originalX = clientItem.client.x - screenItem.x - clientsPadding;
+                clientItem.originalY = clientItem.client.y - screenItem.y - clientsDecorationsHeight - clientsPadding;
+                clientItem.originalWidth = clientItem.client.width + 2 * clientsPadding;
+                clientItem.originalHeight = clientItem.client.height + clientsDecorationsHeight + 2 * clientsPadding;
 
-                if (newThumbRatio > clientItem.originalWidth / clientItem.originalHeight)
-                    scale = newThumbHeight < clientItem.originalHeight ? newThumbHeight / clientItem.originalHeight : 1.0;
-                else
-                    scale = newThumbWidth < clientItem.originalWidth ? newThumbWidth / clientItem.originalWidth : 1.0;
-
-                clientItem.calculatedWidth = clientItem.originalWidth * scale;
-                clientItem.calculatedHeight = clientItem.originalHeight * scale;
-                clientItem.calculatedX = gridItemX + (gridItemWidth - clientItem.calculatedWidth) / 2;
-
-                if (desktopItem.big) {
-                    clientItem.clientDecorations.width = Math.max(clientItem.calculatedWidth * 0.8, gridItemWidth / 2);
-                    clientItem.clientDecorations.x = gridItemX + (gridItemWidth - clientItem.clientDecorations.width) / 2;
-                    clientItem.clientDecorations.y = gridItemY +
-                        (gridItemHeight - (clientItem.calculatedHeight + clientItem.clientDecorations.height)) / 2;
-
-                    clientItem.calculatedY = clientItem.clientDecorations.y + clientItem.clientDecorations.height;
-
-                    clientItem.selectedFrame.x = Math.min(clientItem.calculatedX, clientItem.clientDecorations.x) - CLIENTS_PADDING;
-                    clientItem.selectedFrame.y = clientItem.clientDecorations.y - CLIENTS_PADDING;
-                    clientItem.selectedFrame.width = Math.max(clientItem.calculatedWidth, clientItem.clientDecorations.width) + 2 * CLIENTS_PADDING;
-                    clientItem.selectedFrame.height = clientItem.clientDecorations.height + clientItem.calculatedHeight + 2 * CLIENTS_PADDING;
+                // calculate the scaling factor, avoiding windows bigger than original size
+                if (gridItemRatio > clientItem.originalWidth / clientItem.originalHeight) {
+                    clientItem.calculatedHeight = Math.min(gridItemHeight, clientItem.originalHeight);
+                    clientItem.calculatedWidth = clientItem.calculatedHeight / clientItem.originalHeight * clientItem.originalWidth;
                 } else {
-                    clientItem.calculatedY = gridItemY + (gridItemHeight - clientItem.calculatedHeight) / 2;
-
-                    clientItem.selectedFrame.x = clientItem.calculatedX;
-                    clientItem.selectedFrame.y = clientItem.calculatedY;
-                    clientItem.selectedFrame.width = clientItem.calculatedWidth;
-                    clientItem.selectedFrame.height = clientItem.calculatedHeight;
+                    clientItem.calculatedWidth = Math.min(gridItemWidth, clientItem.originalWidth);
+                    clientItem.calculatedHeight = clientItem.calculatedWidth / clientItem.originalWidth * clientItem.originalHeight;
                 }
+                clientItem.calculatedX = column * gridItemWidth + (gridItemWidth - clientItem.calculatedWidth) / 2;
+                clientItem.calculatedY = row * gridItemHeight + (gridItemHeight - clientItem.calculatedHeight) / 2;
 
                 currentClient++;
                 if (currentClient === clientsCount) {
@@ -249,10 +218,10 @@ Item {
         bigDesktopMargin = 40;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             let currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.clientThumbnail.x = currentClientItem.calculatedX;
-            currentClientItem.clientThumbnail.y = currentClientItem.calculatedY;
-            currentClientItem.clientThumbnail.width = currentClientItem.calculatedWidth;
-            currentClientItem.clientThumbnail.height = currentClientItem.calculatedHeight;
+            currentClientItem.x = currentClientItem.calculatedX;
+            currentClientItem.y = currentClientItem.calculatedY;
+            currentClientItem.width = currentClientItem.calculatedWidth;
+            currentClientItem.height = currentClientItem.calculatedHeight;
         }
     }
 
@@ -262,16 +231,10 @@ Item {
         bigDesktopMargin = 0;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             let currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.clientThumbnail.x = currentClientItem.originalX;
-            currentClientItem.clientThumbnail.y = currentClientItem.originalY;
-            currentClientItem.clientThumbnail.width = currentClientItem.originalWidth;
-            currentClientItem.clientThumbnail.height = currentClientItem.originalHeight;
+            currentClientItem.x = currentClientItem.originalX;
+            currentClientItem.y = currentClientItem.originalY;
+            currentClientItem.width = currentClientItem.originalWidth;
+            currentClientItem.height = currentClientItem.originalHeight;
         }
-    }
-
-    function isAnimating() {
-        for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++)
-            if (clientsRepeater.itemAt(currentClient).isAnimating) return true;
-        return false;
     }
 }
