@@ -26,6 +26,11 @@ After activate the script in *Kwin Scripts* window you can use the default regis
   
 You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute*. That way you can use it with *Easystroke*, for example.
 
+Mouse buttons:
+* Left button - Select window.
+* Middle button - Close window.
+* Right button - (Un)pin window.
+
 ## Notes
 
 * Developed and tested in *Plasma* 5.18, but **not ready for daily use**.
