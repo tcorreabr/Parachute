@@ -148,8 +148,20 @@ Item {
             enabled: big && !bigDesktopMarginAnimation.running && !mainWindow.dragging
 
             onPointChanged: {
-                if (point.position.x !== 0 && point.position.y !== 0 && mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y))
+                if (mainWindow.keyboardSelected) {
+                    mainWindow.keyboardSelected = false;
+                    mainWindow.pointKeyboardWasSelected = point.position;
+                    return;
+                }
+
+                if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y) &&
+                        point.position !== Qt.point(0, 0) &&
+                        (mainWindow.pointKeyboardWasSelected === null ||
+                        Math.abs(mainWindow.pointKeyboardWasSelected.x - point.position.x) > 3 ||
+                        Math.abs(mainWindow.pointKeyboardWasSelected.y - point.position.y) > 3)) {
                     mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);
+                    mainWindow.pointKeyboardWasSelected = null;
+                }
             }
 
             onHoveredChanged: if (!hovered) mainWindow.selectedClientItem = null;
@@ -185,6 +197,7 @@ Item {
         let currentClient = 0;
         for (var row = 0; row < rows; row++) {
             for (var column = 0; column < columns; column++) {
+                // FIXME sometimes clientItem is null (something related with yakuake or krunner?)
                 let clientItem = clientsRepeater.itemAt(currentClient);
 
                 clientItem.originalX = clientItem.client.x - screenItem.x - clientsPadding;

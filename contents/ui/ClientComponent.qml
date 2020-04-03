@@ -48,7 +48,7 @@ Item {
         imagePath: "widgets/viewitem"
         prefix: "hover"
         visible: big && !isAnimating && mainWindow.selectedClientItem === clientItem  && !mainWindow.dragging
-        opacity: 0.4
+        opacity: 0.5
     }
 
     Item {
@@ -94,30 +94,13 @@ Item {
                     id: closeButton
                     anchors.fill: parent
                     icon.name: "window-close"
-                    visible: selectedFrame.visible // selectedFrameHoverHandler.hovered && !mainWindow.dragging
+                    visible: selectedFrame.visible
                     hoverEnabled: false
                     radius: height / 2
                     focusPolicy: Qt.NoFocus
 
                     onClicked: clientItem.client.closeWindow();
                 }
-            }
-        }
-    }
-
-    Item {
-        id: dragPlaceholder
-        anchors.fill: parent
-        anchors.margins: desktopItem.clientsPadding
-        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
-
-        DragHandler {
-            id: myDragHandler
-            target: null
-
-            onActiveChanged: {
-                mainWindow.dragging = myDragHandler.active;
-                myDragHandler.active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
             }
         }
     }
@@ -146,6 +129,23 @@ Item {
                 Drag.hotSpot.y: clientThumbnail.height / 2
                 x: desktopItem.clientsPadding + myDragHandler.centroid.position.x - clientThumbnail.width / 2
                 y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + myDragHandler.centroid.position.y - clientThumbnail.height / 2
+            }
+        }
+    }
+
+    Item {
+        id: dragPlaceholder
+        anchors.fill: parent
+        anchors.margins: desktopItem.clientsPadding
+        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
+
+        DragHandler {
+            id: myDragHandler
+            target: null
+
+            onActiveChanged: {
+                mainWindow.dragging = myDragHandler.active;
+                myDragHandler.active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
             }
         }
     }

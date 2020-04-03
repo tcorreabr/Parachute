@@ -12,23 +12,49 @@ Window {
     y: mainWindow.activated ? 0 : -mainWindow.height * 2
 
     property bool activated: false
-    property bool configBlurBackground: true
     property bool dragging: false
     property bool workWithActivities: false // Waiting for write access to client.activities, for now always work with virtual desktops
-    property bool shouldRequestActivate: true
     property bool desktopsInitialized: false
-    property var selectedClientItem: null
-    property var outsideSelectedClient: null
+    property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) : workspace.currentDesktop - 1
+
+    // Config
+    property bool configBlurBackground: true
+
+    // Animations
     property real animationsDuration: units.longDuration + units.shortDuration * 2
     property int noAnimation: 0 // Const to disable animations
-    property int easingType
-    property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) : workspace.currentDesktop - 1
+    property int easingType: noAnimation
+
+    // Selection (with mouse or keyboard)
+    property var selectedClientItem: null
+    property var outsideSelectedClient: null
+    property var pointKeyboardWasSelected: null
+    property bool keyboardSelected: false
+    property bool shouldRequestActivate: true
 
     Item {
         id: keyboardHandler
 
         Keys.onPressed: {
-            if (event.key === Qt.Key_Escape && mainWindow.activated) toggleActive();
+            keyboardSelected = true;
+            switch (event.key) {
+                case Qt.Key_Escape:
+                    selectedClientItem = null;
+                    mainWindow.toggleActive();
+                    break;
+                case Qt.Key_Return:
+                    if (selectedClientItem !== null) mainWindow.toggleActive();
+                    break;
+                case Qt.Key_Home:
+                    mainWindow.selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                            bigDesktop.clientsRepeater.itemAt(0);
+                    break;
+                case Qt.Key_End:
+                    let lastBigDesktopsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater;
+                    let lastClientsRepeater = lastBigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+                    mainWindow.selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    break;
+            }
         }
     }
 

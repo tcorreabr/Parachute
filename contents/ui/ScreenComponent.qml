@@ -22,7 +22,7 @@ Item {
     PlasmaCore.WindowThumbnail {
         id: desktopThumbnail
         anchors.fill: parent
-        visible: winId !== 0
+        visible: desktopThumbnail.winId !== 0
         opacity: mainWindow.configBlurBackground ? 0 : 1
     }
     // }
@@ -31,7 +31,7 @@ Item {
         id: blurBackground
         anchors.fill: parent
         source: desktopThumbnail
-        radius: 48
+        radius: 64
         visible: desktopThumbnail.winId !== 0 && mainWindow.configBlurBackground
         // cached: true
     }
