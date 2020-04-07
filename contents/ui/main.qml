@@ -46,13 +46,47 @@ Window {
                     if (selectedClientItem !== null) mainWindow.toggleActive();
                     break;
                 case Qt.Key_Home:
-                    mainWindow.selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                    selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
                             bigDesktop.clientsRepeater.itemAt(0);
                     break;
                 case Qt.Key_End:
-                    let lastBigDesktopsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater;
-                    let lastClientsRepeater = lastBigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
-                    mainWindow.selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
+                            itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+                    selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    break;
+                case Qt.Key_Left:
+                    if (selectedClientItem === null) {
+                        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                                bigDesktop.clientsRepeater.itemAt(0);
+                    } else {
+                        selectNextClientOn(Enums.Position.Left);
+            }
+                    break;
+                case Qt.Key_Right:
+                    if (selectedClientItem === null) {
+                        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
+                                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+                        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    } else {
+                        selectNextClientOn(Enums.Position.Right);
+        }
+                    break;
+                case Qt.Key_Up:
+                    if (selectedClientItem === null) {
+                        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                                bigDesktop.clientsRepeater.itemAt(0);
+                    } else {
+                        selectNextClientOn(Enums.Position.Top);
+    }
+                    break;
+                case Qt.Key_Down:
+                    if (selectedClientItem === null) {
+                        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
+                                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+                        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    } else {
+                        selectNextClientOn(Enums.Position.Bottom);
+                    }
                     break;
             }
         }
@@ -86,7 +120,7 @@ Window {
 
         if (mainWindow.activated) {
             shouldRequestActivate = false;
-            workspace.activeClient = mainWindow.selectedClientItem !== null ? mainWindow.selectedClientItem.client : mainWindow.outsideSelectedClient;
+            workspace.activeClient = selectedClientItem !== null ? selectedClientItem.client : mainWindow.outsideSelectedClient;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -96,7 +130,7 @@ Window {
         } else {
             mainWindow.requestActivate();
             mainWindow.activated = true;
-            mainWindow.selectedClientItem = null;
+            selectedClientItem = null;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -121,6 +155,7 @@ Window {
         workspace.clientActivated.connect(clientActivated);
         workspace.numberScreensChanged.connect(function(count) {mainWindow.desktopsInitialized = false;});
         workspace.screenResized.connect(function(screen) {mainWindow.desktopsInitialized = false;});        
+        workspace.currentDesktopChanged.connect(function(desktop, client) {selectedClientItem = null;});
     }
 
     Component.onDestruction: {
@@ -128,6 +163,7 @@ Window {
     }
 
     function clientActivated(client) {
+        // The correct thing to do would be to use the client parameter but sometimes it doesn't seem to be with the right value
         if (workspace.activeClient !== null) {
             mainWindow.outsideSelectedClient = workspace.activeClient;
 
@@ -146,7 +182,7 @@ Window {
         shouldRequestActivate = true;
     }
 
-    // Get keyboard focus back when this script is activated and a client is activated externally
+    // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
         id: requestActivateTimer
         interval: 10; repeat: true; triggeredOnStart: false
@@ -185,5 +221,62 @@ Window {
             }
         }
         desktopsInitialized = true;
+    }
+
+    function selectNextClientOn(position) {
+        // Make the clients positions consider the screens positions.
+        // The clients centers will be used to calculate distance between clients.
+        let selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
+        let selectedClientItemY = selectedClientItem.y + screensRepeater.itemAt(selectedClientItem.client.screen).y;
+        let selectedClientItemXCenter = selectedClientItemX + selectedClientItem.width / 2;
+        let selectedClientItemYCenter = selectedClientItemY + selectedClientItem.height / 2;
+
+        let candidateClientItem = null;
+        let candidateClientDistance = Number.MAX_VALUE;
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            let currentScreenItem = screensRepeater.itemAt(currentScreen);
+            let currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+            for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
+                let currentClientItem = currentClientsRepeater.itemAt(currentClient);
+                let currentClientItemX = currentClientItem.x + currentScreenItem.x;
+                let currentClientItemY = currentClientItem.y + currentScreenItem.y;
+
+                let candidate = false;
+                switch (position) {
+                    case Enums.Position.Left:
+                        candidate = currentClientItemX + currentClientItem.width <= selectedClientItemX &&
+                            currentClientItemY <= selectedClientItemY + selectedClientItemY + selectedClientItem.height &&
+                            currentClientItemY + currentClientItemY + currentClientItem.height >= selectedClientItemY;
+                        break;
+                    case Enums.Position.Right:
+                        candidate = selectedClientItemX + selectedClientItem.width <= currentClientItemX &&
+                            currentClientItemY <= selectedClientItemY + selectedClientItemY + selectedClientItem.height &&
+                            currentClientItemY + currentClientItemY + currentClientItem.height >= selectedClientItemY;
+                        break;
+                    case Enums.Position.Top:
+                        candidate = currentClientItemY + currentClientItem.height <= selectedClientItemY &&
+                            currentClientItemX <= selectedClientItemX + selectedClientItemX + selectedClientItem.width &&
+                            currentClientItemX + currentClientItemX + currentClientItem.width >= selectedClientItemX;
+                        break;
+                    case Enums.Position.Bottom:
+                        candidate = selectedClientItemY + selectedClientItem.height <= currentClientItemY &&
+                            currentClientItemX <= selectedClientItemX + selectedClientItemX + selectedClientItem.width &&
+                            currentClientItemX + currentClientItemX + currentClientItem.width >= selectedClientItemX;
+                        break;
+                }
+
+                if (candidate) {
+                    let currentClientItemXCenter = currentClientItemX + currentClientItem.width / 2;
+                    let currentClientItemYCenter = currentClientItemY + currentClientItem.height / 2;
+                    let currentClientDistance = Math.hypot(Math.abs(currentClientItemXCenter - selectedClientItemXCenter),
+                            Math.abs(currentClientItemYCenter - selectedClientItemYCenter));
+                    if (currentClientDistance < candidateClientDistance) {
+                        candidateClientDistance = currentClientDistance;
+                        candidateClientItem = currentClientItem;
+                    }
+                }
+            }
+        }
+        if (candidateClientItem !== null) selectedClientItem = candidateClientItem;
     }
 }

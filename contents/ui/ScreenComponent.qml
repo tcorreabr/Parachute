@@ -69,7 +69,7 @@ Item {
 
                     TapHandler {
                         acceptedButtons: Qt.LeftButton
-                        onTapped: workspace.currentDesktop = desktopIndex + 1;
+                        onTapped: workspace.currentDesktop = model.index + 1;
                     }
                 }
             }

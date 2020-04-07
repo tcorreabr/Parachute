@@ -195,9 +195,9 @@ Item {
         let gridItemRatio = gridItemWidth / gridItemHeight;
 
         let currentClient = 0;
-        for (var row = 0; row < rows; row++) {
-            for (var column = 0; column < columns; column++) {
-                // FIXME sometimes clientItem is null (something related with yakuake or krunner?)
+        for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+                // TODO FIXME sometimes clientItem is null (something related with yakuake or krunner?)
                 let clientItem = clientsRepeater.itemAt(currentClient);
 
                 clientItem.originalX = clientItem.client.x - screenItem.x - clientsPadding;
@@ -218,8 +218,8 @@ Item {
 
                 currentClient++;
                 if (currentClient === clientsCount) {
-                    row = rows;
-                    column = columns;
+                    column = columns; // exit inner for
+                    row = rows; // exit outer for
                 }
             }
         }
