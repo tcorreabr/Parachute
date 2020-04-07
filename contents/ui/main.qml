@@ -168,7 +168,7 @@ Window {
             mainWindow.outsideSelectedClient = workspace.activeClient;
 
             if (workspace.activeClient.desktopWindow) {
-                let currentScreenItem = screensRepeater.itemAt(workspace.activeScreen);
+                let currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
                 if (currentScreenItem.desktopThumbnail.winId === 0)
                     currentScreenItem.desktopThumbnail.winId = client.windowId;
             }
