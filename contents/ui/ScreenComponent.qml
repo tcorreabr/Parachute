@@ -152,4 +152,8 @@ Item {
                     : workspace.currentDesktop = currentIndex + 1;
         }
     }
+
+    WheelHandler {
+        onWheel: event.angleDelta.y > 0 ? workspace.currentDesktop++ : workspace.currentDesktop--;
+    }
 }
