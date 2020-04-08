@@ -19,6 +19,7 @@ Window {
 
     // Config
     property bool configBlurBackground: true
+    property bool configShowDesktopBarBackground: true
 
     // Animations
     property real animationsDuration: units.longDuration + units.shortDuration * 2

@@ -36,36 +36,41 @@ Item {
         // cached: true
     }
 
-    Item {
+    Rectangle { // To apply some transparency without interfere with children transparency
+        id: desktopsBarBackground
+        anchors.fill: desktopsBar
+        color: "black"
+        opacity: 0.1
+        visible: mainWindow.configShowDesktopBarBackground
+    }
+
+    ScrollView {
         id: desktopsBar
         height: parent.height / 6
         anchors.bottom: bigDesktops.top
         anchors.right: parent.right
         anchors.left: parent.left
-
-        Rectangle { // To apply some transparency without interfere with children transparency
-            id: desktopsBarBackground
-            anchors.fill: parent
-            color: "black"
-            opacity: 0.1
-        }
+        contentWidth: desktopsWrapper.width
+        clip: true
 
         Item { // To centralize children
             id: desktopsWrapper
-            width: childrenRect.width
-            height: childrenRect.height
-            anchors.horizontalCenter: parent.horizontalCenter
+            width: childrenRect.width + 15
+            height: childrenRect.height + 15
+            x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
+            // anchors.horizontalCenter: parent.horizontalCenter
+            // anchors.verticalCenter: parent.verticalCenter
 
             Repeater {
                 id: desktopsBarRepeater
                 model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
 
                 DesktopComponent {
-                    x: 15 + index * (width + 15)
+                    x: 15 + model.index * (width + 15)
                     y: 15
                     width: (height / screenItem.height) * screenItem.width
                     height: desktopsBar.height - 30
-                    activity: mainWindow.workWithActivities ? workspace.activities[index] : ""
+                    activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
 
                     TapHandler {
                         acceptedButtons: Qt.LeftButton
