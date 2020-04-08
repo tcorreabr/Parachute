@@ -22,7 +22,7 @@ Window {
     property bool configShowDesktopBarBackground: true
 
     // Animations
-    property real animationsDuration: units.longDuration + units.shortDuration * 2
+    property real animationsDuration: 2 * units.longDuration - units.shortDuration
     property int noAnimation: 0 // Const to disable animations
     property int easingType: noAnimation
 

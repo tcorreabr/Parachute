@@ -152,7 +152,7 @@ Item {
 
     onClientChanged: {
         if (client !== null && client !== undefined) {
-            // client.geometryChanged.connect(function() {mainWindow.desktopsInitialized = false;});
+            client.moveResizedChanged.connect(function() {mainWindow.desktopsInitialized = false;} );
             // client.activitiesChanged.connect(function() {desktopItem.clientsModel.update();});
         }
     }
