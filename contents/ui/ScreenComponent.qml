@@ -154,6 +154,40 @@ Item {
     }
 
     WheelHandler {
-        onWheel: event.angleDelta.y > 0 ? workspace.currentDesktop++ : workspace.currentDesktop--;
+        property int wheelDelta: 0
+
+        function scrollByWheel(wheelDelta, eventDelta) {
+            // magic number 120 is common "one click"
+            // See: http://qt-project.org/doc/qt-5/qml-qtquick-wheelevent.html#angleDelta-prop
+            wheelDelta += eventDelta;
+
+            var increment = 0;
+
+            while (wheelDelta >= 120) {
+                wheelDelta -= 120;
+                increment++;
+            }
+
+            while (wheelDelta <= -120) {
+                wheelDelta += 120;
+                increment--;
+            }
+
+            while (increment != 0) {
+                if (increment < 0) {
+                    workspace.currentDesktop++;
+                } else {
+                    workspace.currentDesktop--;
+                }
+
+                increment += (increment < 0) ? 1 : -1;
+            }
+
+            return wheelDelta;
+        }
+
+        onWheel: {
+            wheelDelta = scrollByWheel(wheelDelta, event.angleDelta.y);
+        }
     }
 }
