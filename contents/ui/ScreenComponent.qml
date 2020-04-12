@@ -160,7 +160,7 @@ Item {
             wheelDelta += event.angleDelta.y;
 
             if (wheelDelta >= 120 || wheelDelta <= -120) {
-                wheelDelta > 0 ? workspace.currentDesktop++ : workspace.currentDesktop--;
+                wheelDelta > 0 ? workspace.currentDesktop-- : workspace.currentDesktop++;
                 wheelDelta = 0;
             }
         }
