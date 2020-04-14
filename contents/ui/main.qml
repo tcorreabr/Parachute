@@ -205,6 +205,7 @@ Window {
             // for (let currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
             //     let clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
                 // let client = clientsByScreen.data(clientModelIndex);
+                // ^^^ this is the line that causes kwin to crash. I don't know why. Maybe some internal bug in data method? ^^^
                 // if (client.desktopWindow) { //} && client.activities.length === 1) {
                 //     // let activityIndex = workspace.activities.indexOf(client.activities[0]);
                 //     screensRepeater.itemAt(currentScreen).desktopThumbnail.winId = client.windowId;
