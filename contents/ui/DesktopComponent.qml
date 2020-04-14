@@ -200,6 +200,9 @@ Item {
                 // TODO FIXME sometimes clientItem is null (something related with yakuake or krunner?)
                 let clientItem = clientsRepeater.itemAt(currentClient);
 
+                // client.noBorder is non-NOTIFYable, so we'll update noBorderMargin here
+                clientItem.noBorderMargin = clientItem.client.noBorder ? big ? 18 : 4 : 0;
+
                 clientItem.originalX = clientItem.client.x - screenItem.x - clientsPadding;
                 clientItem.originalY = clientItem.client.y - screenItem.y - clientsDecorationsHeight - clientsPadding;
                 clientItem.originalWidth = clientItem.client.width + 2 * clientsPadding;

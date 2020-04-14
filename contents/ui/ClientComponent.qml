@@ -11,6 +11,7 @@ Item {
 
     property bool isAnimating: xAnimation.running || yAnimation.running || widthAnimation.running || heightAnimation.running
     property var client: model.client
+    property int noBorderMargin
 
     property real originalX
     property real originalY
@@ -108,8 +109,8 @@ Item {
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
         anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
-        anchors.margins: desktopItem.clientsPadding
-        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
+        anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
+        anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client.internalId
         clipTo: screenItem
         clip: true
