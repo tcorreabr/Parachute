@@ -15,14 +15,15 @@ Window {
     property bool dragging: false
     property bool workWithActivities: false // Waiting for write access to client.activities, for now always work with virtual desktops
     property bool desktopsInitialized: false
-    property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) : workspace.currentDesktop - 1
+    property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
+            workspace.currentDesktop - 1
 
     // Config
     property bool configBlurBackground: true
     property bool configShowDesktopBarBackground: true
 
     // Animations
-    property real animationsDuration: 150
+    property real animationsDuration: 160
     property int noAnimation: 0 // Const to disable animations
     property int easingType: noAnimation
 
@@ -47,47 +48,22 @@ Window {
                     if (selectedClientItem !== null) mainWindow.toggleActive();
                     break;
                 case Qt.Key_Home:
-                    selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
-                            bigDesktop.clientsRepeater.itemAt(0);
+                    selectFirstClient();
                     break;
                 case Qt.Key_End:
-                    let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                            itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
-                    selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+                    selectLastClient();
                     break;
                 case Qt.Key_Left:
-                    if (selectedClientItem === null) {
-                        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
-                                bigDesktop.clientsRepeater.itemAt(0);
-                    } else {
-                        selectNextClientOn(Enums.Position.Left);
-            }
+                    selectedClientItem === null ? selectFirstClient() : selectNextClientOn(Enums.Position.Left);
                     break;
                 case Qt.Key_Right:
-                    if (selectedClientItem === null) {
-                        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
-                        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
-                    } else {
-                        selectNextClientOn(Enums.Position.Right);
-        }
+                    selectedClientItem === null ? selectLastClient() : selectNextClientOn(Enums.Position.Right);
                     break;
                 case Qt.Key_Up:
-                    if (selectedClientItem === null) {
-                        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
-                                bigDesktop.clientsRepeater.itemAt(0);
-                    } else {
-                        selectNextClientOn(Enums.Position.Top);
-    }
+                    selectedClientItem === null ? selectFirstClient() : selectNextClientOn(Enums.Position.Top);
                     break;
                 case Qt.Key_Down:
-                    if (selectedClientItem === null) {
-                        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
-                        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
-                    } else {
-                        selectNextClientOn(Enums.Position.Bottom);
-                    }
+                    selectedClientItem === null ? selectLastClient() : selectNextClientOn(Enums.Position.Bottom);
                     break;
             }
         }
@@ -101,8 +77,8 @@ Window {
 
     KWinComponents.ClientModelByScreenAndDesktop {
         id: clientsByScreenAndDesktop
-        exclusions: KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion
-                | KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion
+        exclusions: KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion
     }
 
     Repeater {
@@ -225,6 +201,17 @@ Window {
         desktopsInitialized = true;
     }
 
+    function selectFirstClient() {
+        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                bigDesktop.clientsRepeater.itemAt(0);
+    }
+
+    function selectLastClient() {
+        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
+                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+    }
+
     function selectNextClientOn(position) {
         // Make the clients positions consider the screens positions.
         // The clients centers will be used to calculate distance between clients.
@@ -272,6 +259,7 @@ Window {
                     let currentClientItemYCenter = currentClientItemY + currentClientItem.height / 2;
                     let currentClientDistance = Math.hypot(Math.abs(currentClientItemXCenter - selectedClientItemXCenter),
                             Math.abs(currentClientItemYCenter - selectedClientItemYCenter));
+
                     if (currentClientDistance < candidateClientDistance) {
                         candidateClientDistance = currentClientDistance;
                         candidateClientItem = currentClientItem;
