@@ -122,8 +122,8 @@ Window {
     }
 
     Component.onCompleted: {
-        mainWindow.width = workspace.displayWidth;
-        mainWindow.height = workspace.displayHeight;
+        mainWindow.width = workspace.displaySize.width;
+        mainWindow.height = workspace.displaySize.height;
 
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", toggleActive);
@@ -167,6 +167,9 @@ Window {
     }
 
     function updateAllDesktops() {
+        mainWindow.width = workspace.displaySize.width;
+        mainWindow.height = workspace.displaySize.height;
+
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             // Kwin.ScreenArea not working here, but Kwin.ScreenArea === 7
             let screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
