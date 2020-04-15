@@ -150,7 +150,7 @@ Window {
         mainWindow.height = workspace.displayHeight;
 
         keyboardHandler.forceActiveFocus();
-        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Alt+W", toggleActive);
+        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", toggleActive);
         clientActivated(workspace.activeClient);
 
         workspace.clientActivated.connect(clientActivated);

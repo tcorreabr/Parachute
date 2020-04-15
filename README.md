@@ -22,7 +22,7 @@ The most promising feature isn't implemented yet. I think that the possibility o
 
 ## Usage
 
-After activate the script in *Kwin Scripts* window you can use the default registered global shortcut (Ctrl+Alt+W) to show/hide *Parachute*.
+After activate the script in *Kwin Scripts* window you can use the default registered global shortcut **Super+Ctrl+D (Meta+Ctrl+D)** to show/hide *Parachute*.
   
 You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute*. That way you can use it with *Easystroke*, for example.
 
@@ -38,18 +38,16 @@ Mouse buttons:
 * If you are going to contribute to the code, please contact me first so that we don't have duplicate work. Unless it's a small contribution.
 * If you are using "Slide" animation to switch desktops, you may want to switch to "Desktop Cube Animation" to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
 * For now, you have to [click on a empty desktop to show the backgrounds](https://github.com/tcorreabr/Parachute/issues/6).
-* You can use Kwin global shortcuts normally while using this script. To navigate between your desktops for example.
+* You can use KWin global shortcuts normally while using this script. To navigate between your desktops for example.
 
 ## Possible improvements
 
-* Response to keyboard events.
-* Insert, move and delete *Plasma Activities* and *Virtual Desktops*.
-* Complete *Plasma Activities* support.
 * Config dialog with internationalization support.
+* Insert, move and delete *Plasma Activities* and *Virtual Desktops*.
 * Option to work with *Plasma Activities* OR *Virtual Desktops*.
 * Option to top/left/right/bottom desktops bar positioning.
 * Option to enable/disable background blur.
 * More plasma theming support.
-* Click on desktops bar to animate it to fullscreen (to simulate *Kwin's Desktop Grid* effect).
-* One more shortcut to open/hide the script in this *Desktop Grid* mode.
+* Click on desktops bar to animate it to fullscreen (simulating *Kwin's Desktop Grid* effect).
+* One more shortcut to show/hide the script in this *Desktop Grid* like mode.
 
