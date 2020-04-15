@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.14
 
 Item {
     id: desktopItem
-    visible: !big || Math.abs(desktopIndex - mainWindow.currentActivityOrDesktop) < 2
+    visible: !big || desktopIndex === mainWindow.currentActivityOrDesktop
 
     property alias clientsRepeater: clientsRepeater
 
@@ -20,7 +20,7 @@ Item {
     onBigDesktopMarginChanged: {
         if (bigDesktopMargin === 0 && mainWindow.easingType === Easing.InExpo) {
             if (mainWindow.activated) {
-                for (var currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
+                for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                     screensRepeater.itemAt(currentScreen).visible = false;
                 mainWindow.activated = false;
             }
@@ -122,8 +122,8 @@ Item {
         }
 
         function update() {
-            for (var i = 0; i < items.count; ++i) {
-                var item = items.get(i);
+            for (let i = 0; i < items.count; ++i) {
+                let item = items.get(i);
                 if (item.inVisible !== filterItem(item))
                     item.inVisible = !item.inVisible;
             }
