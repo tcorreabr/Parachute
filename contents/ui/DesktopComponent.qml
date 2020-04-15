@@ -68,6 +68,11 @@ Item {
                 PropertyChanges { target: colorizeRect; color: "#500055FF"; }
             }
         ]
+
+        HoverHandler {
+            id: desktopItemHoverHandler
+            enabled: !big
+        }
     }
 
     DropArea {
@@ -144,7 +149,6 @@ Item {
         }
 
         HoverHandler {
-            id: desktopItemHoverHandler
             enabled: big && !bigDesktopMarginAnimation.running && !mainWindow.dragging
 
             onPointChanged: {
