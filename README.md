@@ -22,7 +22,7 @@ The most promising feature isn't implemented yet. I think that the possibility o
 
 ## Usage
 
-After activate the script in *Kwin Scripts* window you can use the default registered global shortcut **Super+Ctrl+D (Meta+Ctrl+D)** to show/hide *Parachute*.
+After activate the script in *Kwin Scripts* window you can use the default registered global shortcut **Ctrl+Super+D (Ctrl+Meta+D)** to show/hide *Parachute*.
   
 You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute*. That way you can use it with *Easystroke*, for example.
 
