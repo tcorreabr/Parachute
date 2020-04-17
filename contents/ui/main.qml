@@ -107,7 +107,6 @@ Window {
         } else {
             mainWindow.requestActivate();
             mainWindow.activated = true;
-            selectedClientItem = null;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -126,7 +125,7 @@ Window {
         mainWindow.height = workspace.displaySize.height;
 
         keyboardHandler.forceActiveFocus();
-        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", toggleActive);
+        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
 
         workspace.clientActivated.connect(clientActivated);
