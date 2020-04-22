@@ -21,9 +21,10 @@ Window {
     // Config
     property bool configBlurBackground: true
     property bool configShowDesktopBarBackground: true
+    property bool configShowWindowTitles: true
 
     // Animations
-    property real animationsDuration: 250 //units.longDuration * 2
+    property real animationsDuration: 230 //units.longDuration * 2
     property int noAnimation: 0 // Const to disable animations
     property int easingType: noAnimation
 
@@ -64,6 +65,9 @@ Window {
                     break;
                 case Qt.Key_Down:
                     selectedClientItem === null ? selectLastClient() : selectNextClientOn(Enums.Position.Bottom);
+                    break;
+                case Qt.Key_F5:
+                    kwinReconfigure.call();
                     break;
             }
         }
@@ -106,12 +110,12 @@ Window {
             }
         } else {
             mainWindow.requestActivate();
-            mainWindow.activated = true;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(mainWindow.noAnimation);
             }
+            mainWindow.activated = true;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.visible = true;
@@ -124,6 +128,7 @@ Window {
         mainWindow.width = workspace.displaySize.width;
         mainWindow.height = workspace.displaySize.height;
 
+        loadConfig();
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
@@ -158,11 +163,27 @@ Window {
         shouldRequestActivate = true;
     }
 
+    KWinComponents.DBusCall {
+        id: kwinReconfigure
+        service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
+        onFinished: delayedLoadConfig.start();
+    }
+
     // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
-        id: requestActivateTimer
-        interval: 10; repeat: true; triggeredOnStart: false
+        id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: false
         onTriggered: mainWindow.requestActivate();
+    }
+
+    Timer {
+        id: delayedLoadConfig; interval: 1000; repeat: false; triggeredOnStart: false
+        onTriggered: loadConfig();
+    }
+
+    function loadConfig() {
+        configBlurBackground = KWin.readConfig("blurBackground", true);
+        configShowDesktopBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
+        configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
     }
 
     function updateAllDesktops() {

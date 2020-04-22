@@ -59,7 +59,7 @@ Item {
         width: clientThumbnail.width * 0.8
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
-        visible: big && !isAnimating && !clientThumbnail.Drag.active
+        visible: big && mainWindow.configShowWindowTitles && !isAnimating && !clientThumbnail.Drag.active
 
         RowLayout {
             id: rowLayout

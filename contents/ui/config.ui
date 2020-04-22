@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KWin::ParachuteConfigForm</class>
+ <widget class="QWidget" name="KWin::ParachuteConfigForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>460</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="kcfg_blurBackground">
+     <property name="text">
+      <string>Blur background</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="kcfg_showDesktopsBarBackground">
+     <property name="text">
+      <string>Show desktops bar background</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="kcfg_showWindowTitles">
+     <property name="text">
+      <string>Show window titles</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>kcfg_blurBackground</tabstop>
+  <tabstop>kcfg_showDesktopsBarBackground</tabstop>
+  <tabstop>kcfg_showWindowTitles</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

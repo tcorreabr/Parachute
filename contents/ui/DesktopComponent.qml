@@ -14,7 +14,7 @@ Item {
     property bool big: false
     property int bigDesktopMargin: 40
 
-    property int clientsDecorationsHeight: big ? 22 : 0
+    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 22 : 0
     property int clientsPadding: big ? 10 : 0
 
     onBigDesktopMarginChanged: {
