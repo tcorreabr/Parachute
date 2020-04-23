@@ -151,10 +151,10 @@ Item {
         }
     }
 
-    onClientChanged: {
-        if (client !== null && client !== undefined) {
-            client.moveResizedChanged.connect(function() {mainWindow.desktopsInitialized = false;} );
-            // client.activitiesChanged.connect(function() {desktopItem.clientsModel.update();});
-        }
+    Connections {
+        target: client
+        
+        onMoveResizedChanged: mainWindow.desktopsInitialized = false;
+        //onActivitiesChanged: desktopItem.clientsModel.update();
     }
 }

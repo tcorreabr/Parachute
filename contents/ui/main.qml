@@ -92,6 +92,15 @@ Window {
         ScreenComponent {}
     }
 
+    Connections {
+        target: workspace
+        
+        onClientActivated: clientActivated();
+        onNumberScreensChanged: mainWindow.desktopsInitialized = false;
+        onScreenResized: mainWindow.desktopsInitialized = false;
+        onCurrentDesktopChanged: mainWindow.selectedClientItem = null;
+    }
+
     function toggleActive() {
         if (!mainWindow.desktopsInitialized) updateAllDesktops();
 
@@ -132,15 +141,6 @@ Window {
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
-
-        workspace.clientActivated.connect(clientActivated);
-        workspace.numberScreensChanged.connect(function(count) {mainWindow.desktopsInitialized = false;});
-        workspace.screenResized.connect(function(screen) {mainWindow.desktopsInitialized = false;});        
-        workspace.currentDesktopChanged.connect(function(desktop, client) {selectedClientItem = null;});
-    }
-
-    Component.onDestruction: {
-        workspace.clientActivated.disconnect(clientActivated);
     }
 
     function clientActivated(client) {
@@ -151,7 +151,7 @@ Window {
             if (workspace.activeClient.desktopWindow) {
                 let currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
                 if (currentScreenItem.desktopThumbnail.winId === 0)
-                    currentScreenItem.desktopThumbnail.winId = client.windowId;
+                    currentScreenItem.desktopThumbnail.winId = workspace.activeClient.windowId;
             }
 
             // Doesn't requestActivate() if the client was selected in this script and the closing animation is running
