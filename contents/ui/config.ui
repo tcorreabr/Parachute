@@ -41,12 +41,23 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="kcfg_showNotificationWindows">
+     <property name="text">
+      <string>Show notification windows</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>kcfg_blurBackground</tabstop>
   <tabstop>kcfg_showDesktopsBarBackground</tabstop>
   <tabstop>kcfg_showWindowTitles</tabstop>
+  <tabstop>kcfg_showNotificationWindows</tabstop>
  </tabstops>
  <resources/>
  <connections/>

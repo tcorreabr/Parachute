@@ -76,13 +76,10 @@ Window {
     // This model will be used for when we work with activities. Currently there is no ClientModelByScreenAndActivity
     KWinComponents.ClientModelByScreen {
         id: clientsByScreen
-        exclusions: KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion
     }
 
     KWinComponents.ClientModelByScreenAndDesktop {
         id: clientsByScreenAndDesktop
-        exclusions: KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
-                KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion
     }
 
     Repeater {
@@ -184,6 +181,20 @@ Window {
         configBlurBackground = KWin.readConfig("blurBackground", true);
         configShowDesktopBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
+
+        if (KWin.readConfig("showNotificationWindows", true)) {
+            clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion;
+
+            clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                    KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion;
+        } else {
+            clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                    KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
+
+            clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                    KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
+                    KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
+        }
     }
 
     function updateAllDesktops() {

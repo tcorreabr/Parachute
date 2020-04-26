@@ -17,5 +17,9 @@
 		  <label>Show window titles</label>
 		  <default>true</default>
 		</entry>
+		<entry name="showNotificationWindows" type="bool">
+		  <label>Show notification windows</label>
+		  <default>true</default>
+		</entry>
     </group>
 </kcfg>
