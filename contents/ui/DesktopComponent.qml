@@ -58,7 +58,6 @@ Item {
         source: screenItem.desktopThumbnail
         maskSource: colorBackground // has to be opaque
         visible: !big && screenItem.desktopThumbnail.thumbnailAvailable
-        // cached: true
     }
 
     Rectangle {
@@ -165,17 +164,17 @@ Item {
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
                     mainWindow.keyboardSelected = false;
-                    mainWindow.pointKeyboardWasSelected = point.position;
+                    mainWindow.pointKeyboardSelected = point.position;
                     return;
                 }
 
                 if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y) &&
                         point.position !== Qt.point(0, 0) &&
-                        (mainWindow.pointKeyboardWasSelected === null ||
-                        Math.abs(mainWindow.pointKeyboardWasSelected.x - point.position.x) > 3 ||
-                        Math.abs(mainWindow.pointKeyboardWasSelected.y - point.position.y) > 3)) {
+                        (mainWindow.pointKeyboardSelected === null ||
+                        Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
+                        Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
                     mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);
-                    mainWindow.pointKeyboardWasSelected = null;
+                    mainWindow.pointKeyboardSelected = null;
                 }
             }
 

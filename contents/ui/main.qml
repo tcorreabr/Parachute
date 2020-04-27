@@ -32,7 +32,7 @@ Window {
     // Selection (with mouse or keyboard)
     property var selectedClientItem: null
     property var outsideSelectedClient: null
-    property var pointKeyboardWasSelected: null
+    property var pointKeyboardSelected: null
     property bool keyboardSelected: false
     property bool shouldRequestActivate: true
 
@@ -100,6 +100,33 @@ Window {
         onCurrentDesktopChanged: mainWindow.selectedClientItem = null;
     }
 
+    KWinComponents.DBusCall {
+        id: kwinReconfigure
+        service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
+        onFinished: delayedLoadConfig.start();
+    }
+
+    // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
+    Timer {
+        id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: false
+        onTriggered: mainWindow.requestActivate();
+    }
+
+    Timer {
+        id: delayedLoadConfig; interval: 1000; repeat: false; triggeredOnStart: false
+        onTriggered: loadConfig();
+    }
+
+    Component.onCompleted: {
+        mainWindow.width = workspace.displaySize.width;
+        mainWindow.height = workspace.displaySize.height;
+
+        loadConfig();
+        keyboardHandler.forceActiveFocus();
+        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
+        clientActivated(workspace.activeClient);
+    }
+
     function toggleActive() {
         if (!mainWindow.desktopsInitialized) updateAllDesktops();
 
@@ -132,16 +159,6 @@ Window {
         }
     }
 
-    Component.onCompleted: {
-        mainWindow.width = workspace.displaySize.width;
-        mainWindow.height = workspace.displaySize.height;
-
-        loadConfig();
-        keyboardHandler.forceActiveFocus();
-        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
-        clientActivated(workspace.activeClient);
-    }
-
     function clientActivated(client) {
         // The correct thing to do would be to use the client parameter but sometimes it doesn't seem to be with the right value
         if (workspace.activeClient !== null) {
@@ -160,23 +177,6 @@ Window {
             requestActivateTimer.stop();
         }
         shouldRequestActivate = true;
-    }
-
-    KWinComponents.DBusCall {
-        id: kwinReconfigure
-        service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
-        onFinished: delayedLoadConfig.start();
-    }
-
-    // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
-    Timer {
-        id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: false
-        onTriggered: mainWindow.requestActivate();
-    }
-
-    Timer {
-        id: delayedLoadConfig; interval: 1000; repeat: false; triggeredOnStart: false
-        onTriggered: loadConfig();
     }
 
     function loadConfig() {

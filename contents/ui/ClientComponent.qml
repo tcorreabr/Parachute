@@ -5,9 +5,7 @@ import org.kde.kwin 2.0 as KWinComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 Item {
-// Rectangle {
     id: clientItem
-    // color: "brown"
 
     property bool isAnimating: xAnimation.running || yAnimation.running || widthAnimation.running || heightAnimation.running
     property var client: model.client
@@ -48,7 +46,7 @@ Item {
         anchors.fill : parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: big && !isAnimating && mainWindow.selectedClientItem === clientItem  && !mainWindow.dragging
+        visible: big && !isAnimating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.5
     }
 
@@ -119,7 +117,6 @@ Item {
         antialiasing: false
         smooth: false
         // fillColor: "green"
-        // visible: mainWindow.activated
         
         states: State {
             when: clientThumbnail.Drag.active
