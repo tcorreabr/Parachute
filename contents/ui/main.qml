@@ -71,6 +71,7 @@ Window {
                     kwinReconfigure.call();
                     break;
             }
+            event.accepted = true;
         }
     }
 
