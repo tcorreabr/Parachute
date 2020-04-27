@@ -32,6 +32,16 @@
     </widget>
    </item>
    <item row="2" column="0">
+    <widget class="QCheckBox" name="kcfg_showDesktopShadows">
+     <property name="text">
+      <string>Show desktop shadows</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QCheckBox" name="kcfg_showWindowTitles">
      <property name="text">
       <string>Show window titles</string>
@@ -41,7 +51,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QCheckBox" name="kcfg_showNotificationWindows">
      <property name="text">
       <string>Show notification windows</string>
@@ -56,6 +66,7 @@
  <tabstops>
   <tabstop>kcfg_blurBackground</tabstop>
   <tabstop>kcfg_showDesktopsBarBackground</tabstop>
+  <tabstop>kcfg_showDesktopShadows</tabstop>
   <tabstop>kcfg_showWindowTitles</tabstop>
   <tabstop>kcfg_showNotificationWindows</tabstop>
  </tabstops>

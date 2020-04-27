@@ -22,6 +22,7 @@ Window {
     property bool configBlurBackground: true
     property bool configShowDesktopBarBackground: true
     property bool configShowWindowTitles: true
+    property bool configShowDesktopShadows: false
 
     // Animations
     property real animationsDuration: 230 //units.longDuration * 2
@@ -180,6 +181,7 @@ Window {
     function loadConfig() {
         configBlurBackground = KWin.readConfig("blurBackground", true);
         configShowDesktopBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
+        configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
 
         if (KWin.readConfig("showNotificationWindows", true)) {

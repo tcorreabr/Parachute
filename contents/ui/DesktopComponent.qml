@@ -41,6 +41,17 @@ Item {
         radius: 10
     }
 
+    DropShadow {
+        anchors.fill: colorBackground
+        horizontalOffset: 3
+        verticalOffset: 3
+        radius: 8.0
+        samples: 17
+        color: "#80000000"
+        visible: !big && mainWindow.configShowDesktopShadows
+        source: colorBackground
+    }
+
     OpacityMask {
         id: thumbBackground
         anchors.fill: parent
