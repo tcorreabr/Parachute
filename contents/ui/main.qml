@@ -1,6 +1,6 @@
-import QtQuick 2.14
-import QtQuick.Window 2.14
-import QtQuick.Controls 2.14
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtQuick.Controls 2.12
 import org.kde.kwin 2.0 as KWinComponents
 
 Window {
@@ -13,6 +13,7 @@ Window {
 
     property bool activated: false
     property bool dragging: false
+    property real qtVersion
     property bool workWithActivities: false // Waiting for write access to client.activities, for now always work with virtual desktops
     property bool desktopsInitialized: false
     property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
@@ -101,6 +102,17 @@ Window {
     }
 
     KWinComponents.DBusCall {
+        id: kwinInfo
+        service: "org.kde.KWin"; path: "/KWin"; method: "supportInformation"
+
+        onFinished: {
+            let regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
+            let match = regexpNames.exec(returnValue[0]);
+            if (match) mainWindow.qtVersion = match[1];
+        }
+    }
+
+    KWinComponents.DBusCall {
         id: kwinReconfigure
         service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
         onFinished: delayedLoadConfig.start();
@@ -123,6 +135,7 @@ Window {
 
         loadConfig();
         keyboardHandler.forceActiveFocus();
+        kwinInfo.call();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
     }
@@ -212,6 +225,9 @@ Window {
             currentScreenItem.y = screenRect.y;
             currentScreenItem.width = screenRect.width;
             currentScreenItem.height = screenRect.height;
+
+            if (mainWindow.qtVersion >= 5.14 && currentScreenItem.children.length < 6)
+                Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
 
             // Get desktop windowId to show backgrounds
             // let screenModelIndex = clientsByScreen.index(currentScreen, 0);

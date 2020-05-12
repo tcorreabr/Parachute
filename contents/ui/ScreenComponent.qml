@@ -1,6 +1,6 @@
-import QtQuick 2.14
-import QtQuick.Controls 2.14
-import QtGraphicalEffects 1.14
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+import QtGraphicalEffects 1.12
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 Item {
@@ -150,21 +150,6 @@ Item {
         onCurrentIndexChanged: {
             mainWindow.workWithActivities ? workspace.currentActivity = workspace.activities[currentIndex]
                     : workspace.currentDesktop = currentIndex + 1;
-        }
-    }
-
-    WheelHandler {
-        property int wheelDelta: 0
-
-        onWheel: wheelDelta += event.angleDelta.y;
-
-        onActiveChanged: {
-            if (active) return;
-
-            if (wheelDelta >= 120 || wheelDelta <= -120) {
-                wheelDelta > 0 ? workspace.currentDesktop-- : workspace.currentDesktop++;
-                wheelDelta = 0;
-            }
         }
     }
 }
