@@ -36,7 +36,7 @@ Item {
     Rectangle {
         id: colorBackground
         anchors.fill: parent
-        visible: !big && !screenItem.desktopThumbnail.thumbnailAvailable
+        visible: !big && !screenItem.desktopBackground.thumbnailAvailable
         color: "#222222"
         radius: 10
     }
@@ -55,9 +55,9 @@ Item {
     OpacityMask {
         id: thumbBackground
         anchors.fill: parent
-        source: screenItem.desktopThumbnail
+        source: screenItem.desktopBackground
         maskSource: colorBackground // has to be opaque
-        visible: !big && screenItem.desktopThumbnail.thumbnailAvailable
+        visible: !big && screenItem.desktopBackground.thumbnailAvailable
     }
 
     Rectangle {

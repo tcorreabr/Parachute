@@ -179,8 +179,8 @@ Window {
 
             if (workspace.activeClient.desktopWindow) {
                 let currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
-                if (currentScreenItem.desktopThumbnail.winId === 0)
-                    currentScreenItem.desktopThumbnail.winId = workspace.activeClient.windowId;
+                if (currentScreenItem.desktopBackground.winId === 0)
+                    currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
 
             // Doesn't requestActivate() if the client was selected in this script and the closing animation is running
@@ -237,7 +237,7 @@ Window {
                 // ^^^ this is the line that causes kwin to crash. I don't know why. Maybe some internal bug in data method? ^^^
                 // if (client.desktopWindow) { //} && client.activities.length === 1) {
                 //     // let activityIndex = workspace.activities.indexOf(client.activities[0]);
-                //     screensRepeater.itemAt(currentScreen).desktopThumbnail.winId = client.windowId;
+                //     screensRepeater.itemAt(currentScreen).desktopBackground.winId = client.windowId;
                 // }
             // }
 

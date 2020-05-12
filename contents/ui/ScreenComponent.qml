@@ -10,7 +10,7 @@ Item {
 
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
-    property alias desktopThumbnail: desktopThumbnail
+    property alias desktopBackground: desktopBackground
     property alias bigDesktopsTopMarginAnimation: bigDesktopsTopMarginAnimation
     // property alias activitiesBackgrounds: activitiesBackgrounds
 
@@ -20,9 +20,9 @@ Item {
     //     id: activitiesBackgrounds
     //     model: workspace.activities.length
     PlasmaCore.WindowThumbnail {
-        id: desktopThumbnail
+        id: desktopBackground
         anchors.fill: parent
-        visible: desktopThumbnail.winId !== 0
+        visible: winId !== 0
         opacity: mainWindow.configBlurBackground ? 0 : 1
     }
     // }
@@ -30,9 +30,9 @@ Item {
     FastBlur {
         id: blurBackground
         anchors.fill: parent
-        source: desktopThumbnail
+        source: desktopBackground
         radius: 64
-        visible: desktopThumbnail.winId !== 0 && mainWindow.configBlurBackground
+        visible: desktopBackground.winId !== 0 && mainWindow.configBlurBackground
         // cached: true
     }
 
