@@ -159,7 +159,7 @@ Item {
         onWheel: wheelDelta += event.angleDelta.y;
 
         onActiveChanged: {
-            if (active === true) return;
+            if (active) return;
 
             if (wheelDelta >= 120 || wheelDelta <= -120) {
                 wheelDelta > 0 ? workspace.currentDesktop-- : workspace.currentDesktop++;

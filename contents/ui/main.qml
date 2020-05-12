@@ -25,7 +25,7 @@ Window {
     property bool configShowDesktopShadows: false
 
     // Animations
-    property real animationsDuration: 230 //units.longDuration * 2
+    property real animationsDuration: 200 //units.longDuration * 2
     property int noAnimation: 0 // Const to disable animations
     property int easingType: noAnimation
 
@@ -47,7 +47,7 @@ Window {
                     mainWindow.toggleActive();
                     break;
                 case Qt.Key_Return:
-                    if (selectedClientItem !== null) mainWindow.toggleActive();
+                    if (selectedClientItem) mainWindow.toggleActive();
                     break;
                 case Qt.Key_Home:
                     selectFirstClient();
@@ -136,7 +136,7 @@ Window {
 
         if (mainWindow.activated) {
             shouldRequestActivate = false;
-            workspace.activeClient = selectedClientItem !== null ? selectedClientItem.client : mainWindow.outsideSelectedClient;
+            workspace.activeClient = selectedClientItem ? selectedClientItem.client : mainWindow.outsideSelectedClient;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -161,7 +161,7 @@ Window {
 
     function clientActivated(client) {
         // The correct thing to do would be to use the client parameter but sometimes it doesn't seem to be with the right value
-        if (workspace.activeClient !== null) {
+        if (workspace.activeClient) {
             mainWindow.outsideSelectedClient = workspace.activeClient;
 
             if (workspace.activeClient.desktopWindow) {
@@ -304,6 +304,6 @@ Window {
                 }
             }
         }
-        if (candidateClientItem !== null) selectedClientItem = candidateClientItem;
+        if (candidateClientItem) selectedClientItem = candidateClientItem;
     }
 }
