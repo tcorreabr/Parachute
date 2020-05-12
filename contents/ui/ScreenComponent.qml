@@ -105,9 +105,7 @@ Item {
                     acceptedButtons: Qt.AllButtons
 
                     onTapped: {
-                        if (mainWindow.selectedClientItem === null)
-                            mainWindow.toggleActive();
-                        else
+                        if (mainWindow.selectedClientItem)
                             switch (eventPoint.event.button) {
                                 case Qt.LeftButton:
                                     mainWindow.toggleActive();
@@ -128,6 +126,8 @@ Item {
                                             mainWindow.selectedClientItem.client.desktop = -1;
                                     break;
                             }
+                        else 
+                            mainWindow.toggleActive();
                     }
                 }
 

@@ -170,7 +170,7 @@ Item {
 
                 if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y) &&
                         point.position !== Qt.point(0, 0) &&
-                        (mainWindow.pointKeyboardSelected === null ||
+                        (!mainWindow.pointKeyboardSelected ||
                         Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
                         Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
                     mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);

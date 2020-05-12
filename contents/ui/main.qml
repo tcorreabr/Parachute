@@ -57,16 +57,16 @@ Window {
                     selectLastClient();
                     break;
                 case Qt.Key_Left:
-                    selectedClientItem === null ? selectFirstClient() : selectNextClientOn(Enums.Position.Left);
+                    selectedClientItem ? selectNextClientOn(Enums.Position.Left) : selectFirstClient();
                     break;
                 case Qt.Key_Right:
-                    selectedClientItem === null ? selectLastClient() : selectNextClientOn(Enums.Position.Right);
+                    selectedClientItem ? selectNextClientOn(Enums.Position.Right) : selectLastClient();
                     break;
                 case Qt.Key_Up:
-                    selectedClientItem === null ? selectFirstClient() : selectNextClientOn(Enums.Position.Top);
+                    selectedClientItem ? selectNextClientOn(Enums.Position.Top) : selectFirstClient();
                     break;
                 case Qt.Key_Down:
-                    selectedClientItem === null ? selectLastClient() : selectNextClientOn(Enums.Position.Bottom);
+                    selectedClientItem ? selectNextClientOn(Enums.Position.Bottom) : selectLastClient();
                     break;
                 case Qt.Key_F5:
                     kwinReconfigure.call();
