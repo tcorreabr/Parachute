@@ -102,17 +102,6 @@ Window {
     }
 
     KWinComponents.DBusCall {
-        id: kwinInfo
-        service: "org.kde.KWin"; path: "/KWin"; method: "supportInformation"
-
-        onFinished: {
-            let regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
-            let match = regexpNames.exec(returnValue[0]);
-            if (match) mainWindow.qtVersion = match[1];
-        }
-    }
-
-    KWinComponents.DBusCall {
         id: kwinReconfigure
         service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
         onFinished: delayedLoadConfig.start();
@@ -135,7 +124,7 @@ Window {
 
         loadConfig();
         keyboardHandler.forceActiveFocus();
-        kwinInfo.call();
+        getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
     }
@@ -321,5 +310,11 @@ Window {
             }
         }
         if (candidateClientItem) selectedClientItem = candidateClientItem;
+    }
+
+    function getQtVersion() {
+        let regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
+        let match = regexpNames.exec(workspace.supportInformation());
+        if (match) mainWindow.qtVersion = match[1];
     }
 }
