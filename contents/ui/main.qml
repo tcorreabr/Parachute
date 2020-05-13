@@ -104,18 +104,12 @@ Window {
     KWinComponents.DBusCall {
         id: kwinReconfigure
         service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
-        onFinished: delayedLoadConfig.start();
     }
 
     // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
         id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: false
         onTriggered: mainWindow.requestActivate();
-    }
-
-    Timer {
-        id: delayedLoadConfig; interval: 1000; repeat: false; triggeredOnStart: false
-        onTriggered: loadConfig();
     }
 
     Component.onCompleted: {
@@ -127,6 +121,7 @@ Window {
         getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
+        options.configChanged.connect(loadConfig);
     }
 
     function toggleActive() {
