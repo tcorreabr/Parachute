@@ -60,7 +60,6 @@ Item {
         visible: big && mainWindow.configShowWindowTitles && !isAnimating && !clientThumbnail.Drag.active
 
         RowLayout {
-            id: rowLayout
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height
             spacing: 10
@@ -79,7 +78,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 color: "white"
-                Layout.maximumWidth: clientDecorations.width - wIcon.width - rowLayout.spacing - closeButton.width - rowLayout.spacing
+                Layout.maximumWidth: clientDecorations.width - wIcon.width - parent.spacing - closeButton.width - parent.spacing
             }
 
             // This wrapper is needed because QML recalculate Layouts when visibility of children change 
@@ -92,11 +91,11 @@ Item {
                 RoundButton {
                     id: closeButton
                     anchors.fill: parent
-                    icon.name: "window-close"
                     visible: selectedFrame.visible
-                    hoverEnabled: false
-                    radius: height / 2
                     focusPolicy: Qt.NoFocus
+                    background: Rectangle { color: "red"; radius: height / 2; }
+
+                    Image { source: "images/close.svg" }
 
                     onClicked: clientItem.client.closeWindow();
                 }
