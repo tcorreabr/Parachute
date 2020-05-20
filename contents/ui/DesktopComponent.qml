@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQml.Models 2.2
 import QtGraphicalEffects 1.12
+import QtQuick.Layouts 1.12
 
 Item {
     id: desktopItem
@@ -13,8 +14,9 @@ Item {
     property string activity
     property bool big: false
     property int bigDesktopMargin: 40
+    property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
 
-    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 22 : 0
+    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
     property int clientsPadding: big ? 10 : 0
 
     onBigDesktopMarginChanged: {
@@ -74,7 +76,7 @@ Item {
                 PropertyChanges { target: colorizeRect; color: "#5000AA00"; }
             },
             State {
-                when: !big && (desktopItemHoverHandler.hovered)
+                when: !big && desktopItem.hovered
                 PropertyChanges { target: colorizeRect; color: "#500055FF"; }
             }
         ]
@@ -82,6 +84,50 @@ Item {
         HoverHandler {
             id: desktopItemHoverHandler
             enabled: !big
+        }
+    }
+
+    ToolTip {
+        visible: desktopItem.hovered
+        text: workspace.desktopName(desktopIndex + 1);
+        delay: 1000
+        timeout: 5000
+    }
+
+    RowLayout {
+        height: 22
+        spacing: 11
+        anchors.top: parent.top
+        anchors.topMargin: -height / 2
+        anchors.horizontalCenter: parent.horizontalCenter
+        visible: false //desktopItem.hovered
+
+        RoundButton {
+            id: removeButton
+            implicitHeight: parent.height
+            implicitWidth: parent.height
+            radius: height / 2
+            focusPolicy: Qt.NoFocus
+
+            Image { source: "images/remove.svg"; anchors.fill: parent; }
+
+            onClicked: {
+                workspace.removeDesktop(desktopItem.desktopIndex + 1);
+            }
+        }
+
+        RoundButton {
+            id: addButton
+            implicitHeight: parent.height
+            implicitWidth: parent.height
+            radius: height / 2
+            focusPolicy: Qt.NoFocus
+
+            Image { source: "images/add.svg"; anchors.fill: parent; }
+
+            onClicked: {
+                workspace.createDesktop(desktopItem.desktopIndex + 2, "Novo desktop");
+            }
         }
     }
 
@@ -128,7 +174,7 @@ Item {
         }
 
         items.onChanged: if (mainWindow.workWithActivities) update();
-        onFilterItemChanged: if (mainWindow.workWithActivities) update();
+        onFilterItemChanged: if (mainWindow.workWithActivities) update(); // Component.onCompleted?
         
         property var filterItem: function(item) {
             if (item.model.client.desktopWindow) return false;
