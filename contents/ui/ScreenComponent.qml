@@ -152,4 +152,18 @@ Item {
                     : workspace.currentDesktop = currentIndex + 1;
         }
     }
+
+    function updateDesktopWindowId() {
+        let clients = workspace.clientList(); 
+        for (let i = 0; i < clients.length; i++) {
+            if (clients[i].desktopWindow && clients[i].screen === screenItem.screenIndex) {
+                screenItem.desktopBackground.winId = clients[i].windowId;
+                return;
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        updateDesktopWindowId();
+    }
 }
