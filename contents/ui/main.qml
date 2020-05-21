@@ -103,12 +103,12 @@ Window {
 
     KWinComponents.DBusCall {
         id: kwinReconfigure
-        service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure"
+        service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure";
     }
 
     // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
-        id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: false
+        id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: true;
         onTriggered: mainWindow.requestActivate();
     }
 
@@ -117,11 +117,11 @@ Window {
         mainWindow.height = workspace.displaySize.height;
 
         loadConfig();
+        options.configChanged.connect(loadConfig);
         keyboardHandler.forceActiveFocus();
         getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
-        options.configChanged.connect(loadConfig);
     }
 
     function toggleActive() {
@@ -141,7 +141,7 @@ Window {
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(Easing.InExpo);
             }
         } else {
-            mainWindow.requestActivate();
+            requestActivateTimer.start();
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 let currentScreenItem = screensRepeater.itemAt(currentScreen);

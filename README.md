@@ -30,7 +30,7 @@ To install the configuration dialog you must execute the following commands, eve
 
 After activate the script in *KWin Scripts* window you can use the default registered global shortcut **Ctrl+Super+D (Ctrl+Meta+D)** to show/hide *Parachute*.
   
-You can also invoke the script with *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute* command. Similarly you can: integrate it with [easystroke](https://github.com/thjaeger/easystroke), [configure it to be invoked with meta key](https://github.com/tcorreabr/Parachute/issues/30), etc.
+You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute*. Similarly you can: integrate it with [easystroke](https://github.com/thjaeger/easystroke), [configure it to be invoked with meta key](https://github.com/tcorreabr/Parachute/issues/30), etc.
 
 Controls:
 * Left mouse button - Select window.
