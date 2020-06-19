@@ -137,7 +137,7 @@ Window {
             workspace.activeClient = selectedClientItem ? selectedClientItem.client : mainWindow.outsideSelectedClient;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                let currentScreenItem = screensRepeater.itemAt(currentScreen);
+                const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 // The window must be hide (mainWindow.activated = false) only in the end of animation
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(Easing.InExpo);
             }
@@ -145,12 +145,12 @@ Window {
             requestActivateTimer.start();
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                let currentScreenItem = screensRepeater.itemAt(currentScreen);
+                const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(mainWindow.noAnimation);
             }
             mainWindow.activated = true;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                let currentScreenItem = screensRepeater.itemAt(currentScreen);
+                const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.visible = true;
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated(Easing.OutExpo);
             }
@@ -163,7 +163,7 @@ Window {
             mainWindow.outsideSelectedClient = workspace.activeClient;
 
             if (workspace.activeClient.desktopWindow) {
-                let currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
+                const currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
                 if (currentScreenItem.desktopBackground.winId === 0)
                     currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
@@ -204,8 +204,8 @@ Window {
 
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             // Kwin.ScreenArea not working here, but Kwin.ScreenArea === 7
-            let screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
-            let currentScreenItem = screensRepeater.itemAt(currentScreen);
+            const screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
+            const currentScreenItem = screensRepeater.itemAt(currentScreen);
             currentScreenItem.x = screenRect.x;
             currentScreenItem.y = screenRect.y;
             currentScreenItem.width = screenRect.width;
@@ -215,23 +215,23 @@ Window {
                 Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
 
             // Get desktop windowId to show backgrounds
-            // let screenModelIndex = clientsByScreen.index(currentScreen, 0);
+            // const screenModelIndex = clientsByScreen.index(currentScreen, 0);
             // for (let currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
-            //     let clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
-                // let client = clientsByScreen.data(clientModelIndex);
+            //     const clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
+                // const client = clientsByScreen.data(clientModelIndex);
                 // ^^^ this is the line that causes kwin to crash. I don't know why. Maybe some internal bug in data method? ^^^
                 // if (client.desktopWindow) { //} && client.activities.length === 1) {
-                //     // let activityIndex = workspace.activities.indexOf(client.activities[0]);
+                //     // const activityIndex = workspace.activities.indexOf(client.activities[0]);
                 //     screensRepeater.itemAt(currentScreen).desktopBackground.winId = client.windowId;
                 // }
             // }
 
             // Update desktops
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
-                let currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
+                const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                 currentBigDesktopItem.calculateTransformations();
                 currentBigDesktopItem.updateToCalculated(mainWindow.noAnimation);
-                let currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
+                const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
                 currentDesktopBarItem.calculateTransformations();
                 currentDesktopBarItem.updateToCalculated(mainWindow.noAnimation);
             }
@@ -245,7 +245,7 @@ Window {
     }
 
     function selectLastClient() {
-        let lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
+        const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
                 itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
         selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
     }
@@ -253,20 +253,20 @@ Window {
     function selectNextClientOn(position) {
         // Make the clients positions consider the screens positions.
         // The clients centers will be used to calculate distance between clients.
-        let selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
-        let selectedClientItemY = selectedClientItem.y + screensRepeater.itemAt(selectedClientItem.client.screen).y;
-        let selectedClientItemXCenter = selectedClientItemX + selectedClientItem.width / 2;
-        let selectedClientItemYCenter = selectedClientItemY + selectedClientItem.height / 2;
+        const selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
+        const selectedClientItemY = selectedClientItem.y + screensRepeater.itemAt(selectedClientItem.client.screen).y;
+        const selectedClientItemXCenter = selectedClientItemX + selectedClientItem.width / 2;
+        const selectedClientItemYCenter = selectedClientItemY + selectedClientItem.height / 2;
 
         let candidateClientItem = null;
         let candidateClientDistance = Number.MAX_VALUE;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-            let currentScreenItem = screensRepeater.itemAt(currentScreen);
-            let currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+            const currentScreenItem = screensRepeater.itemAt(currentScreen);
+            const currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
             for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
-                let currentClientItem = currentClientsRepeater.itemAt(currentClient);
-                let currentClientItemX = currentClientItem.x + currentScreenItem.x;
-                let currentClientItemY = currentClientItem.y + currentScreenItem.y;
+                const currentClientItem = currentClientsRepeater.itemAt(currentClient);
+                const currentClientItemX = currentClientItem.x + currentScreenItem.x;
+                const currentClientItemY = currentClientItem.y + currentScreenItem.y;
 
                 let candidate = false;
                 switch (position) {
@@ -293,9 +293,9 @@ Window {
                 }
 
                 if (candidate) {
-                    let currentClientItemXCenter = currentClientItemX + currentClientItem.width / 2;
-                    let currentClientItemYCenter = currentClientItemY + currentClientItem.height / 2;
-                    let currentClientDistance = Math.hypot(Math.abs(currentClientItemXCenter - selectedClientItemXCenter),
+                    const currentClientItemXCenter = currentClientItemX + currentClientItem.width / 2;
+                    const currentClientItemYCenter = currentClientItemY + currentClientItem.height / 2;
+                    const currentClientDistance = Math.hypot(Math.abs(currentClientItemXCenter - selectedClientItemXCenter),
                             Math.abs(currentClientItemYCenter - selectedClientItemYCenter));
 
                     if (currentClientDistance < candidateClientDistance) {
@@ -309,8 +309,8 @@ Window {
     }
 
     function getQtVersion() {
-        let regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
-        let match = regexpNames.exec(workspace.supportInformation());
+        const regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
+        const match = regexpNames.exec(workspace.supportInformation());
         if (match) mainWindow.qtVersion = match[1];
     }
 }

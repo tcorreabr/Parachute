@@ -154,7 +154,7 @@ Item {
     }
 
     function updateDesktopWindowId() {
-        let clients = workspace.clientList(); 
+        const clients = workspace.clientList(); 
         for (let i = 0; i < clients.length; i++) {
             if (clients[i].desktopWindow && clients[i].screen === screenItem.screenIndex) {
                 screenItem.desktopBackground.winId = clients[i].windowId;

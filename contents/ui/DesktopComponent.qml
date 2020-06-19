@@ -184,7 +184,7 @@ Item {
 
         function update() {
             for (let i = 0; i < items.count; ++i) {
-                let item = items.get(i);
+                const item = items.get(i);
                 if (item.inVisible !== filterItem(item))
                     item.inVisible = !item.inVisible;
             }
@@ -242,23 +242,23 @@ Item {
         bigDesktopMargin = 40;
 
         // Calculate the number of rows and columns
-        let clientsCount = clientsRepeater.count;
+        const clientsCount = clientsRepeater.count;
+        const addToColumns = Math.floor(clientsArea.width / clientsArea.height);
         let columns = Math.floor(Math.sqrt(clientsCount));
-        let addToColumns = Math.floor(clientsArea.width / clientsArea.height);
         (columns + addToColumns >= clientsCount) ? columns = clientsCount : columns += addToColumns;
         let rows = Math.ceil(clientsCount / columns);
         while ((columns - 1) * rows >= clientsCount) columns--;
 
         // Calculate client's geometry transformations
-        let gridItemWidth = Math.floor(clientsArea.width / columns);
-        let gridItemHeight = Math.floor(clientsArea.height / rows);
-        let gridItemRatio = gridItemWidth / gridItemHeight;
+        const gridItemWidth = Math.floor(clientsArea.width / columns);
+        const gridItemHeight = Math.floor(clientsArea.height / rows);
+        const gridItemRatio = gridItemWidth / gridItemHeight;
 
         let currentClient = 0;
         for (let row = 0; row < rows; row++) {
             for (let column = 0; column < columns; column++) {
                 // TODO FIXME sometimes clientItem is null (something related with yakuake or krunner?)
-                let clientItem = clientsRepeater.itemAt(currentClient);
+                const clientItem = clientsRepeater.itemAt(currentClient);
 
                 // client.noBorder is non-NOTIFYable, so we'll update noBorderMargin here
                 clientItem.noBorderMargin = clientItem.client.noBorder ? big ? 18 : 4 : 0;
@@ -293,7 +293,7 @@ Item {
         bigDesktops.anchors.topMargin = bigDesktops.parent.height / 6;
         bigDesktopMargin = 40;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
-            let currentClientItem = clientsRepeater.itemAt(currentClient);
+            const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.calculatedX;
             currentClientItem.y = currentClientItem.calculatedY;
             currentClientItem.width = currentClientItem.calculatedWidth;
@@ -306,7 +306,7 @@ Item {
         bigDesktops.anchors.topMargin = 0;
         bigDesktopMargin = 0;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
-            let currentClientItem = clientsRepeater.itemAt(currentClient);
+            const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.originalX;
             currentClientItem.y = currentClientItem.originalY;
             currentClientItem.width = currentClientItem.originalWidth;
