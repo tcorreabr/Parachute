@@ -147,10 +147,8 @@ Item {
         }
     }
 
-    Connections {
-        target: client
-        
-        onMoveResizedChanged: mainWindow.desktopsInitialized = false;
-        //onActivitiesChanged: desktopItem.clientsModel.update();
+    onClientChanged: {
+        if (client)
+            client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; print(client.width); });
     }
 }

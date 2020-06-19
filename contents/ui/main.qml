@@ -92,15 +92,6 @@ Window {
         ScreenComponent {}
     }
 
-    Connections {
-        target: workspace
-        
-        onClientActivated: clientActivated();
-        onNumberScreensChanged: mainWindow.desktopsInitialized = false;
-        onScreenResized: mainWindow.desktopsInitialized = false;
-        onCurrentDesktopChanged: mainWindow.selectedClientItem = null;
-    }
-
     KWinComponents.DBusCall {
         id: kwinReconfigure
         service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure";
@@ -117,11 +108,21 @@ Window {
         mainWindow.height = workspace.displaySize.height;
 
         loadConfig();
-        options.configChanged.connect(loadConfig);
         keyboardHandler.forceActiveFocus();
         getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
+
+        options.configChanged.connect(loadConfig);
+        workspace.clientActivated.connect(clientActivated);
+        workspace.numberScreensChanged.connect(function(count) { mainWindow.desktopsInitialized = false; });
+        workspace.screenResized.connect(function(screen) { mainWindow.desktopsInitialized = false; });
+        workspace.currentDesktopChanged.connect(function(desktop, client) { mainWindow.selectedClientItem = null;} );
+    }
+
+    Component.onDestruction: {
+        workspace.clientActivated.disconnect(clientActivated);
+        options.configChanged.disconnect(loadConfig);
     }
 
     function toggleActive() {
