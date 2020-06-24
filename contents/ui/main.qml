@@ -24,6 +24,7 @@ Window {
     property bool configShowDesktopBarBackground: true
     property bool configShowWindowTitles: true
     property bool configShowDesktopShadows: false
+    property int configDesktopBarPosition: Enums.Position.Top
 
     // Animations
     property real animationsDuration: 200 //units.longDuration * 2
@@ -36,6 +37,9 @@ Window {
     property var pointKeyboardSelected: null
     property bool keyboardSelected: false
     property bool shouldRequestActivate: true
+
+    // Consts
+    property int bigDesktopMargin: 40
 
     Item {
         id: keyboardHandler

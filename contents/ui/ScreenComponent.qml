@@ -14,6 +14,9 @@ Item {
     property alias bigDesktopsTopMarginAnimation: bigDesktopsTopMarginAnimation
     // property alias activitiesBackgrounds: activitiesBackgrounds
 
+    property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
+    property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
+
     property int screenIndex: model.index
 
     // Repeater {
@@ -46,7 +49,7 @@ Item {
 
     ScrollView {
         id: desktopsBar
-        height: parent.height / 6
+        height: desktopsBarHeight
         anchors.bottom: bigDesktops.top
         anchors.right: parent.right
         anchors.left: parent.left
@@ -84,14 +87,30 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        anchors.topMargin: parent.height / 6
+        anchors.topMargin: desktopsBarHeight
         clip: true
         currentIndex: mainWindow.currentActivityOrDesktop
         //vertical: true
 
         Behavior on anchors.topMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation
-            NumberAnimation { id: bigDesktopsTopMarginAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
+
+            NumberAnimation {
+                id: bigDesktopsTopMarginAnimation
+                duration: mainWindow.animationsDuration
+                easing.type: mainWindow.easingType
+
+                onRunningChanged: {
+                    if (!running && bigDesktops.anchors.topMargin === 0 && mainWindow.easingType === Easing.InExpo) {
+                        if (mainWindow.activated) {
+                            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
+                                screensRepeater.itemAt(currentScreen).visible = false;
+                            mainWindow.activated = false;
+                        }
+                        bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).bigDesktop.updateToCalculated(mainWindow.noAnimation); // for the case: exit -> switch desktop -> enter
+                    }
+                }    
+            }
         }
 
         Repeater {
@@ -136,10 +155,10 @@ Item {
                     big: true
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
-                    width: desktopRatio < screenRatio ? parent.width - bigDesktopMargin
-                            : parent.height / screenItem.height * screenItem.width - bigDesktopMargin
-                    height: desktopRatio > screenRatio ? parent.height - bigDesktopMargin
-                            : parent.width / screenItem.width * screenItem.height - bigDesktopMargin
+                    width: desktopRatio < screenRatio ? parent.width - mainWindow.bigDesktopMargin
+                            : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
+                    height: desktopRatio > screenRatio ? parent.height - mainWindow.bigDesktopMargin
+                            : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
 
                     property real desktopRatio: parent.width / parent.height
                     property real screenRatio: screenItem.width / screenItem.height

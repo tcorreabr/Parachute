@@ -13,27 +13,10 @@ Item {
     property int desktopIndex: model.index
     property string activity
     property bool big: false
-    property int bigDesktopMargin: 40
     property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
 
     property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
     property int clientsPadding: big ? 10 : 0
-
-    onBigDesktopMarginChanged: {
-        if (bigDesktopMargin === 0 && mainWindow.easingType === Easing.InExpo) {
-            if (mainWindow.activated) {
-                for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-                    screensRepeater.itemAt(currentScreen).visible = false;
-                mainWindow.activated = false;
-            }
-            desktopItem.updateToCalculated(mainWindow.noAnimation);
-        }
-    }
-
-    Behavior on bigDesktopMargin {
-        enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: bigDesktopMarginAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
-    }
 
     Rectangle {
         id: colorBackground
@@ -112,7 +95,7 @@ Item {
             Image { source: "images/remove.svg"; anchors.fill: parent; }
 
             onClicked: {
-                workspace.removeDesktop(desktopItem.desktopIndex + 1);
+                workspace.removeDesktop(desktopItem.desktopIndex);
             }
         }
 
@@ -126,7 +109,7 @@ Item {
             Image { source: "images/add.svg"; anchors.fill: parent; }
 
             onClicked: {
-                workspace.createDesktop(desktopItem.desktopIndex + 2, "Novo desktop");
+                workspace.createDesktop(desktopItem.desktopIndex + 1, "Novo desktop");
             }
         }
     }
@@ -205,7 +188,7 @@ Item {
         }
 
         HoverHandler {
-            enabled: big && !bigDesktopMarginAnimation.running && !mainWindow.dragging
+            enabled: big && !bigDesktopsTopMarginAnimation.running && !mainWindow.dragging
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
@@ -238,8 +221,7 @@ Item {
         if (clientsRepeater.count < 1) return;
 
         mainWindow.easingType = mainWindow.noAnimation;
-        bigDesktops.anchors.topMargin = bigDesktops.parent.height / 6;
-        bigDesktopMargin = 40;
+        bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight
 
         // Calculate the number of rows and columns
         const clientsCount = clientsRepeater.count;
@@ -290,8 +272,7 @@ Item {
 
     function updateToCalculated(animationType) {
         mainWindow.easingType = animationType;
-        bigDesktops.anchors.topMargin = bigDesktops.parent.height / 6;
-        bigDesktopMargin = 40;
+        bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.calculatedX;
@@ -304,7 +285,6 @@ Item {
     function updateToOriginal(animationType) {
         mainWindow.easingType = animationType;
         bigDesktops.anchors.topMargin = 0;
-        bigDesktopMargin = 0;
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.originalX;
