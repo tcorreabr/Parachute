@@ -7,7 +7,6 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 Item {
     id: clientItem
 
-    property bool isAnimating: xAnimation.running || yAnimation.running || widthAnimation.running || heightAnimation.running
     property var client: model.client
     property int noBorderMargin
 
@@ -46,7 +45,7 @@ Item {
         anchors.fill : parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: big && !isAnimating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
+        visible: big && !screenItem.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.5
     }
 
@@ -57,7 +56,7 @@ Item {
         width: clientThumbnail.width * 0.8
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
-        visible: big && mainWindow.configShowWindowTitles && !isAnimating && !clientThumbnail.Drag.active
+        visible: big && mainWindow.configShowWindowTitles && !screenItem.animating && !clientThumbnail.Drag.active
 
         RowLayout {
             anchors.horizontalCenter: parent.horizontalCenter

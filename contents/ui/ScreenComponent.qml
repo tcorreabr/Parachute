@@ -11,11 +11,11 @@ Item {
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
     property alias desktopBackground: desktopBackground
-    property alias bigDesktopsTopMarginAnimation: bigDesktopsTopMarginAnimation
     // property alias activitiesBackgrounds: activitiesBackgrounds
 
     property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
     property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
+    property bool animating: false
 
     property int screenIndex: model.index
 
@@ -96,11 +96,12 @@ Item {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
 
             NumberAnimation {
-                id: bigDesktopsTopMarginAnimation
                 duration: mainWindow.animationsDuration
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
+                    screenItem.animating = running;
+
                     if (!running && bigDesktops.anchors.topMargin === 0 && mainWindow.easingType === Easing.InExpo) {
                         if (mainWindow.activated) {
                             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)

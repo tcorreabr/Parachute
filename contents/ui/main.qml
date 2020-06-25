@@ -134,7 +134,7 @@ Window {
 
         // Return if any big desktop is animating
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-            if (screensRepeater.itemAt(currentScreen).bigDesktopsTopMarginAnimation.running) return;
+            if (screensRepeater.itemAt(currentScreen).animating) return;
 
         if (mainWindow.activated) {
             shouldRequestActivate = false;

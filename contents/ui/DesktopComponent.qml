@@ -188,7 +188,7 @@ Item {
         }
 
         HoverHandler {
-            enabled: big && !bigDesktopsTopMarginAnimation.running && !mainWindow.dragging
+            enabled: big && !screenItem.animating && !mainWindow.dragging
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
