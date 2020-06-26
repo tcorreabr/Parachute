@@ -81,8 +81,8 @@ Item {
 
         Item { // To centralize children
             id: desktopsWrapper
-            width: childrenRect.width + 15
-            height: childrenRect.height + 15
+            width: childrenRect.width + mainWindow.smallDesktopMargin
+            height: childrenRect.height + mainWindow.smallDesktopMargin
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
             y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
             // anchors.horizontalCenter: parent.horizontalCenter
@@ -93,27 +93,29 @@ Item {
                 model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
 
                 DesktopComponent {
-                    id: miniDesktop
+                    id: smallDesktop
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
 
                     states: [
                         State {
-                            when: mainWindow.configDesktopBarPosition === Enums.Position.Top || mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                            when: mainWindow.configDesktopBarPosition === Enums.Position.Top ||
+                                    mainWindow.configDesktopBarPosition === Enums.Position.Bottom
                             PropertyChanges {
-                                target: miniDesktop
-                                x: 15 + model.index * (width + 15)
-                                y: 15
+                                target: smallDesktop
+                                x: mainWindow.smallDesktopMargin + model.index * (width + mainWindow.smallDesktopMargin)
+                                y: mainWindow.smallDesktopMargin
                                 width: (height / screenItem.height) * screenItem.width
-                                height: desktopsBar.height - 30
+                                height: desktopsBar.height - mainWindow.smallDesktopMargin * 2
                             }
                         },
                         State {
-                            when: mainWindow.configDesktopBarPosition === Enums.Position.Left || mainWindow.configDesktopBarPosition === Enums.Position.Right
+                            when: mainWindow.configDesktopBarPosition === Enums.Position.Left ||
+                                    mainWindow.configDesktopBarPosition === Enums.Position.Right
                             PropertyChanges {
-                                target: miniDesktop
-                                x: 15
-                                y: 15 + model.index * (height + 15)
-                                width: desktopsBar.width - 30
+                                target: smallDesktop
+                                x: mainWindow.smallDesktopMargin
+                                y: mainWindow.smallDesktopMargin + model.index * (height + mainWindow.smallDesktopMargin)
+                                width: desktopsBar.width - mainWindow.smallDesktopMargin * 2
                                 height: (width / screenItem.width) * screenItem.height
                             }
                         }
