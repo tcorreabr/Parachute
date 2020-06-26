@@ -66,7 +66,7 @@ Item {
 
         HoverHandler {
             id: desktopItemHoverHandler
-            enabled: !big
+            enabled: !big && !screenItem.animating && !mainWindow.dragging
         }
     }
 
@@ -221,7 +221,7 @@ Item {
         if (clientsRepeater.count < 1) return;
 
         mainWindow.easingType = mainWindow.noAnimation;
-        bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight
+        screenItem.showDesktopsBar();
 
         // Calculate the number of rows and columns
         const clientsCount = clientsRepeater.count;
@@ -272,7 +272,7 @@ Item {
 
     function updateToCalculated(animationType) {
         mainWindow.easingType = animationType;
-        bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight;
+        screenItem.showDesktopsBar();
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.calculatedX;
@@ -284,7 +284,7 @@ Item {
 
     function updateToOriginal(animationType) {
         mainWindow.easingType = animationType;
-        bigDesktops.anchors.topMargin = 0;
+        screenItem.hideDesktopsBar();
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.originalX;

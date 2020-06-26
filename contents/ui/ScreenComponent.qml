@@ -16,6 +16,7 @@ Item {
     property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
     property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
     property bool animating: false
+    property real ratio: width / height
 
     property int screenIndex: model.index
 
@@ -49,18 +50,41 @@ Item {
 
     ScrollView {
         id: desktopsBar
-        height: desktopsBarHeight
-        anchors.bottom: bigDesktops.top
-        anchors.right: parent.right
-        anchors.left: parent.left
         contentWidth: desktopsWrapper.width
+        contentHeight: desktopsWrapper.height
         clip: true
+
+        states: [
+            State {
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Top || mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                PropertyChanges {
+                    target: desktopsBar
+                    height: desktopsBarHeight
+                    anchors.bottom: mainWindow.configDesktopBarPosition === Enums.Position.Top ? bigDesktops.top : undefined
+                    anchors.top: mainWindow.configDesktopBarPosition === Enums.Position.Bottom ? bigDesktops.bottom : undefined
+                    anchors.right: parent.right
+                    anchors.left: parent.left
+                }
+            },
+            State {
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Left || mainWindow.configDesktopBarPosition === Enums.Position.Right
+                PropertyChanges {
+                    target: desktopsBar
+                    width: desktopsBarWidth
+                    anchors.bottom: parent.bottom
+                    anchors.top: parent.top
+                    anchors.right: mainWindow.configDesktopBarPosition === Enums.Position.Left ? bigDesktops.left : undefined
+                    anchors.left: mainWindow.configDesktopBarPosition === Enums.Position.Right ? bigDesktops.right : undefined
+                }
+            }
+        ]
 
         Item { // To centralize children
             id: desktopsWrapper
             width: childrenRect.width + 15
             height: childrenRect.height + 15
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
+            y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
             // anchors.horizontalCenter: parent.horizontalCenter
             // anchors.verticalCenter: parent.verticalCenter
 
@@ -69,11 +93,31 @@ Item {
                 model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
 
                 DesktopComponent {
-                    x: 15 + model.index * (width + 15)
-                    y: 15
-                    width: (height / screenItem.height) * screenItem.width
-                    height: desktopsBar.height - 30
+                    id: miniDesktop
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
+
+                    states: [
+                        State {
+                            when: mainWindow.configDesktopBarPosition === Enums.Position.Top || mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                            PropertyChanges {
+                                target: miniDesktop
+                                x: 15 + model.index * (width + 15)
+                                y: 15
+                                width: (height / screenItem.height) * screenItem.width
+                                height: desktopsBar.height - 30
+                            }
+                        },
+                        State {
+                            when: mainWindow.configDesktopBarPosition === Enums.Position.Left || mainWindow.configDesktopBarPosition === Enums.Position.Right
+                            PropertyChanges {
+                                target: miniDesktop
+                                x: 15
+                                y: 15 + model.index * (height + 15)
+                                width: desktopsBar.width - 30
+                                height: (width / screenItem.width) * screenItem.height
+                            }
+                        }
+                    ]
 
                     TapHandler {
                         acceptedButtons: Qt.LeftButton
@@ -87,10 +131,10 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        anchors.topMargin: desktopsBarHeight
         clip: true
         currentIndex: mainWindow.currentActivityOrDesktop
-        //vertical: true
+        orientation: mainWindow.configDesktopBarPosition === Enums.Position.Left ||
+                mainWindow.configDesktopBarPosition === Enums.Position.Right ? Qt.Vertical : Qt.Horizontal
 
         Behavior on anchors.topMargin {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
@@ -102,15 +146,61 @@ Item {
                 onRunningChanged: {
                     screenItem.animating = running;
 
-                    if (!running && bigDesktops.anchors.topMargin === 0 && mainWindow.easingType === Easing.InExpo) {
-                        if (mainWindow.activated) {
-                            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-                                screensRepeater.itemAt(currentScreen).visible = false;
-                            mainWindow.activated = false;
-                        }
-                        bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).bigDesktop.updateToCalculated(mainWindow.noAnimation); // for the case: exit -> switch desktop -> enter
+                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                        mainWindow.deactivate();
                     }
-                }    
+                }  
+            }
+        }
+
+        Behavior on anchors.bottomMargin {
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+
+            NumberAnimation {
+                duration: mainWindow.animationsDuration
+                easing.type: mainWindow.easingType
+
+                onRunningChanged: {
+                    screenItem.animating = running;
+
+                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                        mainWindow.deactivate();
+                    }
+                }   
+            }
+        }
+
+        Behavior on anchors.leftMargin {
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Left
+
+            NumberAnimation {
+                duration: mainWindow.animationsDuration
+                easing.type: mainWindow.easingType
+
+                onRunningChanged: {
+                    screenItem.animating = running;
+
+                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                        mainWindow.deactivate();
+                    }
+                }
+            }
+        }
+
+        Behavior on anchors.rightMargin {
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Right
+
+            NumberAnimation {
+                duration: mainWindow.animationsDuration
+                easing.type: mainWindow.easingType
+
+                onRunningChanged: {
+                    screenItem.animating = running;
+
+                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                        mainWindow.deactivate();
+                    }
+                }
             }
         }
 
@@ -156,13 +246,12 @@ Item {
                     big: true
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
-                    width: desktopRatio < screenRatio ? parent.width - mainWindow.bigDesktopMargin
+                    width: desktopRatio < screenItem.ratio ? parent.width - mainWindow.bigDesktopMargin
                             : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
-                    height: desktopRatio > screenRatio ? parent.height - mainWindow.bigDesktopMargin
+                    height: desktopRatio > screenItem.ratio ? parent.height - mainWindow.bigDesktopMargin
                             : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
 
                     property real desktopRatio: parent.width / parent.height
-                    property real screenRatio: screenItem.width / screenItem.height
                 }
             }
         }
@@ -171,6 +260,30 @@ Item {
             mainWindow.workWithActivities ? workspace.currentActivity = workspace.activities[currentIndex]
                     : workspace.currentDesktop = currentIndex + 1;
         }
+    }
+
+    function showDesktopsBar() {
+        switch (mainWindow.configDesktopBarPosition) {
+            case Enums.Position.Top:
+                bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight;
+                break;
+            case Enums.Position.Bottom:
+                bigDesktops.anchors.bottomMargin = screenItem.desktopsBarHeight;
+                break;
+            case Enums.Position.Left:
+                bigDesktops.anchors.leftMargin = screenItem.desktopsBarWidth;
+                break;
+            case Enums.Position.Right:
+                bigDesktops.anchors.rightMargin = screenItem.desktopsBarWidth;
+                break;
+        }
+    }
+
+    function hideDesktopsBar() {
+        bigDesktops.anchors.topMargin = 0;
+        bigDesktops.anchors.bottomMargin = 0;
+        bigDesktops.anchors.leftMargin = 0;
+        bigDesktops.anchors.rightMargin = 0;
     }
 
     function updateDesktopWindowId() {

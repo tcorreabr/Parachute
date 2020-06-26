@@ -142,8 +142,8 @@ Window {
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                // The window must be hide (mainWindow.activated = false) only in the end of animation
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(Easing.InExpo);
+                // The window must be hide (mainWindow.activated = false) only in the end of animation
             }
         } else {
             requestActivateTimer.start();
@@ -159,6 +159,16 @@ Window {
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated(Easing.OutExpo);
             }
         }
+    }
+
+    function deactivate() {
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            const currentScreenItem = screensRepeater.itemAt(currentScreen);
+            currentScreenItem.visible = false;
+            currentScreenItem.bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).
+                    bigDesktop.updateToCalculated(mainWindow.noAnimation);
+        }
+        mainWindow.activated = false;
     }
 
     function clientActivated(client) {
