@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
-    <height>160</height>
+    <width>640</width>
+    <height>402</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>General</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
     <widget class="QCheckBox" name="kcfg_blurBackground">
      <property name="text">
       <string>Blur background</string>
@@ -22,9 +28,9 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QCheckBox" name="kcfg_showDesktopsBarBackground">
+       <widget class="QCheckBox" name="kcfg_showWindowTitles">
      <property name="text">
-      <string>Show desktops bar background</string>
+         <string>Show window titles and icons</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -32,44 +38,103 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QCheckBox" name="kcfg_showDesktopShadows">
+       <widget class="QCheckBox" name="kcfg_showNotificationWindows">
      <property name="text">
-      <string>Show desktop shadows</string>
+         <string>Show notification windows</string>
      </property>
      <property name="checked">
-      <bool>false</bool>
+         <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="3" column="0">
-    <widget class="QCheckBox" name="kcfg_showWindowTitles">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Duration of the animations:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="kcfg_animationsDuration">
+        <property name="suffix">
+         <string>ms</string>
+        </property>
+        <property name="minimum">
+         <number>200</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="singleStep">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Desktops bar</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="kcfg_showDesktopsBarBackground">
      <property name="text">
-      <string>Show window titles</string>
+         <string>Show background</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QCheckBox" name="kcfg_showNotificationWindows">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="kcfg_showDesktopShadows">
      <property name="text">
-      <string>Show notification windows</string>
+         <string>Show desktop shadows</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Position:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="kcfg_desktopsBarPlacement">
+        <item>
+         <property name="text">
+          <string>Top</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bottom</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Left</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Right</string>
      </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>kcfg_blurBackground</tabstop>
-  <tabstop>kcfg_showDesktopsBarBackground</tabstop>
-  <tabstop>kcfg_showDesktopShadows</tabstop>
-  <tabstop>kcfg_showWindowTitles</tabstop>
-  <tabstop>kcfg_showNotificationWindows</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
