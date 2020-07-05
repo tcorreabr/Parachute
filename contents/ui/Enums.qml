@@ -2,7 +2,7 @@
 
     Item {
         enum Position {
-            Top, Left, Right, Bottom
+            Top, Bottom, Left, Right
         }
     }
 

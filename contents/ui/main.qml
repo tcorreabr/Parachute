@@ -18,6 +18,8 @@ Window {
     property bool desktopsInitialized: false
     property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
             workspace.currentDesktop - 1
+    property bool horizontalDesktopsLayout: configDesktopBarPosition === Enums.Position.Top ||
+            mainWindow.configDesktopBarPosition === Enums.Position.Bottom
 
     // Config
     property bool configBlurBackground: true
@@ -113,6 +115,7 @@ Window {
         mainWindow.height = workspace.displaySize.height;
 
         loadConfig();
+        updateAllDesktops();
         keyboardHandler.forceActiveFocus();
         getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
@@ -210,6 +213,14 @@ Window {
             clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
                     KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
                     KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
+        }
+
+        const tempConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", 0);
+        if (tempConfigDesktopBarPosition !== configDesktopBarPosition) {
+            if (mainWindow.activated) toggleActive();
+            mainWindow.desktopsInitialized = false;
+            configDesktopBarPosition = tempConfigDesktopBarPosition;
+            // updateAllDesktops();
         }
     }
 

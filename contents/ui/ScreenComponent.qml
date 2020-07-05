@@ -56,25 +56,55 @@ Item {
 
         states: [
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Top || mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Top
                 PropertyChanges {
                     target: desktopsBar
                     height: desktopsBarHeight
-                    anchors.bottom: mainWindow.configDesktopBarPosition === Enums.Position.Top ? bigDesktops.top : undefined
-                    anchors.top: mainWindow.configDesktopBarPosition === Enums.Position.Bottom ? bigDesktops.bottom : undefined
-                    anchors.right: parent.right
-                    anchors.left: parent.left
+                }
+                AnchorChanges {
+                    target: desktopsBar
+                    anchors.bottom: bigDesktops.top
+                    anchors.right: screenItem.right
+                    anchors.left: screenItem.left
                 }
             },
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Left || mainWindow.configDesktopBarPosition === Enums.Position.Right
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                PropertyChanges {
+                    target: desktopsBar
+                    height: desktopsBarHeight
+                }
+                AnchorChanges {
+                    target: desktopsBar
+                    anchors.top: bigDesktops.bottom
+                    anchors.right: screenItem.right
+                    anchors.left: screenItem.left
+                }
+            },
+            State {
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Left
                 PropertyChanges {
                     target: desktopsBar
                     width: desktopsBarWidth
-                    anchors.bottom: parent.bottom
-                    anchors.top: parent.top
-                    anchors.right: mainWindow.configDesktopBarPosition === Enums.Position.Left ? bigDesktops.left : undefined
-                    anchors.left: mainWindow.configDesktopBarPosition === Enums.Position.Right ? bigDesktops.right : undefined
+                }
+                AnchorChanges {
+                    target: desktopsBar
+                    anchors.bottom: screenItem.bottom
+                    anchors.top: screenItem.top
+                    anchors.right: bigDesktops.left
+                }
+            },
+            State {
+                when: mainWindow.configDesktopBarPosition === Enums.Position.Right
+                PropertyChanges {
+                    target: desktopsBar
+                    width: desktopsBarWidth
+                }
+                AnchorChanges {
+                    target: desktopsBar
+                    anchors.bottom: screenItem.bottom
+                    anchors.top: screenItem.top
+                    anchors.left: bigDesktops.right
                 }
             }
         ]
@@ -98,25 +128,23 @@ Item {
 
                     states: [
                         State {
-                            when: mainWindow.configDesktopBarPosition === Enums.Position.Top ||
-                                    mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                            when: mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
-                                x: mainWindow.smallDesktopMargin + model.index * (width + mainWindow.smallDesktopMargin)
+                                x: mainWindow.smallDesktopMargin + model.index * (smallDesktop.width + mainWindow.smallDesktopMargin)
                                 y: mainWindow.smallDesktopMargin
-                                width: (height / screenItem.height) * screenItem.width
+                                width: (smallDesktop.height / screenItem.height) * screenItem.width
                                 height: desktopsBar.height - mainWindow.smallDesktopMargin * 2
                             }
                         },
                         State {
-                            when: mainWindow.configDesktopBarPosition === Enums.Position.Left ||
-                                    mainWindow.configDesktopBarPosition === Enums.Position.Right
+                            when: !mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
                                 x: mainWindow.smallDesktopMargin
-                                y: mainWindow.smallDesktopMargin + model.index * (height + mainWindow.smallDesktopMargin)
+                                y: mainWindow.smallDesktopMargin + model.index * (smallDesktop.height + mainWindow.smallDesktopMargin)
                                 width: desktopsBar.width - mainWindow.smallDesktopMargin * 2
-                                height: (width / screenItem.width) * screenItem.height
+                                height: (smallDesktop.width / screenItem.width) * screenItem.height
                             }
                         }
                     ]
@@ -135,8 +163,7 @@ Item {
         anchors.fill: parent
         clip: true
         currentIndex: mainWindow.currentActivityOrDesktop
-        orientation: mainWindow.configDesktopBarPosition === Enums.Position.Left ||
-                mainWindow.configDesktopBarPosition === Enums.Position.Right ? Qt.Vertical : Qt.Horizontal
+        orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
 
         Behavior on anchors.topMargin {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
