@@ -23,7 +23,7 @@ Item {
 
     Behavior on bigDesktopMargin {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: bigDesktopMarginAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: bigDesktopMarginAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     // Repeater {
@@ -175,7 +175,7 @@ Item {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
 
             NumberAnimation {
-                duration: mainWindow.animationsDuration
+                duration: mainWindow.configAnimationsDuration
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
@@ -192,7 +192,7 @@ Item {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Bottom
 
             NumberAnimation {
-                duration: mainWindow.animationsDuration
+                duration: mainWindow.configAnimationsDuration
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
@@ -209,7 +209,7 @@ Item {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Left
 
             NumberAnimation {
-                duration: mainWindow.animationsDuration
+                duration: mainWindow.configAnimationsDuration
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
@@ -226,7 +226,7 @@ Item {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Right
 
             NumberAnimation {
-                duration: mainWindow.animationsDuration
+                duration: mainWindow.configAnimationsDuration
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {

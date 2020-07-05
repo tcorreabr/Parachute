@@ -18,36 +18,36 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-    <widget class="QCheckBox" name="kcfg_blurBackground">
-     <property name="text">
-      <string>Blur background</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-       <widget class="QCheckBox" name="kcfg_showWindowTitles">
-     <property name="text">
-         <string>Show window titles and icons</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-       <widget class="QCheckBox" name="kcfg_showNotificationWindows">
-     <property name="text">
-         <string>Show notification windows</string>
-     </property>
-     <property name="checked">
+       <widget class="QCheckBox" name="kcfg_blurBackground">
+        <property name="text">
+         <string>Blur background</string>
+        </property>
+        <property name="checked">
          <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="kcfg_showWindowTitles">
+        <property name="text">
+         <string>Show window titles and icons</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="kcfg_showNotificationWindows">
+        <property name="text">
+         <string>Show notification windows</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Duration of the animations:</string>
@@ -63,10 +63,13 @@
          <number>200</number>
         </property>
         <property name="maximum">
-         <number>500</number>
+         <number>400</number>
         </property>
         <property name="singleStep">
          <number>50</number>
+        </property>
+        <property name="value">
+         <number>200</number>
         </property>
        </widget>
       </item>
@@ -81,20 +84,20 @@
      <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
        <widget class="QCheckBox" name="kcfg_showDesktopsBarBackground">
-     <property name="text">
+        <property name="text">
          <string>Show background</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="kcfg_showDesktopShadows">
-     <property name="text">
+        <property name="text">
          <string>Show desktop shadows</string>
-     </property>
-     <property name="checked">
+        </property>
+        <property name="checked">
          <bool>false</bool>
         </property>
        </widget>
@@ -126,7 +129,7 @@
         <item>
          <property name="text">
           <string>Right</string>
-     </property>
+         </property>
         </item>
        </widget>
       </item>

@@ -20,18 +20,15 @@ Window {
             workspace.currentDesktop - 1
     property bool horizontalDesktopsLayout: configDesktopBarPosition === Enums.Position.Top ||
             mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+    property int easingType: noAnimation
 
     // Config
-    property bool configBlurBackground: true
-    property bool configShowDesktopBarBackground: true
-    property bool configShowWindowTitles: true
-    property bool configShowDesktopShadows: false
-    property int configDesktopBarPosition: Enums.Position.Top
-
-    // Animations
-    property real animationsDuration: 200 //units.longDuration * 2
-    property int noAnimation: 0 // Const to disable animations
-    property int easingType: noAnimation
+    property bool configBlurBackground
+    property bool configShowDesktopBarBackground
+    property bool configShowWindowTitles
+    property bool configShowDesktopShadows
+    property real configAnimationsDuration
+    property int configDesktopBarPosition
 
     // Selection (with mouse or keyboard)
     property var selectedClientItem: null
@@ -41,6 +38,7 @@ Window {
     property bool shouldRequestActivate: true
 
     // Consts
+    property int noAnimation: 0
     property int smallDesktopMargin: 15
 
     Item {
@@ -207,6 +205,7 @@ Window {
         configShowDesktopBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
+        configAnimationsDuration = KWin.readConfig("animationsDuration", 200); //units.longDuration
 
         if (KWin.readConfig("showNotificationWindows", true)) {
             clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion;
@@ -222,7 +221,7 @@ Window {
                     KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
         }
 
-        const tempConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", 0);
+        const tempConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
         if (tempConfigDesktopBarPosition !== configDesktopBarPosition) {
             if (mainWindow.activated) toggleActive();
             mainWindow.desktopsInitialized = false;

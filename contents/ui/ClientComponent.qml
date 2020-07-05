@@ -22,22 +22,22 @@ Item {
 
     Behavior on x {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: xAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: xAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on y {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: yAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: yAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on width {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: widthAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: widthAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on height {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: heightAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { id: heightAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     PlasmaCore.FrameSvgItem {
