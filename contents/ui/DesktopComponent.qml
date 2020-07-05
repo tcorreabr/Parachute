@@ -213,15 +213,15 @@ Item {
 
     function rearrangeClients() {
         if (!mainWindow.desktopsInitialized) return;
+
+        mainWindow.easingType = mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation;
+        screenItem.showDesktopsBar();
         calculateTransformations();
-        desktopItem.updateToCalculated(mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation);
+        desktopItem.updateToCalculated();
     }
 
     function calculateTransformations() {
         if (clientsRepeater.count < 1) return;
-
-        mainWindow.easingType = mainWindow.noAnimation;
-        screenItem.showDesktopsBar();
 
         // Calculate the number of rows and columns
         const clientsCount = clientsRepeater.count;
@@ -270,9 +270,7 @@ Item {
         }
     }
 
-    function updateToCalculated(animationType) {
-        mainWindow.easingType = animationType;
-        screenItem.showDesktopsBar();
+    function updateToCalculated() {
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.calculatedX;
@@ -282,9 +280,7 @@ Item {
         }
     }
 
-    function updateToOriginal(animationType) {
-        mainWindow.easingType = animationType;
-        screenItem.hideDesktopsBar();
+    function updateToOriginal() {
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
             currentClientItem.x = currentClientItem.originalX;

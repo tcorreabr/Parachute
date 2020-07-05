@@ -144,33 +144,41 @@ Window {
             shouldRequestActivate = false;
             workspace.activeClient = selectedClientItem ? selectedClientItem.client : mainWindow.outsideSelectedClient;
 
+            mainWindow.easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(Easing.InExpo);
+                currentScreenItem.hideDesktopsBar();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
                 // The window must be hide (mainWindow.activated = false) only in the end of animation
             }
         } else {
             requestActivateTimer.start();
 
+            mainWindow.easingType = mainWindow.noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal(mainWindow.noAnimation);
+                currentScreenItem.hideDesktopsBar();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
             }
+            mainWindow.easingType = Easing.OutExpo;
             mainWindow.activated = true;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.visible = true;
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated(Easing.OutExpo);
+                currentScreenItem.showDesktopsBar();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated();
             }
         }
     }
 
     function deactivate() {
+        mainWindow.easingType = mainWindow.noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
             currentScreenItem.visible = false;
+            currentScreenItem.showDesktopsBar();
             currentScreenItem.bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).
-                    bigDesktop.updateToCalculated(mainWindow.noAnimation);
+                    bigDesktop.updateToCalculated();
         }
         mainWindow.activated = false;
     }
@@ -253,13 +261,15 @@ Window {
             // }
 
             // Update desktops
+            mainWindow.easingType = mainWindow.noAnimation;
+            currentScreenItem.showDesktopsBar();
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                 const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                 currentBigDesktopItem.calculateTransformations();
-                currentBigDesktopItem.updateToCalculated(mainWindow.noAnimation);
+                currentBigDesktopItem.updateToCalculated();
                 const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
                 currentDesktopBarItem.calculateTransformations();
-                currentDesktopBarItem.updateToCalculated(mainWindow.noAnimation);
+                currentDesktopBarItem.updateToCalculated();
             }
         }
         desktopsInitialized = true;
