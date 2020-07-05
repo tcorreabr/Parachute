@@ -15,10 +15,16 @@ Item {
 
     property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
     property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
+    property int bigDesktopMargin
     property bool animating: false
     property real ratio: width / height
 
     property int screenIndex: model.index
+
+    Behavior on bigDesktopMargin {
+        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        NumberAnimation { id: bigDesktopMarginAnimation; duration: animationsDuration; easing.type: mainWindow.easingType; }
+    }
 
     // Repeater {
     //     id: activitiesBackgrounds
@@ -175,7 +181,7 @@ Item {
                 onRunningChanged: {
                     screenItem.animating = running;
 
-                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
                     }
                 }  
@@ -192,7 +198,7 @@ Item {
                 onRunningChanged: {
                     screenItem.animating = running;
 
-                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
                     }
                 }   
@@ -209,7 +215,7 @@ Item {
                 onRunningChanged: {
                     screenItem.animating = running;
 
-                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
                     }
                 }
@@ -226,7 +232,7 @@ Item {
                 onRunningChanged: {
                     screenItem.animating = running;
 
-                    if (!running && mainWindow.activated && bigDesktops.anchors.margins === 0 && mainWindow.easingType === Easing.InExpo) {
+                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
                     }
                 }
@@ -275,10 +281,10 @@ Item {
                     big: true
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
-                    width: desktopRatio < screenItem.ratio ? parent.width - mainWindow.bigDesktopMargin
-                            : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
-                    height: desktopRatio > screenItem.ratio ? parent.height - mainWindow.bigDesktopMargin
-                            : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
+                    width: desktopRatio < screenItem.ratio ? parent.width - screenItem.bigDesktopMargin
+                            : parent.height / screenItem.height * screenItem.width - screenItem.bigDesktopMargin
+                    height: desktopRatio > screenItem.ratio ? parent.height - screenItem.bigDesktopMargin
+                            : parent.width / screenItem.width * screenItem.height - screenItem.bigDesktopMargin
 
                     property real desktopRatio: parent.width / parent.height
                 }
@@ -306,6 +312,7 @@ Item {
                 bigDesktops.anchors.rightMargin = screenItem.desktopsBarWidth;
                 break;
         }
+        screenItem.bigDesktopMargin = 40;
     }
 
     function hideDesktopsBar() {
@@ -313,6 +320,7 @@ Item {
         bigDesktops.anchors.bottomMargin = 0;
         bigDesktops.anchors.leftMargin = 0;
         bigDesktops.anchors.rightMargin = 0;
+        screenItem.bigDesktopMargin = 0;
     }
 
     function updateDesktopWindowId() {

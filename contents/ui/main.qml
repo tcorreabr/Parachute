@@ -41,7 +41,6 @@ Window {
     property bool shouldRequestActivate: true
 
     // Consts
-    property int bigDesktopMargin: 40
     property int smallDesktopMargin: 15
 
     Item {
