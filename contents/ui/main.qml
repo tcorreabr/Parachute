@@ -169,6 +169,7 @@ Window {
     }
 
     function deactivate() {
+        mainWindow.activated = false;
         mainWindow.easingType = mainWindow.noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -177,7 +178,6 @@ Window {
             currentScreenItem.bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).
                     bigDesktop.updateToCalculated();
         }
-        mainWindow.activated = false;
     }
 
     function clientActivated(client) {

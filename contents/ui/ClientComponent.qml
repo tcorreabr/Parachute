@@ -148,6 +148,6 @@ Item {
 
     onClientChanged: {
         if (client)
-            client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; print(client.width); });
+            client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
     }
 }
