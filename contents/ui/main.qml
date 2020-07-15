@@ -221,12 +221,25 @@ Window {
                     KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
         }
 
-        const tempConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
-        if (tempConfigDesktopBarPosition !== configDesktopBarPosition) {
-            if (mainWindow.activated) toggleActive();
-            mainWindow.desktopsInitialized = false;
-            configDesktopBarPosition = tempConfigDesktopBarPosition;
-            // updateAllDesktops();
+        // updating configDesktopBarPosition is a little more tricky than the others options
+        const tmpConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
+        if (configDesktopBarPosition !== tmpConfigDesktopBarPosition) {
+            mainWindow.easingType = mainWindow.noAnimation;
+            configDesktopBarPosition = tmpConfigDesktopBarPosition;
+
+            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+                const currentScreenItem = screensRepeater.itemAt(currentScreen);
+                currentScreenItem.hideDesktopsBar();
+                currentScreenItem.showDesktopsBar();
+                for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
+                    const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
+                    currentBigDesktopItem.calculateTransformations();
+                    currentBigDesktopItem.updateToCalculated();
+                    const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
+                    currentDesktopBarItem.calculateTransformations();
+                    currentDesktopBarItem.updateToCalculated();
+                }
+            }
         }
     }
 
