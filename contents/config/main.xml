@@ -31,7 +31,7 @@
 		</entry>
 		<entry name="animationsDuration" type="int">
 		  <label>Duration of the animations</label>
-		  <default>200</default>
+		  <default>250</default>
 		</entry>
     </group>
 </kcfg>

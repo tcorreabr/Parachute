@@ -112,10 +112,10 @@ Window {
         mainWindow.width = workspace.displaySize.width;
         mainWindow.height = workspace.displaySize.height;
 
+        getQtVersion();
         loadConfig();
         updateAllDesktops();
         keyboardHandler.forceActiveFocus();
-        getQtVersion();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
 
@@ -206,7 +206,7 @@ Window {
         configShowDesktopsBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
-        configAnimationsDuration = KWin.readConfig("animationsDuration", 200); //units.longDuration
+        configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
 
         if (KWin.readConfig("showNotificationWindows", true)) {
             clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion;
