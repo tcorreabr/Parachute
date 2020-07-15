@@ -18,17 +18,17 @@ Window {
     property bool desktopsInitialized: false
     property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
             workspace.currentDesktop - 1
-    property bool horizontalDesktopsLayout: configDesktopBarPosition === Enums.Position.Top ||
-            mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+    property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
+            mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: noAnimation
 
     // Config
     property bool configBlurBackground
-    property bool configShowDesktopBarBackground
+    property bool configShowDesktopsBarBackground
     property bool configShowWindowTitles
     property bool configShowDesktopShadows
     property real configAnimationsDuration
-    property int configDesktopBarPosition
+    property int configDesktopsBarPlacement
 
     // Selection (with mouse or keyboard)
     property var selectedClientItem: null
@@ -203,7 +203,7 @@ Window {
 
     function loadConfig() {
         configBlurBackground = KWin.readConfig("blurBackground", true);
-        configShowDesktopBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
+        configShowDesktopsBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
         configAnimationsDuration = KWin.readConfig("animationsDuration", 200); //units.longDuration
@@ -222,11 +222,11 @@ Window {
                     KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
         }
 
-        // updating configDesktopBarPosition is a little more tricky than the others options
-        const tmpConfigDesktopBarPosition = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
-        if (configDesktopBarPosition !== tmpConfigDesktopBarPosition) {
+        // updating configDesktopsBarPlacement is a little more tricky than the others options
+        const tmpConfigDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
+        if (configDesktopsBarPlacement !== tmpConfigDesktopsBarPlacement) {
             mainWindow.easingType = mainWindow.noAnimation;
-            configDesktopBarPosition = tmpConfigDesktopBarPosition;
+            configDesktopsBarPlacement = tmpConfigDesktopsBarPlacement;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -259,18 +259,6 @@ Window {
 
             if (mainWindow.qtVersion >= 5.14 && currentScreenItem.children.length < 6)
                 Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
-
-            // Get desktop windowId to show backgrounds
-            // const screenModelIndex = clientsByScreen.index(currentScreen, 0);
-            // for (let currentClient = 0; currentClient < clientsByScreen.rowCount(screenModelIndex); currentClient++) {
-            //     const clientModelIndex = clientsByScreen.index(currentClient, 0, screenModelIndex);
-                // const client = clientsByScreen.data(clientModelIndex);
-                // ^^^ this is the line that causes kwin to crash. I don't know why. Maybe some internal bug in data method? ^^^
-                // if (client.desktopWindow) { //} && client.activities.length === 1) {
-                //     // const activityIndex = workspace.activities.indexOf(client.activities[0]);
-                //     screensRepeater.itemAt(currentScreen).desktopBackground.winId = client.windowId;
-                // }
-            // }
 
             // Update desktops
             mainWindow.easingType = mainWindow.noAnimation;

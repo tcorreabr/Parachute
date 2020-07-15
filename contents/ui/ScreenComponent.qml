@@ -11,7 +11,6 @@ Item {
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
     property alias desktopBackground: desktopBackground
-    // property alias activitiesBackgrounds: activitiesBackgrounds
 
     property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
     property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
@@ -20,16 +19,12 @@ Item {
 
     property int screenIndex: model.index
 
-    // Repeater {
-    //     id: activitiesBackgrounds
-    //     model: workspace.activities.length
     PlasmaCore.WindowThumbnail {
         id: desktopBackground
         anchors.fill: parent
         visible: winId !== 0
         opacity: mainWindow.configBlurBackground ? 0 : 1
     }
-    // }
 
     FastBlur {
         id: blurBackground
@@ -45,7 +40,7 @@ Item {
         anchors.fill: desktopsBar
         color: "black"
         opacity: 0.1
-        visible: mainWindow.configShowDesktopBarBackground
+        visible: mainWindow.configShowDesktopsBarBackground
     }
 
     ScrollView {
@@ -56,7 +51,7 @@ Item {
 
         states: [
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Top
+                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Top
                 PropertyChanges {
                     target: desktopsBar
                     height: desktopsBarHeight
@@ -69,7 +64,7 @@ Item {
                 }
             },
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
                 PropertyChanges {
                     target: desktopsBar
                     height: desktopsBarHeight
@@ -82,7 +77,7 @@ Item {
                 }
             },
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Left
+                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Left
                 PropertyChanges {
                     target: desktopsBar
                     width: desktopsBarWidth
@@ -95,7 +90,7 @@ Item {
                 }
             },
             State {
-                when: mainWindow.configDesktopBarPosition === Enums.Position.Right
+                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Right
                 PropertyChanges {
                     target: desktopsBar
                     width: desktopsBarWidth
@@ -166,7 +161,7 @@ Item {
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
 
         Behavior on anchors.topMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Top
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Top
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -183,7 +178,7 @@ Item {
         }
 
         Behavior on anchors.bottomMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Bottom
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -200,7 +195,7 @@ Item {
         }
 
         Behavior on anchors.leftMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Left
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Left
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -217,7 +212,7 @@ Item {
         }
 
         Behavior on anchors.rightMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopBarPosition === Enums.Position.Right
+            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Right
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -292,7 +287,7 @@ Item {
     }
 
     function showDesktopsBar() {
-        switch (mainWindow.configDesktopBarPosition) {
+        switch (mainWindow.configDesktopsBarPlacement) {
             case Enums.Position.Top:
                 bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight;
                 break;
