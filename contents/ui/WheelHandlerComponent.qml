@@ -2,7 +2,6 @@ import QtQuick 2.14
 
 Item {
     anchors.fill: parent
-    z: -999
 
     WheelHandler {
         property int wheelDelta: 0
