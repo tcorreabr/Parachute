@@ -146,7 +146,12 @@ Item {
 
                     TapHandler {
                         acceptedButtons: Qt.LeftButton
-                        onTapped: workspace.currentDesktop = model.index + 1;
+                        onTapped: {
+                            if (workspace.currentDesktop === model.index + 1)
+                                mainWindow.toggleActive();
+                            else
+                                workspace.currentDesktop = model.index + 1;
+                        }
                     }
                 }
             }

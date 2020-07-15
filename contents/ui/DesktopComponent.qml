@@ -188,7 +188,7 @@ Item {
         }
 
         HoverHandler {
-            enabled: big && !screenItem.animating && !mainWindow.dragging
+            enabled: !screenItem.animating && !mainWindow.dragging
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
