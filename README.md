@@ -4,11 +4,9 @@
   <img src="parachute.svg">
 </p>
 
-Look at your windows and desktops from above. I think the opening animation resembles a parachute opening too.
+Look at your windows and desktops from above.
 
 This *KWin* script was inspired by the excellent work of several projects like: [KWin (Present Windows and Desktop Grid effects)](https://github.com/KDE/kwin), [kwinOverview](https://github.com/astatide/kwinOverview), [qOverview](https://gitlab.com/bharadwaj-raju/QOverview), [Gnome](https://www.gnome.org/), [Deepin](https://www.deepin.org/).
-
-The most promising feature isn't implemented yet. I think that the possibility of working with *Plasma* activities in a faster and more natural way can be game changing in their daily use. In the future, this script may allow you to insert/delete activities, move windows between them, etc. For now, it works with virtual desktops and just ignores activities because I think some changes in *KWin's* source code may be needed for the support.
 
 ![](parachute.png)
 
@@ -33,29 +31,28 @@ After activate the script in *KWin Scripts* window you can use the default regis
 You can also invoke the script with: *qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Parachute*. Similarly you can: integrate it with [easystroke](https://github.com/thjaeger/easystroke), [configure it to be invoked with meta key](https://github.com/tcorreabr/Parachute/issues/30), etc.
 
 Controls:
-* Left mouse button - Select window.
+* Left mouse button - Activate window.
 * Middle mouse button - Close window.
 * Right mouse button - (Un)pin window.
-* Arrow keys - Navigate through windows.
+* Arrow keys - Select a window.
 * Home/End - Select first/last window.
-* Enter - Select window.
-* Esc - Deactivate Parachute.
-* F5 - Reload config options.
+* Enter - Activate selected window.
+* Esc - Hide Parachute.
+* F5 - Update settings.
 
 ## Notes
 
-* Developed and tested in *Plasma* 5.18, but **not ready for daily use**.
-* Not tested on *Wayland*. I'm pretty sure it doesn't work on it.
+* Developed and tested in *Plasma* >= 5.18 and *Qt* >= 5.14.
+* For now it doesn't work on *Wayland*.
+* For now you may have to [click on a empty desktop to show it's wallpaper](https://github.com/tcorreabr/Parachute/issues/6). This should be fixed only when *KWin* 5.20 arrives.
+* You can use *KWin's* global shortcuts normally while using this script. To navigate between your desktops for example.
 * If you are using "Slide" animation to switch desktops, you may want to switch to "Desktop Cube Animation" or "Fade Desktop" to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
-* For now, you have to [click on a empty desktop to show the backgrounds](https://github.com/tcorreabr/Parachute/issues/6).
-* You can use KWin's global shortcuts normally while using this script. To navigate between your desktops for example.
+* If you are having poor performance on animations, try to change "Scale method" to "Smooth" or "Crisp" in Compositor settings.
 * If you have [Virtual Desktop Bar](https://github.com/wsdfhjxc/virtual-desktop-bar) installed, [Parachute keyboard shortcut may be ineffective](https://github.com/tcorreabr/Parachute/issues/14) until KWin restart or dynamic desktop operations.
 
 ## Possible improvements
 
-* Insert, move and delete *Plasma* activities and virtual desktops.
-* Option to work with *Plasma* activities OR virtual desktops.
-* Option to top/left/right/bottom desktops bar positioning.
-* More plasma theming support.
+* Insert, move and delete *Plasma* activities and virtual desktops. This should be supported only when *KWin* 5.20 arrives.
+* More *Plasma* theming support.
 * Click on desktops bar to animate it to fullscreen (simulating *KWin's* Desktop Grid effect).
 * One more shortcut to invoke Parachute in this Desktop Grid like mode.
