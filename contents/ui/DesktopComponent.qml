@@ -6,7 +6,6 @@ import QtQuick.Layouts 1.12
 
 Item {
     id: desktopItem
-    visible: !big || desktopIndex === mainWindow.currentActivityOrDesktop
 
     property alias clientsRepeater: clientsRepeater
 
