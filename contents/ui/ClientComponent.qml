@@ -65,7 +65,7 @@ Item {
 
             PlasmaCore.IconItem {
                 id: wIcon
-                source: clientItem.client.icon
+                source: clientItem.client ? clientItem.client.icon : null
                 implicitHeight: parent.height
                 implicitWidth: parent.height
             }
@@ -73,7 +73,7 @@ Item {
             Text {
                 id: caption
                 height: parent.height
-                text: clientItem.client.caption
+                text: clientItem.client ? clientItem.client.caption : null
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 color: "white"
@@ -107,7 +107,7 @@ Item {
         anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
         anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
         anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
-        wId: clientItem.client.internalId
+        wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clipTo: screenItem
         clip: true
         renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
