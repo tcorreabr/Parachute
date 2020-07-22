@@ -10,11 +10,6 @@ Item {
     property var client: model.client
     property int noBorderMargin
 
-    property real originalX
-    property real originalY
-    property real originalWidth
-    property real originalHeight
-
     property real calculatedX
     property real calculatedY
     property real calculatedWidth
@@ -22,22 +17,22 @@ Item {
 
     Behavior on x {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: xAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on y {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: yAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on width {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: widthAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on height {
         enabled: mainWindow.easingType !== mainWindow.noAnimation
-        NumberAnimation { id: heightAnimation; duration: configAnimationsDuration; easing.type: mainWindow.easingType; }
+        NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     PlasmaCore.FrameSvgItem {
@@ -46,16 +41,16 @@ Item {
         imagePath: "widgets/viewitem"
         prefix: "hover"
         visible: big && !screenItem.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
-        opacity: 0.5
+        opacity: 0.7
     }
 
     Item {
         id: clientDecorations
         height: desktopItem.clientsDecorationsHeight
-        anchors.horizontalCenter: parent.horizontalCenter
         width: clientThumbnail.width * 0.8
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
+        anchors.horizontalCenter: parent.horizontalCenter
         visible: big && mainWindow.configShowWindowTitles && !screenItem.animating && !clientThumbnail.Drag.active
 
         RowLayout {
@@ -64,7 +59,7 @@ Item {
             spacing: 10
 
             PlasmaCore.IconItem {
-                id: wIcon
+                id: icon
                 source: clientItem.client ? clientItem.client.icon : null
                 implicitHeight: parent.height
                 implicitWidth: parent.height
@@ -77,16 +72,15 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 color: "white"
-                Layout.maximumWidth: clientDecorations.width - wIcon.width - parent.spacing - closeButton.width - parent.spacing
+                Layout.maximumWidth: clientDecorations.width - icon.width - parent.spacing - closeButton.width - parent.spacing
             }
 
-            // This wrapper is needed because QML recalculate Layouts when visibility of children change 
+            // This wrapper is needed because QML recalculate Layouts when children visibility change 
             Item {
                 id: closeButtonWrapper
                 implicitHeight: parent.height
                 implicitWidth: parent.height
 
-                // PlasmaComponents.Button {
                 RoundButton {
                     id: closeButton
                     anchors.fill: parent
@@ -108,23 +102,24 @@ Item {
         anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
         anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
-        clipTo: screenItem
+        clipTo: desktopItem
         clip: true
-        renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
         Drag.source: clientItem.client
+        renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
         antialiasing: false
         smooth: false
         // fillColor: "green"
         
         states: State {
             when: clientThumbnail.Drag.active
+
             PropertyChanges {
                 target: clientThumbnail
+                x: desktopItem.clientsPadding + myDragHandler.centroid.position.x - clientThumbnail.width / 2
+                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + myDragHandler.centroid.position.y - clientThumbnail.height / 2
                 width: 250; height: 250; clip: false
                 Drag.hotSpot.x: clientThumbnail.width / 2
                 Drag.hotSpot.y: clientThumbnail.height / 2
-                x: desktopItem.clientsPadding + myDragHandler.centroid.position.x - clientThumbnail.width / 2
-                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + myDragHandler.centroid.position.y - clientThumbnail.height / 2
             }
         }
     }
@@ -132,8 +127,8 @@ Item {
     Item {
         id: dragPlaceholder
         anchors.fill: parent
-        anchors.margins: desktopItem.clientsPadding
-        anchors.topMargin: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight
+        anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
+        anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
 
         DragHandler {
             id: myDragHandler
@@ -147,7 +142,9 @@ Item {
     }
 
     onClientChanged: {
-        if (client)
+        if (client) {
             client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
+            clientItem.noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+        }
     }
 }
