@@ -6,7 +6,6 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 Item {
     id: screenItem
     visible: false
-    clip: true // Fixes the glitches? The glitches are caused by desktopsBar going out of screen?
 
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
@@ -47,7 +46,6 @@ Item {
         id: desktopsBar
         contentWidth: desktopsWrapper.width
         contentHeight: desktopsWrapper.height
-        clip: true
 
         states: [
             State {
@@ -110,8 +108,6 @@ Item {
             height: childrenRect.height + mainWindow.smallDesktopMargin
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
             y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
-            // anchors.horizontalCenter: parent.horizontalCenter
-            // anchors.verticalCenter: parent.verticalCenter
 
             Repeater {
                 id: desktopsBarRepeater
@@ -161,7 +157,6 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        clip: true
         currentIndex: mainWindow.currentActivityOrDesktop
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
 
