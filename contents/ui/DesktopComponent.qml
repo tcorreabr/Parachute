@@ -13,9 +13,9 @@ Item {
     property string activity
     property bool big: false
     property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
-
-    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
+    property int padding: 10
     property int clientsPadding: big ? 10 : 0
+    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
 
     Rectangle {
         id: colorBackground
@@ -26,11 +26,9 @@ Item {
     }
 
     DropShadow {
-        anchors.fill: colorBackground
+        anchors.fill: parent
         horizontalOffset: 3
         verticalOffset: 3
-        radius: 8.0
-        samples: 17
         color: "#80000000"
         visible: !big && mainWindow.configShowDesktopShadows
         source: colorBackground
@@ -62,11 +60,6 @@ Item {
                 PropertyChanges { target: colorizeRect; color: "#500055FF"; }
             }
         ]
-
-        HoverHandler {
-            id: desktopItemHoverHandler
-            enabled: !big && !screenItem.animating && !mainWindow.dragging
-        }
     }
 
     ToolTip {
@@ -108,7 +101,7 @@ Item {
             Image { source: "images/add.svg"; anchors.fill: parent; }
 
             onClicked: {
-                workspace.createDesktop(desktopItem.desktopIndex + 1, "Novo desktop");
+                workspace.createDesktop(desktopItem.desktopIndex + 1, "New desktop");
             }
         }
     }
@@ -176,7 +169,6 @@ Item {
     Item {
         id: clientsArea
         anchors.fill: parent
-        anchors.margins: 10
 
         Repeater {
             id: clientsRepeater
@@ -187,6 +179,7 @@ Item {
         }
 
         HoverHandler {
+            id: desktopItemHoverHandler
             enabled: !screenItem.animating && !mainWindow.dragging
 
             onPointChanged: {
@@ -224,15 +217,15 @@ Item {
 
         // Calculate the number of rows and columns
         const clientsCount = clientsRepeater.count;
-        const addToColumns = Math.floor(clientsArea.width / clientsArea.height);
+        const addToColumns = Math.floor((clientsArea.width - padding * 2) / (clientsArea.height - padding * 2));
         let columns = Math.floor(Math.sqrt(clientsCount));
         (columns + addToColumns >= clientsCount) ? columns = clientsCount : columns += addToColumns;
         let rows = Math.ceil(clientsCount / columns);
         while ((columns - 1) * rows >= clientsCount) columns--;
 
         // Calculate client's geometry transformations
-        const gridItemWidth = Math.floor(clientsArea.width / columns);
-        const gridItemHeight = Math.floor(clientsArea.height / rows);
+        const gridItemWidth = Math.floor((clientsArea.width - padding * 2) / columns);
+        const gridItemHeight = Math.floor((clientsArea.height - padding * 2) / rows);
         const gridItemRatio = gridItemWidth / gridItemHeight;
 
         let currentClient = 0;
@@ -241,24 +234,16 @@ Item {
                 // TODO FIXME sometimes clientItem is null (something related with yakuake or krunner?)
                 const clientItem = clientsRepeater.itemAt(currentClient);
 
-                // client.noBorder is non-NOTIFYable, so we'll update noBorderMargin here
-                clientItem.noBorderMargin = clientItem.client.noBorder ? big ? 18 : 4 : 0;
-
-                clientItem.originalX = clientItem.client.x - screenItem.x - clientsPadding;
-                clientItem.originalY = clientItem.client.y - screenItem.y - clientsDecorationsHeight - clientsPadding;
-                clientItem.originalWidth = clientItem.client.width + 2 * clientsPadding;
-                clientItem.originalHeight = clientItem.client.height + clientsDecorationsHeight + 2 * clientsPadding;
-
                 // calculate the scaling factor, avoiding windows bigger than original size
-                if (gridItemRatio > clientItem.originalWidth / clientItem.originalHeight) {
-                    clientItem.calculatedHeight = Math.min(gridItemHeight, clientItem.originalHeight);
-                    clientItem.calculatedWidth = clientItem.calculatedHeight / clientItem.originalHeight * clientItem.originalWidth;
+                if (gridItemRatio > clientItem.client.width / clientItem.client.height) {
+                    clientItem.calculatedHeight = Math.min(gridItemHeight, clientItem.client.height);
+                    clientItem.calculatedWidth = clientItem.calculatedHeight / clientItem.client.height * clientItem.client.width;
                 } else {
-                    clientItem.calculatedWidth = Math.min(gridItemWidth, clientItem.originalWidth);
-                    clientItem.calculatedHeight = clientItem.calculatedWidth / clientItem.originalWidth * clientItem.originalHeight;
+                    clientItem.calculatedWidth = Math.min(gridItemWidth, clientItem.client.width);
+                    clientItem.calculatedHeight = clientItem.calculatedWidth / clientItem.client.width * clientItem.client.height;
                 }
-                clientItem.calculatedX = column * gridItemWidth + (gridItemWidth - clientItem.calculatedWidth) / 2;
-                clientItem.calculatedY = row * gridItemHeight + (gridItemHeight - clientItem.calculatedHeight) / 2;
+                clientItem.calculatedX = column * gridItemWidth + padding + (gridItemWidth - clientItem.calculatedWidth) / 2;
+                clientItem.calculatedY = row * gridItemHeight + padding + (gridItemHeight - clientItem.calculatedHeight) / 2;
 
                 currentClient++;
                 if (currentClient === clientsCount) {
@@ -282,10 +267,10 @@ Item {
     function updateToOriginal() {
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.x = currentClientItem.originalX;
-            currentClientItem.y = currentClientItem.originalY;
-            currentClientItem.width = currentClientItem.originalWidth;
-            currentClientItem.height = currentClientItem.originalHeight;
+            currentClientItem.x = currentClientItem.client.x - screenItem.x;
+            currentClientItem.y = currentClientItem.client.y - screenItem.y;
+            currentClientItem.width = currentClientItem.client.width;
+            currentClientItem.height = currentClientItem.client.height;
         }
     }
 }
