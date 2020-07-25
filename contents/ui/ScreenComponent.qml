@@ -13,7 +13,6 @@ Item {
 
     property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
     property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
-    property bool animating: false
     property real ratio: width / height
 
     property int screenIndex: model.index
@@ -168,7 +167,7 @@ Item {
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
-                    screenItem.animating = running;
+                    mainWindow.animating = running;
 
                     if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
@@ -185,7 +184,7 @@ Item {
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
-                    screenItem.animating = running;
+                    mainWindow.animating = running;
 
                     if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
@@ -202,7 +201,7 @@ Item {
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
-                    screenItem.animating = running;
+                    mainWindow.animating = running;
 
                     if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();
@@ -219,7 +218,7 @@ Item {
                 easing.type: mainWindow.easingType
 
                 onRunningChanged: {
-                    screenItem.animating = running;
+                    mainWindow.animating = running;
 
                     if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
                         mainWindow.deactivate();

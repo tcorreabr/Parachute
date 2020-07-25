@@ -21,6 +21,7 @@ Window {
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
             mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: noAnimation
+    property bool animating: false
 
     // Config
     property bool configBlurBackground
@@ -132,11 +133,9 @@ Window {
     }
 
     function toggleActive() {
+        if (animating) return;
+        
         if (!mainWindow.desktopsInitialized) updateAllDesktops();
-
-        // Return if any big desktop is animating
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-            if (screensRepeater.itemAt(currentScreen).animating) return;
 
         if (mainWindow.activated) {
             shouldRequestActivate = false;

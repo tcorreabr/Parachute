@@ -40,7 +40,7 @@ Item {
         anchors.fill : parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: big && !screenItem.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
+        visible: big && !mainWindow.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.7
     }
 
@@ -51,7 +51,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: big && mainWindow.configShowWindowTitles && !screenItem.animating && !clientThumbnail.Drag.active
+        visible: big && mainWindow.configShowWindowTitles && !mainWindow.animating && !clientThumbnail.Drag.active
 
         RowLayout {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -102,7 +102,7 @@ Item {
         anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
         anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
-        clipTo: desktopItem
+        clipTo: screenItem
         clip: true
         Drag.source: clientItem.client
         renderTarget: KWinComponents.ThumbnailItem.FramebufferObject

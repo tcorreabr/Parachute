@@ -180,7 +180,7 @@ Item {
 
         HoverHandler {
             id: desktopItemHoverHandler
-            enabled: !screenItem.animating && !mainWindow.dragging
+            enabled: !mainWindow.animating && !mainWindow.dragging && (!big || desktopIndex === mainWindow.currentActivityOrDesktop)
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
@@ -209,7 +209,7 @@ Item {
         mainWindow.easingType = mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation;
         screenItem.showDesktopsBar();
         calculateTransformations();
-        desktopItem.updateToCalculated();
+        updateToCalculated();
     }
 
     function calculateTransformations() {
