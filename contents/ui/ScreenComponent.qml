@@ -229,9 +229,9 @@ Item {
                     big: true
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
-                    width: desktopRatio < screenItem.ratio ? parent.width - mainWindow.bigDesktopMargin
+                    width: desktopRatio < ratio ? parent.width - mainWindow.bigDesktopMargin
                             : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
-                    height: desktopRatio > screenItem.ratio ? parent.height - mainWindow.bigDesktopMargin
+                    height: desktopRatio > ratio ? parent.height - mainWindow.bigDesktopMargin
                             : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
 
                     property real desktopRatio: parent.width / parent.height
@@ -248,16 +248,16 @@ Item {
     function showDesktopsBar() {
         switch (mainWindow.configDesktopsBarPlacement) {
             case Enums.Position.Top:
-                bigDesktops.anchors.topMargin = screenItem.desktopsBarHeight;
+                bigDesktops.anchors.topMargin = desktopsBarHeight;
                 break;
             case Enums.Position.Bottom:
-                bigDesktops.anchors.bottomMargin = screenItem.desktopsBarHeight;
+                bigDesktops.anchors.bottomMargin = desktopsBarHeight;
                 break;
             case Enums.Position.Left:
-                bigDesktops.anchors.leftMargin = screenItem.desktopsBarWidth;
+                bigDesktops.anchors.leftMargin = desktopsBarWidth;
                 break;
             case Enums.Position.Right:
-                bigDesktops.anchors.rightMargin = screenItem.desktopsBarWidth;
+                bigDesktops.anchors.rightMargin = desktopsBarWidth;
                 break;
         }
     }
@@ -272,8 +272,8 @@ Item {
     function updateDesktopWindowId() {
         const clients = workspace.clientList(); 
         for (let i = 0; i < clients.length; i++) {
-            if (clients[i].desktopWindow && clients[i].screen === screenItem.screenIndex) {
-                screenItem.desktopBackground.winId = clients[i].windowId;
+            if (clients[i].desktopWindow && clients[i].screen === screenIndex) {
+                desktopBackground.winId = clients[i].windowId;
                 return;
             }
         }

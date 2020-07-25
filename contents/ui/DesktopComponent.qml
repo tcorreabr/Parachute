@@ -56,14 +56,14 @@ Item {
                 PropertyChanges { target: colorizeRect; color: "#5000AA00"; }
             },
             State {
-                when: !big && desktopItem.hovered
+                when: !big && hovered
                 PropertyChanges { target: colorizeRect; color: "#500055FF"; }
             }
         ]
     }
 
     ToolTip {
-        visible: desktopItem.hovered
+        visible: hovered
         text: workspace.desktopName(desktopIndex + 1);
         delay: 1000
         timeout: 5000
@@ -75,7 +75,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: -height / 2
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: false //desktopItem.hovered
+        visible: false // hovered
 
         RoundButton {
             id: removeButton
@@ -87,7 +87,7 @@ Item {
             Image { source: "images/remove.svg"; anchors.fill: parent; }
 
             onClicked: {
-                workspace.removeDesktop(desktopItem.desktopIndex);
+                workspace.removeDesktop(desktopIndex);
             }
         }
 
@@ -101,7 +101,7 @@ Item {
             Image { source: "images/add.svg"; anchors.fill: parent; }
 
             onClicked: {
-                workspace.createDesktop(desktopItem.desktopIndex + 1, "New desktop");
+                workspace.createDesktop(desktopIndex + 1, "New desktop");
             }
         }
     }
@@ -116,7 +116,7 @@ Item {
                 drag.accepted = true;
                 return;
             }
-            if (mainWindow.workWithActivities && !drag.source.activities.includes(desktopItem.activity) && drag.source.activities.length !== 0) {
+            if (mainWindow.workWithActivities && !drag.source.activities.includes(activity) && drag.source.activities.length !== 0) {
                 drag.accepted = true;
                 return;
             }
@@ -127,8 +127,8 @@ Item {
         onDropped: {
             if (!mainWindow.workWithActivities && desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1)
                 drag.source.desktop = desktopIndex + 1;
-            if (mainWindow.workWithActivities && !drag.source.activities.includes(desktopItem.activity) && drag.source.activities.length !== 0)
-                drag.source.activities.push(desktopItem.activity);
+            if (mainWindow.workWithActivities && !drag.source.activities.includes(activity) && drag.source.activities.length !== 0)
+                drag.source.activities.push(activity);
             if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
                 workspace.sendClientToScreen(drag.source, screenItem.screenIndex);
         }
@@ -154,7 +154,7 @@ Item {
         property var filterItem: function(item) {
             if (item.model.client.desktopWindow) return false;
             if (item.model.client.activities.length === 0) return true;
-            return item.model.client.activities.includes(desktopItem.activity);
+            return item.model.client.activities.includes(activity);
         }
 
         function update() {

@@ -8,8 +8,8 @@ Window {
     flags: Qt.X11BypassWindowManagerHint
     visible: true
     color: "#333333"
-    x: mainWindow.activated ? 0 : -mainWindow.width * 2
-    y: mainWindow.activated ? 0 : -mainWindow.height * 2
+    x: activated ? 0 : -mainWindow.width * 2
+    y: activated ? 0 : -mainWindow.height * 2
 
     property bool activated: false
     property bool dragging: false
@@ -19,7 +19,7 @@ Window {
     property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
             workspace.currentDesktop - 1
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
-            mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
+            configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: noAnimation
     property bool animating: false
 
@@ -50,10 +50,10 @@ Window {
             switch (event.key) {
                 case Qt.Key_Escape:
                     selectedClientItem = null;
-                    mainWindow.toggleActive();
+                    toggleActive();
                     break;
                 case Qt.Key_Return:
-                    if (selectedClientItem) mainWindow.toggleActive();
+                    if (selectedClientItem) toggleActive();
                     break;
                 case Qt.Key_Home:
                     selectFirstClient();
@@ -105,13 +105,10 @@ Window {
     // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
         id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: true;
-        onTriggered: mainWindow.requestActivate();
+        onTriggered: requestActivate();
     }
 
     Component.onCompleted: {
-        mainWindow.width = workspace.displaySize.width;
-        mainWindow.height = workspace.displaySize.height;
-
         getQtVersion();
         loadConfig();
         updateAllDesktops();
@@ -121,9 +118,9 @@ Window {
 
         options.configChanged.connect(loadConfig);
         workspace.clientActivated.connect(clientActivated);
-        workspace.numberScreensChanged.connect(function(count) { mainWindow.desktopsInitialized = false; });
-        workspace.screenResized.connect(function(screen) { mainWindow.desktopsInitialized = false; });
-        workspace.currentDesktopChanged.connect(function(desktop, client) { mainWindow.selectedClientItem = null;} );
+        workspace.numberScreensChanged.connect(function(count) { desktopsInitialized = false; });
+        workspace.screenResized.connect(function(screen) { desktopsInitialized = false; });
+        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null;} );
     }
 
     Component.onDestruction: {
@@ -134,30 +131,30 @@ Window {
     function toggleActive() {
         if (animating) return;
         
-        if (!mainWindow.desktopsInitialized) updateAllDesktops();
+        if (!desktopsInitialized) updateAllDesktops();
 
-        if (mainWindow.activated) {
+        if (activated) {
             shouldRequestActivate = false;
-            workspace.activeClient = selectedClientItem ? selectedClientItem.client : mainWindow.outsideSelectedClient;
+            workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
 
-            mainWindow.easingType = Easing.InExpo;
+            easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.hideDesktopsBar();
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
-                // The window must be hide (mainWindow.activated = false) only in the end of animation
+                // The window must be hide (activated = false) only in the end of animation
             }
         } else {
             requestActivateTimer.start();
 
-            mainWindow.easingType = mainWindow.noAnimation;
+            easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.hideDesktopsBar();
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
             }
-            mainWindow.easingType = Easing.OutExpo;
-            mainWindow.activated = true;
+            easingType = Easing.OutExpo;
+            activated = true;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.visible = true;
@@ -168,13 +165,13 @@ Window {
     }
 
     function deactivate() {
-        mainWindow.activated = false;
-        mainWindow.easingType = mainWindow.noAnimation;
+        activated = false;
+        easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
             currentScreenItem.visible = false;
             currentScreenItem.showDesktopsBar();
-            currentScreenItem.bigDesktopsRepeater.itemAt(mainWindow.currentActivityOrDesktop).
+            currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
                     bigDesktop.updateToCalculated();
         }
     }
@@ -182,7 +179,7 @@ Window {
     function clientActivated(client) {
         // The correct thing to do would be to use the client parameter but sometimes it doesn't seem to be with the right value
         if (workspace.activeClient) {
-            mainWindow.outsideSelectedClient = workspace.activeClient;
+            outsideSelectedClient = workspace.activeClient;
 
             if (workspace.activeClient.desktopWindow) {
                 const currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
@@ -191,7 +188,7 @@ Window {
             }
 
             // Doesn't requestActivate() if the client was selected in this script and the closing animation is running
-            if (mainWindow.activated && shouldRequestActivate)
+            if (activated && shouldRequestActivate)
                 requestActivateTimer.start();
         } else {
             requestActivateTimer.stop();
@@ -223,8 +220,8 @@ Window {
         // updating configDesktopsBarPlacement is a little more tricky than the others options
         const tmpConfigDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
         if (configDesktopsBarPlacement !== tmpConfigDesktopsBarPlacement) {
-            mainWindow.easingType = mainWindow.noAnimation;
             configDesktopsBarPlacement = tmpConfigDesktopsBarPlacement;
+            easingType = noAnimation;
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -255,11 +252,11 @@ Window {
             currentScreenItem.width = screenRect.width;
             currentScreenItem.height = screenRect.height;
 
-            if (mainWindow.qtVersion >= 5.14 && currentScreenItem.children.length < 6)
+            if (qtVersion >= 5.14 && currentScreenItem.children.length < 6)
                 Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
 
             // Update desktops
-            mainWindow.easingType = mainWindow.noAnimation;
+            easingType = noAnimation;
             currentScreenItem.showDesktopsBar();
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                 const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
@@ -349,6 +346,6 @@ Window {
     function getQtVersion() {
         const regexpNames = /Qt Version: (\d+.\d+).\d+/mg;
         const match = regexpNames.exec(workspace.supportInformation());
-        if (match) mainWindow.qtVersion = match[1];
+        if (match) qtVersion = match[1];
     }
 }

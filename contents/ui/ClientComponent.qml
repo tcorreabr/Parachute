@@ -40,7 +40,7 @@ Item {
         anchors.fill : parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: big && !mainWindow.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
+        visible: desktopItem.big && !mainWindow.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.7
     }
 
@@ -51,7 +51,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: big && mainWindow.configShowWindowTitles && !mainWindow.animating && !clientThumbnail.Drag.active
+        visible: desktopItem.big && mainWindow.configShowWindowTitles && !mainWindow.animating && !clientThumbnail.Drag.active
 
         RowLayout {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -99,8 +99,8 @@ Item {
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
         anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
-        anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
-        anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
+        anchors.margins: desktopItem.clientsPadding + noBorderMargin
+        anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clipTo: screenItem
         clip: true
@@ -115,8 +115,8 @@ Item {
 
             PropertyChanges {
                 target: clientThumbnail
-                x: desktopItem.clientsPadding + myDragHandler.centroid.position.x - clientThumbnail.width / 2
-                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + myDragHandler.centroid.position.y - clientThumbnail.height / 2
+                x: desktopItem.clientsPadding + clientDragHandler.centroid.position.x - clientThumbnail.width / 2
+                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + clientDragHandler.centroid.position.y - clientThumbnail.height / 2
                 width: 250; height: 250; clip: false
                 Drag.hotSpot.x: clientThumbnail.width / 2
                 Drag.hotSpot.y: clientThumbnail.height / 2
@@ -127,16 +127,16 @@ Item {
     Item {
         id: dragPlaceholder
         anchors.fill: parent
-        anchors.margins: desktopItem.clientsPadding + clientItem.noBorderMargin
-        anchors.topMargin: desktopItem.clientsPadding + clientItem.noBorderMargin + desktopItem.clientsDecorationsHeight
+        anchors.margins: desktopItem.clientsPadding + noBorderMargin
+        anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
 
         DragHandler {
-            id: myDragHandler
+            id: clientDragHandler
             target: null
 
             onActiveChanged: {
-                mainWindow.dragging = myDragHandler.active;
-                myDragHandler.active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
+                mainWindow.dragging = active;
+                active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
             }
         }
     }
@@ -144,7 +144,7 @@ Item {
     onClientChanged: {
         if (client) {
             client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
-            clientItem.noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+            noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
         }
     }
 }
