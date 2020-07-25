@@ -47,7 +47,6 @@ Window {
         id: keyboardHandler
 
         Keys.onPressed: {
-            keyboardSelected = true;
             switch (event.key) {
                 case Qt.Key_Escape:
                     selectedClientItem = null;
@@ -275,17 +274,21 @@ Window {
     }
 
     function selectFirstClient() {
+        keyboardSelected = true;
         selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
                 bigDesktop.clientsRepeater.itemAt(0);
     }
 
     function selectLastClient() {
+        keyboardSelected = true;
         const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
                 itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
         selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
     }
 
     function selectNextClientOn(position) {
+        keyboardSelected = true;
+        
         // Make the clients positions consider the screens positions.
         // The clients centers will be used to calculate distance between clients.
         const selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
