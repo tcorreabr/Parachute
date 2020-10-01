@@ -40,7 +40,7 @@ Window {
 
     // Consts
     property int noAnimation: 0
-    property int bigDesktopMargin: 40
+    property int bigDesktopMargin: 10
     property int smallDesktopMargin: 15
 
     Item {
