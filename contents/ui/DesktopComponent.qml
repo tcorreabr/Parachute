@@ -63,7 +63,7 @@ Item {
     }
 
     ToolTip {
-        visible: hovered
+        visible: !big && hovered
         text: workspace.desktopName(desktopIndex + 1);
         delay: 1000
         timeout: 5000
