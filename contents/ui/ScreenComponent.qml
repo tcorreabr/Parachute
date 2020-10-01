@@ -140,12 +140,31 @@ Item {
                     ]
 
                     TapHandler {
-                        acceptedButtons: Qt.LeftButton
+                        acceptedButtons: Qt.AllButtons
                         onTapped: {
+                            switch (eventPoint.event.button) {
+                                case Qt.LeftButton:
                             if (workspace.currentDesktop === model.index + 1)
                                 mainWindow.toggleActive();
                             else
                                 workspace.currentDesktop = model.index + 1;
+                                    break;
+                                case Qt.MiddleButton:
+                                    mainWindow.selectedClientItem.client.closeWindow();
+                                    break;
+                                case Qt.RightButton:
+                                    if (mainWindow.workWithActivities)
+                                        if (mainWindow.selectedClientItem.client.activities.length === 0)
+                                            mainWindow.selectedClientItem.client.activities.push(workspace.activities[model.index]);
+                                        else
+                                            mainWindow.selectedClientItem.client.activities = [];
+                                    else
+                                        if (mainWindow.selectedClientItem.client.desktop === -1)
+                                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
+                                        else
+                                            mainWindow.selectedClientItem.client.desktop = -1;
+                                    break;
+                            }
                         }
                     }
                 }
