@@ -86,7 +86,7 @@ Item {
                     anchors.fill: parent
                     visible: selectedFrame.visible
                     focusPolicy: Qt.NoFocus
-                    background: Rectangle { color: "red"; radius: height / 2; }
+                    background: Rectangle { color: "firebrick"; radius: height / 2; }
 
                     Image { source: "images/close.svg" }
 
