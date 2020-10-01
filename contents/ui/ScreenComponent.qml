@@ -6,6 +6,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 Item {
     id: screenItem
     visible: false
+    clip: true
 
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
@@ -45,6 +46,7 @@ Item {
         id: desktopsBar
         contentWidth: desktopsWrapper.width
         contentHeight: desktopsWrapper.height
+        clip: true
 
         states: [
             State {
@@ -177,6 +179,7 @@ Item {
         anchors.fill: parent
         currentIndex: mainWindow.currentActivityOrDesktop
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
+        clip: true
 
         Behavior on anchors.topMargin {
             enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Top
