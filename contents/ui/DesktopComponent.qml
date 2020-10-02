@@ -204,6 +204,26 @@ Item {
             onItemRemoved: rearrangeClients();
         }
 
+        TapHandler {
+            acceptedDevices: PointerDevice.TouchScreen
+
+            onTapped: {
+                if (mainWindow.keyboardSelected) {
+                    mainWindow.keyboardSelected = false;
+                    mainWindow.pointKeyboardSelected = point.position;
+                }
+                else if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y) &&
+                        point.position !== Qt.point(0, 0) &&
+                        (!mainWindow.pointKeyboardSelected ||
+                        Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
+                        Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
+                    mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);
+                    mainWindow.pointKeyboardSelected = null;
+                }
+                mainWindow.toggleActive();
+            }
+        }
+        
         HoverHandler {
             enabled: big && !bigDesktopMarginAnimation.running && !mainWindow.dragging
 

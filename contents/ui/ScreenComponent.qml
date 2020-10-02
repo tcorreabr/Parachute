@@ -103,6 +103,7 @@ Item {
 
                 TapHandler {
                     acceptedButtons: Qt.AllButtons
+                    acceptedDevices: PointerDevice.AllDevices & ~PointerDevice.TouchScreen
 
                     onTapped: {
                         if (mainWindow.selectedClientItem)
