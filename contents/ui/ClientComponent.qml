@@ -47,7 +47,7 @@ Item {
     Item {
         id: clientDecorations
         height: desktopItem.clientsDecorationsHeight
-        width: clientThumbnail.width * 0.8
+        width: parent.width - desktopItem.clientsPadding * 2
         anchors.top: parent.top
         anchors.topMargin: desktopItem.clientsPadding
         anchors.horizontalCenter: parent.horizontalCenter
@@ -56,6 +56,7 @@ Item {
         RowLayout {
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height
+            width: parent.width
             spacing: 10
 
             PlasmaCore.IconItem {
@@ -63,6 +64,8 @@ Item {
                 source: clientItem.client ? clientItem.client.icon : null
                 implicitHeight: parent.height
                 implicitWidth: parent.height
+                anchors.right: caption.left
+                anchors.rightMargin: 10
             }
 
             Text {
@@ -72,6 +75,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 color: "white"
+                anchors.horizontalCenter: parent.horizontalCenter
                 Layout.maximumWidth: clientDecorations.width - icon.width - parent.spacing - closeButton.width - parent.spacing
             }
 
@@ -80,6 +84,7 @@ Item {
                 id: closeButtonWrapper
                 implicitHeight: parent.height
                 implicitWidth: parent.height
+                anchors.right: parent.right
 
                 RoundButton {
                     id: closeButton
