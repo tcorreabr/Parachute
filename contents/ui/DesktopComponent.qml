@@ -198,8 +198,6 @@ Item {
                     mainWindow.pointKeyboardSelected = null;
                 }
             }
-
-            onHoveredChanged: if (!hovered) mainWindow.selectedClientItem = null;
         }
     }
 

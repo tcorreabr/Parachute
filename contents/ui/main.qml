@@ -36,7 +36,6 @@ Window {
     property var outsideSelectedClient: null
     property var pointKeyboardSelected: null
     property bool keyboardSelected: false
-    property bool shouldRequestActivate: true
 
     // Consts
     property int noAnimation: 0
@@ -105,6 +104,7 @@ Window {
     // Ugly code to get keyboard focus back when this script is activated and a client is activated externally
     Timer {
         id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: true;
+        running: mainWindow.activated && workspace.activeClient
         onTriggered: requestActivate();
     }
 
@@ -113,14 +113,14 @@ Window {
         loadConfig();
         updateAllDesktops();
         keyboardHandler.forceActiveFocus();
-        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
+        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", toggleActive);
         clientActivated(workspace.activeClient);
 
         options.configChanged.connect(loadConfig);
         workspace.clientActivated.connect(clientActivated);
         workspace.numberScreensChanged.connect(function(count) { desktopsInitialized = false; });
         workspace.screenResized.connect(function(screen) { desktopsInitialized = false; });
-        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null;} );
+        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; } );
     }
 
     Component.onDestruction: {
@@ -134,9 +134,6 @@ Window {
         if (!desktopsInitialized) updateAllDesktops();
 
         if (activated) {
-            shouldRequestActivate = false;
-            workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
-
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -145,8 +142,6 @@ Window {
                 // The window must be hide (activated = false) only in the end of animation
             }
         } else {
-            requestActivateTimer.start();
-
             easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -166,6 +161,9 @@ Window {
 
     function deactivate() {
         activated = false;
+        workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
+        selectedClientItem = null;
+
         easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
@@ -181,19 +179,10 @@ Window {
         if (workspace.activeClient) {
             outsideSelectedClient = workspace.activeClient;
 
-            if (workspace.activeClient.desktopWindow) {
-                const currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
-                if (currentScreenItem.desktopBackground.winId === 0)
+            // Ugly code for KWin < 5.20
+            if (workspace.activeClient.desktopWindow && screensRepeater.itemAt(workspace.activeClient.screen).desktopBackground.winId === 0)
                     currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
-
-            // Doesn't requestActivate() if the client was selected in this script and the closing animation is running
-            if (activated && shouldRequestActivate)
-                requestActivateTimer.start();
-        } else {
-            requestActivateTimer.stop();
-        }
-        shouldRequestActivate = true;
     }
 
     function loadConfig() {
