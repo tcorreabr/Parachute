@@ -148,8 +148,10 @@ Window {
                 currentScreenItem.hideDesktopsBar();
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
             }
-            easingType = Easing.OutExpo;
+
             activated = true;
+
+            easingType = Easing.OutExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.visible = true;
@@ -160,6 +162,13 @@ Window {
     }
 
     function deactivate() {
+        // 1. Make the visual items invisible before hiding the window. This prevents some flickering problems.
+        // 2. Breaking into two identical loops prevents the closing animation from showing an empty frame at the end
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            const currentScreenItem = screensRepeater.itemAt(currentScreen);
+            currentScreenItem.visible = false;
+        }
+
         activated = false;
         workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
         selectedClientItem = null;
@@ -167,8 +176,6 @@ Window {
         easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            currentScreenItem.visible = false;
-            currentScreenItem.showDesktopsBar();
             currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
                     bigDesktop.updateToCalculated();
         }
