@@ -47,7 +47,6 @@ Item {
         id: desktopsBar
         contentWidth: desktopsWrapper.width
         contentHeight: desktopsWrapper.height
-        clip: true
 
         states: [
             State {
@@ -288,6 +287,7 @@ Item {
 
                 DesktopComponent {
                     id: bigDesktop
+                    visible: model.index === mainWindow.currentActivityOrDesktop
                     big: true
                     activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
