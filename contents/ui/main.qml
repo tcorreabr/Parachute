@@ -180,9 +180,10 @@ Window {
             outsideSelectedClient = workspace.activeClient;
 
             // Ugly code for KWin < 5.20
-            if (workspace.activeClient.desktopWindow && screensRepeater.itemAt(workspace.activeClient.screen).desktopBackground.winId === 0)
+            if (workspace.activeClient.desktopWindow && screensRepeater.itemAt(workspace.activeClient.screen).desktopBackground.winId === 0) {
                     currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
+    }
     }
 
     function loadConfig() {

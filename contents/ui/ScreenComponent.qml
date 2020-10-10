@@ -6,7 +6,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 Item {
     id: screenItem
     visible: false
-    clip: true
+    smooth: false
+    antialiasing: false
 
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
@@ -31,7 +32,7 @@ Item {
         source: desktopBackground
         radius: 64
         visible: desktopBackground.winId !== 0 && mainWindow.configBlurBackground
-        // cached: true
+        cached: true
     }
 
     Rectangle { // To apply some transparency without interfere with children transparency
@@ -179,10 +180,9 @@ Item {
         anchors.fill: parent
         currentIndex: mainWindow.currentActivityOrDesktop
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
-        clip: true
 
         Behavior on anchors.topMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Top
+            enabled: mainWindow.easingType !== mainWindow.noAnimation
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -199,7 +199,7 @@ Item {
         }
 
         Behavior on anchors.bottomMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
+            enabled: mainWindow.easingType !== mainWindow.noAnimation
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -216,7 +216,7 @@ Item {
         }
 
         Behavior on anchors.leftMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Left
+            enabled: mainWindow.easingType !== mainWindow.noAnimation
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration
@@ -233,7 +233,7 @@ Item {
         }
 
         Behavior on anchors.rightMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Right
+            enabled: mainWindow.easingType !== mainWindow.noAnimation
 
             NumberAnimation {
                 duration: mainWindow.configAnimationsDuration

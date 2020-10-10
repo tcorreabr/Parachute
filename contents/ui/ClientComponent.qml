@@ -105,10 +105,8 @@ Item {
         clipTo: screenItem
         clip: true
         Drag.source: clientItem.client
-        renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
         antialiasing: false
         smooth: false
-        // fillColor: "green"
         
         states: State {
             when: clientThumbnail.Drag.active

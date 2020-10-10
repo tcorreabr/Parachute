@@ -32,6 +32,7 @@ Item {
         color: "#80000000"
         visible: !big && mainWindow.configShowDesktopShadows
         source: colorBackground
+        cached: true
     }
 
     OpacityMask {
@@ -40,6 +41,7 @@ Item {
         source: screenItem.desktopBackground
         maskSource: colorBackground // has to be opaque
         visible: !big && screenItem.desktopBackground.thumbnailAvailable
+        cached: true
     }
 
     Rectangle {
