@@ -61,16 +61,16 @@ Window {
                 case Qt.Key_End:
                     selectLastClient();
                     break;
-                case Qt.Key_Left:
+                case Qt.Key_Left: case Qt.Key_H:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Left) : selectFirstClient();
                     break;
-                case Qt.Key_Right:
+                case Qt.Key_Right: case Qt.Key_L:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Right) : selectLastClient();
                     break;
-                case Qt.Key_Up:
+                case Qt.Key_Up: case Qt.Key_K:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Top) : selectFirstClient();
                     break;
-                case Qt.Key_Down:
+                case Qt.Key_Down: case Qt.Key_J:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Bottom) : selectLastClient();
                     break;
                 case Qt.Key_F5:
