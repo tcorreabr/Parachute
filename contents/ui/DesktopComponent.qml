@@ -127,8 +127,18 @@ Item {
         }
 
         onDropped: {
-            if (!mainWindow.workWithActivities && desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1)
+            if (!mainWindow.workWithActivities && desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
+                // Ensures mainWindow.outsideSelectedClient stays on current desktop
+                if (drag.source === mainWindow.outsideSelectedClient) {
+                    if (clientsRepeater.itemAt(0))
+                        mainWindow.outsideSelectedClient = clientsRepeater.itemAt(0);
+                    // TODO: create screenItem.desktopWindow?
+                    // else
+                    //      mainWindow.outsideSelectedClient = ??
+                }
+
                 drag.source.desktop = desktopIndex + 1;
+            }
             if (mainWindow.workWithActivities && !drag.source.activities.includes(activity) && drag.source.activities.length !== 0)
                 drag.source.activities.push(activity);
             if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
