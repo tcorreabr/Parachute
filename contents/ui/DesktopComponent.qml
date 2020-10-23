@@ -10,7 +10,6 @@ Item {
     property alias clientsRepeater: clientsRepeater
 
     property int desktopIndex: model.index
-    property string activity
     property bool big: false
     property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
     property int padding: 10
@@ -49,7 +48,7 @@ Item {
         anchors.fill: parent
         color: "transparent"
         radius: 10
-        border.width: !big && desktopIndex === mainWindow.currentActivityOrDesktop ? 2 : 0
+        border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
         border.color: "white"
 
         states: [
@@ -114,11 +113,7 @@ Item {
 
         onEntered: {
             drag.accepted = false;            
-            if (!mainWindow.workWithActivities && desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
-                drag.accepted = true;
-                return;
-            }
-            if (mainWindow.workWithActivities && !drag.source.activities.includes(activity) && drag.source.activities.length !== 0) {
+            if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
                 drag.accepted = true;
                 return;
             }
@@ -127,7 +122,7 @@ Item {
         }
 
         onDropped: {
-            if (!mainWindow.workWithActivities && desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
+            if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
                 // Ensures mainWindow.outsideSelectedClient stays on current desktop
                 if (drag.source === mainWindow.outsideSelectedClient) {
                     if (clientsRepeater.itemAt(0))
@@ -139,8 +134,6 @@ Item {
 
                 drag.source.desktop = desktopIndex + 1;
             }
-            if (mainWindow.workWithActivities && !drag.source.activities.includes(activity) && drag.source.activities.length !== 0)
-                drag.source.activities.push(activity);
             if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
                 workspace.sendClientToScreen(drag.source, screenItem.screenIndex);
         }
@@ -148,10 +141,9 @@ Item {
 
     DelegateModel {
         id: clientsModel
-        model: mainWindow.workWithActivities ? clientsByScreen : clientsByScreenAndDesktop
-        rootIndex: mainWindow.workWithActivities ? clientsByScreen.index(screenItem.screenIndex, 0) :
-            clientsByScreenAndDesktop.index(desktopItem.desktopIndex, 0, clientsByScreenAndDesktop.index(screenItem.screenIndex,0))
-        filterOnGroup: mainWindow.workWithActivities ? "visible" : "items"
+        model: clientsByScreenAndDesktop
+        rootIndex: clientsByScreenAndDesktop.index(desktopItem.desktopIndex, 0, clientsByScreenAndDesktop.index(screenItem.screenIndex,0))
+        filterOnGroup: "visible"
 
         delegate: ClientComponent {}
 
@@ -160,13 +152,11 @@ Item {
             includeByDefault: false
         }
 
-        items.onChanged: if (mainWindow.workWithActivities) update();
-        onFilterItemChanged: if (mainWindow.workWithActivities) update(); // Component.onCompleted?
+        items.onChanged: update();
+        // onFilterItemChanged: update();
         
         property var filterItem: function(item) {
-            if (item.model.client.desktopWindow) return false;
-            if (item.model.client.activities.length === 0) return true;
-            return item.model.client.activities.includes(activity);
+            return !item.model.client.caption.endsWith(" — Yakuake") && !item.model.client.caption.endsWith(" — krunner");
         }
 
         function update() {

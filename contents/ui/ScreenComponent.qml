@@ -101,11 +101,10 @@ Rectangle {
 
             Repeater {
                 id: desktopsBarRepeater
-                model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
+                model: workspace.desktops
 
                 DesktopComponent {
                     id: smallDesktop
-                    activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
 
                     states: [
                         State {
@@ -140,12 +139,6 @@ Rectangle {
                                     mainWindow.selectedClientItem.client.closeWindow();
                                     break;
                                 case Qt.RightButton:
-                                    if (mainWindow.workWithActivities)
-                                        if (mainWindow.selectedClientItem.client.activities.length === 0)
-                                            mainWindow.selectedClientItem.client.activities.push(workspace.activities[model.index]);
-                                        else
-                                            mainWindow.selectedClientItem.client.activities = [];
-                                    else
                                         if (mainWindow.selectedClientItem.client.desktop === -1)
                                             mainWindow.selectedClientItem.client.desktop = model.index + 1;
                                         else
@@ -166,12 +159,12 @@ Rectangle {
         anchors.bottomMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom ? desktopsBarHeight : 0
         anchors.leftMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? desktopsBarWidth : 0
         anchors.rightMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Right ? desktopsBarWidth : 0
-        currentIndex: mainWindow.currentActivityOrDesktop
+        currentIndex: mainWindow.currentDesktop
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
 
         Repeater {
             id: bigDesktopsRepeater
-            model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
+            model: workspace.desktops
 
             Item { // Cannot set geometry of SwipeView's root item
                 property alias bigDesktop: bigDesktop
@@ -189,12 +182,6 @@ Rectangle {
                                     mainWindow.selectedClientItem.client.closeWindow();
                                     break;
                                 case Qt.RightButton:
-                                    if (mainWindow.workWithActivities)
-                                        if (mainWindow.selectedClientItem.client.activities.length === 0)
-                                            mainWindow.selectedClientItem.client.activities.push(workspace.activities[model.index]);
-                                        else
-                                            mainWindow.selectedClientItem.client.activities = [];
-                                    else
                                         if (mainWindow.selectedClientItem.client.desktop === -1)
                                             mainWindow.selectedClientItem.client.desktop = model.index + 1;
                                         else
@@ -208,9 +195,8 @@ Rectangle {
 
                 DesktopComponent {
                     id: bigDesktop
-                    visible: model.index === mainWindow.currentActivityOrDesktop
+                    visible: model.index === mainWindow.currentDesktop
                     big: true
-                    activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
                     anchors.centerIn: parent
                     width: desktopRatio < ratio ? parent.width - mainWindow.bigDesktopMargin
                             : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
@@ -222,10 +208,7 @@ Rectangle {
             }
         }
 
-        onCurrentIndexChanged: {
-            mainWindow.workWithActivities ? workspace.currentActivity = workspace.activities[currentIndex]
-                    : workspace.currentDesktop = currentIndex + 1;
-        }
+        onCurrentIndexChanged: workspace.currentDesktop = currentIndex + 1;
     }
 
     function updateDesktopWindowId() {

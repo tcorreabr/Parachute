@@ -15,10 +15,8 @@ Window {
     property bool activated: false
     property bool dragging: false
     property real qtVersion
-    property bool workWithActivities: false // Waiting for write access to client.activities, for now always work with virtual desktops
     property bool desktopsInitialized: false
-    property int currentActivityOrDesktop: workWithActivities ? workspace.activities.indexOf(workspace.currentActivity) :
-            workspace.currentDesktop - 1
+    property int currentDesktop: workspace.currentDesktop - 1 // workspace.currentDesktop is one based
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: noAnimation
@@ -84,11 +82,6 @@ Window {
         }
     }
 
-    // This model will be used for when we work with activities. Currently there is no ClientModelByScreenAndActivity
-    KWinComponents.ClientModelByScreen {
-        id: clientsByScreen
-    }
-
     KWinComponents.ClientModelByScreenAndDesktop {
         id: clientsByScreenAndDesktop
     }
@@ -141,14 +134,14 @@ Window {
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToOriginal();
                 avoidEmptyFrameTimer.start();
             }
         } else {
             easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToOriginal();
             }
 
             activated = true;
@@ -157,7 +150,7 @@ Window {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.opacity = 1;
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToCalculated();
             }
         }
 
@@ -201,7 +194,7 @@ Window {
             // Desktops only have to be in original state for opening/closing animations.
         easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).
                     bigDesktop.updateToCalculated();
         }
     }
@@ -229,14 +222,9 @@ Window {
         configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
 
         if (KWin.readConfig("showNotificationWindows", true)) {
-            clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion;
-
             clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
                     KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion;
         } else {
-            clientsByScreen.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
-                    KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
-
             clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
                     KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
                     KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
@@ -294,14 +282,14 @@ Window {
 
     function selectFirstClient() {
         keyboardSelected = true;
-        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentDesktop).
                 bigDesktop.clientsRepeater.itemAt(0);
     }
 
     function selectLastClient() {
         keyboardSelected = true;
         const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+                itemAt(currentDesktop).bigDesktop.clientsRepeater;
         selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
     }
 
@@ -319,7 +307,7 @@ Window {
         let candidateClientDistance = Number.MAX_VALUE;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            const currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.clientsRepeater;
+            const currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.clientsRepeater;
             for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
                 const currentClientItem = currentClientsRepeater.itemAt(currentClient);
                 const currentClientItemX = currentClientItem.x + currentScreenItem.x;

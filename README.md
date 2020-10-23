@@ -49,10 +49,3 @@ Controls:
 * If you are using "Slide" animation to switch desktops, you may want to enable the "Slide docks" option to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
 * If you are having poor performance on animations, try to change "Scale method" to "Smooth" or "Crisp" in Compositor settings.
 * If you have [Virtual Desktop Bar](https://github.com/wsdfhjxc/virtual-desktop-bar) installed, [Parachute keyboard shortcut may be ineffective](https://github.com/tcorreabr/Parachute/issues/14) until KWin restart or dynamic desktop operations.
-
-## Possible improvements
-
-* Insert, move and delete *Plasma* activities and virtual desktops. This should be supported only when *KWin* 5.20 arrives.
-* More *Plasma* theming support.
-* Click on desktops bar to animate it to fullscreen (simulating *KWin's* Desktop Grid effect).
-* One more shortcut to invoke Parachute in this Desktop Grid like mode.
