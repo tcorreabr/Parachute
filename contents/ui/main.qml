@@ -8,9 +8,9 @@ Window {
     id: mainWindow
     flags: Qt.X11BypassWindowManagerHint
     visible: true
-    color: "#333333"
-    x: activated ? 0 : -mainWindow.width * 2
-    y: activated ? 0 : -mainWindow.height * 2
+    color: "transparent"
+    x: activated ? 0 : mainWindow.width * 2
+    y: activated ? 0 : mainWindow.height * 2
 
     property bool activated: false
     property bool dragging: false
@@ -134,22 +134,20 @@ Window {
 
     function toggleActive() {
         if (animating) return;
-        
         if (!desktopsInitialized) updateAllDesktops();
+        animating = true;
 
         if (activated) {
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.hideDesktopsBar();
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
-                // The window must be hide (activated = false) only in the end of animation
+                avoidEmptyFrameTimer.start();
             }
         } else {
             easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.hideDesktopsBar();
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToOriginal();
             }
 
@@ -158,31 +156,55 @@ Window {
             easingType = Easing.OutExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.visible = true;
-                currentScreenItem.showDesktopsBar();
+                currentScreenItem.opacity = 1;
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).bigDesktop.updateToCalculated();
             }
         }
+
+        endAnimationTimer.start();
     }
 
-    function deactivate() {
-        // 1. Make the visual items invisible before hiding the window. This prevents some flickering problems.
-        // 2. Breaking into two identical loops prevents the closing animation from showing an empty frame at the end
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-            const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            currentScreenItem.visible = false;
-        }
+    Timer {
+        id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 10; repeat: false; triggeredOnStart: false;
 
+        onTriggered: {
+            // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
+            // in the end of closing animation. This Timer runs 10ms before endAnimationTimer to avoid this.
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+                screensRepeater.itemAt(currentScreen).opacity = 0;
+        }
+        }
+    }
+
+    Timer {
+        id: endAnimationTimer; interval: mainWindow.configAnimationsDuration; repeat: false; triggeredOnStart: false;
+
+        onTriggered: {
+            if (easingType === Easing.InExpo) {
         activated = false;
+
         workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
         selectedClientItem = null;
 
+                updateToCalculatedTimer.start();
+            }
+
+            animating = false;
+        }
+    }
+
+    Timer {
+        id: updateToCalculatedTimer; interval: 10; repeat: false; triggeredOnStart: false;
+
+        onTriggered: {
+            // Return current bigDesktop to calculated state.
+            // Desktops only have to be in original state for opening/closing animations.
         easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-            const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            currentScreenItem.bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentActivityOrDesktop).
                     bigDesktop.updateToCalculated();
         }
+    }
     }
 
     function clientActivated(client) {
@@ -191,7 +213,9 @@ Window {
             outsideSelectedClient = workspace.activeClient;
 
             // Ugly code for KWin < 5.20
-            if (workspace.activeClient.desktopWindow && screensRepeater.itemAt(workspace.activeClient.screen).desktopBackground.winId === 0) {
+            if (workspace.activeClient.desktopWindow) {
+                const currentScreenItem = screensRepeater.itemAt(workspace.activeClient.screen);
+                if (currentScreenItem.desktopBackground.winId === 0)
                     currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
     }
@@ -226,8 +250,6 @@ Window {
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.hideDesktopsBar();
-                currentScreenItem.showDesktopsBar();
                 for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                     const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                     currentBigDesktopItem.calculateTransformations();
@@ -258,7 +280,6 @@ Window {
 
             // Update desktops
             easingType = noAnimation;
-            currentScreenItem.showDesktopsBar();
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                 const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                 currentBigDesktopItem.calculateTransformations();

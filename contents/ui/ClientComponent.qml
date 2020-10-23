@@ -102,11 +102,7 @@ Item {
         anchors.margins: desktopItem.clientsPadding + noBorderMargin
         anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
-        clipTo: screenItem
-        clip: true
         Drag.source: clientItem.client
-        antialiasing: false
-        smooth: false
         
         states: State {
             when: clientThumbnail.Drag.active

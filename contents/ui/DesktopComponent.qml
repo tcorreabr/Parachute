@@ -29,7 +29,7 @@ Item {
         anchors.fill: parent
         horizontalOffset: 3
         verticalOffset: 3
-        color: "#80000000"
+        color: "#55000000"
         visible: !big && mainWindow.configShowDesktopShadows
         source: colorBackground
         cached: true
@@ -49,13 +49,13 @@ Item {
         anchors.fill: parent
         color: "transparent"
         radius: 10
-        border.width: !big && (desktopIndex === mainWindow.currentActivityOrDesktop) ? 2 : 0
+        border.width: !big && desktopIndex === mainWindow.currentActivityOrDesktop ? 2 : 0
         border.color: "white"
 
         states: [
             State {
                 when: desktopDropArea.containsDrag
-                PropertyChanges { target: colorizeRect; color: "#5000AA00"; }
+                PropertyChanges { target: colorizeRect; color: "#3F006600"; }
             },
             State {
                 when: !big && hovered

@@ -3,11 +3,12 @@ import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-Item {
+Rectangle {
     id: screenItem
-    visible: false
+    color: "#333333"
     smooth: false
     antialiasing: false
+    enabled: mainWindow.activated
 
     property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
@@ -161,76 +162,12 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
+        anchors.topMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? desktopsBarHeight : 0
+        anchors.bottomMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom ? desktopsBarHeight : 0
+        anchors.leftMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? desktopsBarWidth : 0
+        anchors.rightMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Right ? desktopsBarWidth : 0
         currentIndex: mainWindow.currentActivityOrDesktop
         orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
-
-        Behavior on anchors.topMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }  
-            }
-        }
-
-        Behavior on anchors.bottomMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }   
-            }
-        }
-
-        Behavior on anchors.leftMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }
-            }
-        }
-
-        Behavior on anchors.rightMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }
-            }
-        }
 
         Repeater {
             id: bigDesktopsRepeater
@@ -289,30 +226,6 @@ Item {
             mainWindow.workWithActivities ? workspace.currentActivity = workspace.activities[currentIndex]
                     : workspace.currentDesktop = currentIndex + 1;
         }
-    }
-
-    function showDesktopsBar() {
-        switch (mainWindow.configDesktopsBarPlacement) {
-            case Enums.Position.Top:
-                bigDesktops.anchors.topMargin = desktopsBarHeight;
-                break;
-            case Enums.Position.Bottom:
-                bigDesktops.anchors.bottomMargin = desktopsBarHeight;
-                break;
-            case Enums.Position.Left:
-                bigDesktops.anchors.leftMargin = desktopsBarWidth;
-                break;
-            case Enums.Position.Right:
-                bigDesktops.anchors.rightMargin = desktopsBarWidth;
-                break;
-        }
-    }
-
-    function hideDesktopsBar() {
-        bigDesktops.anchors.topMargin = 0;
-        bigDesktops.anchors.bottomMargin = 0;
-        bigDesktops.anchors.leftMargin = 0;
-        bigDesktops.anchors.rightMargin = 0;
     }
 
     function updateDesktopWindowId() {
