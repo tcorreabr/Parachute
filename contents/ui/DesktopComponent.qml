@@ -180,7 +180,7 @@ Item {
 
         HoverHandler {
             id: desktopItemHoverHandler
-        enabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
+        enabled: mainWindow.handlersEnabled
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {

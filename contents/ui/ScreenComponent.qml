@@ -127,6 +127,8 @@ Rectangle {
 
                     TapHandler {
                         acceptedButtons: Qt.AllButtons
+                        enabled: mainWindow.handlersEnabled
+
                         onTapped: {
                             switch (eventPoint.event.button) {
                                 case Qt.LeftButton:
@@ -171,6 +173,7 @@ Rectangle {
 
                 TapHandler {
                     acceptedButtons: Qt.AllButtons
+                    enabled: mainWindow.handlersEnabled
 
                     onTapped: {
                         if (mainWindow.selectedClientItem)

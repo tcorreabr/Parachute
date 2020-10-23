@@ -23,6 +23,7 @@ Window {
     property bool animating: false
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
+    property bool handlersEnabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
 
     // Config
     property bool configBlurBackground
