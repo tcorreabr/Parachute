@@ -72,12 +72,12 @@ Item {
     }
 
     RowLayout {
-        height: 22
-        spacing: 11
+        height: 20
+        spacing: 10
         anchors.top: parent.top
-        anchors.topMargin: -height / 2
+        anchors.topMargin: -10
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: false // hovered
+        visible: false // !big && hovered
 
         RoundButton {
             id: removeButton
@@ -189,6 +189,7 @@ Item {
             onItemAdded: rearrangeClients();
             onItemRemoved: rearrangeClients();
         }
+    }
 
         HoverHandler {
             id: desktopItemHoverHandler
@@ -211,13 +212,11 @@ Item {
                 }
             }
         }
-    }
 
     function rearrangeClients() {
         if (!mainWindow.desktopsInitialized) return;
 
         mainWindow.easingType = mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation;
-        screenItem.showDesktopsBar();
         calculateTransformations();
         updateToCalculated();
     }
