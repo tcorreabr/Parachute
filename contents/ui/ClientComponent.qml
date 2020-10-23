@@ -135,10 +135,13 @@ Item {
         }
     }
 
-    onClientChanged: {
-        if (client) {
-            client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
+    Component.onCompleted: {
+        // client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
             noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+        desktopItem.rearrangeClients();
         }
+
+    Component.onDestruction: {
+        desktopItem.rearrangeClients();
     }
 }

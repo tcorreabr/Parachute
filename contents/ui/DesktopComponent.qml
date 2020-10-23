@@ -175,9 +175,6 @@ Item {
         Repeater {
             id: clientsRepeater
             model: clientsModel
-
-            onItemAdded: rearrangeClients();
-            onItemRemoved: rearrangeClients();
         }
     }
 
