@@ -41,6 +41,7 @@ Window {
     property int noAnimation: 0
     property int bigDesktopMargin: 10
     property int smallDesktopMargin: 15
+    property int desktopBarSpacing: 15
 
     Item {
         id: keyboardHandler

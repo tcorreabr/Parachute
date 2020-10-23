@@ -35,48 +35,41 @@ Item {
         cached: true
     }
 
-    Rectangle { // To apply some transparency without interfere with children transparency
+    ScrollView {
+        id: desktopsBar
+
+        background: Rectangle {
         id: desktopsBarBackground
-        anchors.fill: desktopsBar
+            anchors.fill: parent
         color: "black"
         opacity: 0.1
         visible: mainWindow.configShowDesktopsBarBackground
     }
 
-    ScrollView {
-        id: desktopsBar
-        contentWidth: desktopsWrapper.width
-        contentHeight: desktopsWrapper.height
-
         states: [
             State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Top
+                when: mainWindow.horizontalDesktopsLayout
                 PropertyChanges {
                     target: desktopsBar
                     height: desktopsBarHeight
                 }
                 AnchorChanges {
                     target: desktopsBar
-                    anchors.bottom: bigDesktops.top
-                    anchors.right: screenItem.right
+                    anchors.bottom: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? bigDesktops.top : undefined
+                    anchors.top: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom ? bigDesktops.bottom : undefined
                     anchors.left: screenItem.left
+                    anchors.right: screenItem.right
                 }
-            },
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
                 PropertyChanges {
-                    target: desktopsBar
-                    height: desktopsBarHeight
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.top: bigDesktops.bottom
-                    anchors.right: screenItem.right
-                    anchors.left: screenItem.left
+                    target: desktopsWrapper
+                    columns: desktopsBarRepeater.count
+                    rows: 1
+                    leftPadding: mainWindow.desktopBarSpacing
+                    rightPadding: mainWindow.desktopBarSpacing
                 }
             },
             State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Left
+                when: !mainWindow.horizontalDesktopsLayout
                 PropertyChanges {
                     target: desktopsBar
                     width: desktopsBarWidth
@@ -85,28 +78,23 @@ Item {
                     target: desktopsBar
                     anchors.bottom: screenItem.bottom
                     anchors.top: screenItem.top
-                    anchors.right: bigDesktops.left
+                    anchors.left: mainWindow.configDesktopsBarPlacement === Enums.Position.Right ? bigDesktops.right : undefined
+                    anchors.right: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? bigDesktops.left : undefined
                 }
-            },
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Right
                 PropertyChanges {
-                    target: desktopsBar
-                    width: desktopsBarWidth
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.bottom: screenItem.bottom
-                    anchors.top: screenItem.top
-                    anchors.left: bigDesktops.right
+                    target: desktopsWrapper
+                    columns: 1
+                    rows: desktopsBarRepeater.count
+                    topPadding: mainWindow.desktopBarSpacing
+                    bottomPadding: mainWindow.desktopBarSpacing
                 }
             }
         ]
 
-        Item { // To centralize children
+        Grid {
             id: desktopsWrapper
-            width: childrenRect.width + mainWindow.smallDesktopMargin
-            height: childrenRect.height + mainWindow.smallDesktopMargin
+            spacing: mainWindow.desktopBarSpacing
+            // anchors.centerIn: parent // <== don't know why but this doesn't work here
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
             y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
 
@@ -123,19 +111,15 @@ Item {
                             when: mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
-                                x: mainWindow.smallDesktopMargin + model.index * (smallDesktop.width + mainWindow.smallDesktopMargin)
-                                y: mainWindow.smallDesktopMargin
                                 width: (smallDesktop.height / screenItem.height) * screenItem.width
-                                height: desktopsBar.height - mainWindow.smallDesktopMargin * 2
+                                height: desktopsBar.height - mainWindow.desktopBarSpacing * 2
                             }
                         },
                         State {
                             when: !mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
-                                x: mainWindow.smallDesktopMargin
-                                y: mainWindow.smallDesktopMargin + model.index * (smallDesktop.height + mainWindow.smallDesktopMargin)
-                                width: desktopsBar.width - mainWindow.smallDesktopMargin * 2
+                                width: desktopsBar.width - mainWindow.desktopBarSpacing * 2
                                 height: (smallDesktop.width / screenItem.width) * screenItem.height
                             }
                         }
