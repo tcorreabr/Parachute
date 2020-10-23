@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import org.kde.kwin 2.0 as KWinComponents
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 Window {
     id: mainWindow
@@ -22,6 +23,8 @@ Window {
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: noAnimation
     property bool animating: false
+    property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
+            PlasmaCore.Theme.buttonHoverColor.b, 0.25)
 
     // Config
     property bool configBlurBackground

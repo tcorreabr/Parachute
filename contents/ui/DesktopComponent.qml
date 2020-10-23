@@ -59,7 +59,7 @@ Item {
             },
             State {
                 when: !big && hovered
-                PropertyChanges { target: colorizeRect; color: "#500055FF"; }
+                PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
             }
         ]
     }
