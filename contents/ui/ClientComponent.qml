@@ -8,12 +8,12 @@ Item {
     id: clientItem
 
     property var client: model.client
-    property int noBorderMargin
+    property int noBorderMargin // margin to add to clients without borders (mainly gtk csd or fullscreen windows)
 
-    property real calculatedX
-    property real calculatedY
-    property real calculatedWidth
-    property real calculatedHeight
+    property real gridX
+    property real gridY
+    property real gridWidth
+    property real gridHeight
 
     Behavior on x {
         enabled: mainWindow.easingType !== mainWindow.noAnimation

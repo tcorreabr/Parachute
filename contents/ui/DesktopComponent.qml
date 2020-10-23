@@ -183,7 +183,7 @@ Item {
 
         HoverHandler {
             id: desktopItemHoverHandler
-            enabled: !mainWindow.animating && !mainWindow.dragging && (!big || desktopIndex === mainWindow.currentActivityOrDesktop)
+        enabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
 
             onPointChanged: {
                 if (mainWindow.keyboardSelected) {
@@ -208,7 +208,7 @@ Item {
 
         mainWindow.easingType = mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation;
         calculateTransformations();
-        updateToCalculated();
+        updateToGrid();
     }
 
     function calculateTransformations() {
@@ -235,14 +235,14 @@ Item {
 
                 // calculate the scaling factor, avoiding windows bigger than original size
                 if (gridItemRatio > clientItem.client.width / clientItem.client.height) {
-                    clientItem.calculatedHeight = Math.min(gridItemHeight, clientItem.client.height);
-                    clientItem.calculatedWidth = clientItem.calculatedHeight / clientItem.client.height * clientItem.client.width;
+                    clientItem.gridHeight = Math.min(gridItemHeight, clientItem.client.height);
+                    clientItem.gridWidth = clientItem.gridHeight / clientItem.client.height * clientItem.client.width;
                 } else {
-                    clientItem.calculatedWidth = Math.min(gridItemWidth, clientItem.client.width);
-                    clientItem.calculatedHeight = clientItem.calculatedWidth / clientItem.client.width * clientItem.client.height;
+                    clientItem.gridWidth = Math.min(gridItemWidth, clientItem.client.width);
+                    clientItem.gridHeight = clientItem.gridWidth / clientItem.client.width * clientItem.client.height;
                 }
-                clientItem.calculatedX = column * gridItemWidth + padding + (gridItemWidth - clientItem.calculatedWidth) / 2;
-                clientItem.calculatedY = row * gridItemHeight + padding + (gridItemHeight - clientItem.calculatedHeight) / 2;
+                clientItem.gridX = column * gridItemWidth + padding + (gridItemWidth - clientItem.gridWidth) / 2;
+                clientItem.gridY = row * gridItemHeight + padding + (gridItemHeight - clientItem.gridHeight) / 2;
 
                 currentClient++;
                 if (currentClient === clientsCount) {
@@ -253,13 +253,13 @@ Item {
         }
     }
 
-    function updateToCalculated() {
+    function updateToGrid() {
         for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
             const currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.x = currentClientItem.calculatedX;
-            currentClientItem.y = currentClientItem.calculatedY;
-            currentClientItem.width = currentClientItem.calculatedWidth;
-            currentClientItem.height = currentClientItem.calculatedHeight;
+            currentClientItem.x = currentClientItem.gridX;
+            currentClientItem.y = currentClientItem.gridY;
+            currentClientItem.width = currentClientItem.gridWidth;
+            currentClientItem.height = currentClientItem.gridHeight;
         }
     }
 

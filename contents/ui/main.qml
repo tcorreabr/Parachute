@@ -150,7 +150,7 @@ Window {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.opacity = 1;
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToCalculated();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToGrid();
             }
         }
 
@@ -179,7 +179,7 @@ Window {
         workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
         selectedClientItem = null;
 
-                updateToCalculatedTimer.start();
+                updateToGridTimer.start();
             }
 
             animating = false;
@@ -187,15 +187,15 @@ Window {
     }
 
     Timer {
-        id: updateToCalculatedTimer; interval: 10; repeat: false; triggeredOnStart: false;
+        id: updateToGridTimer; interval: 10; repeat: false; triggeredOnStart: false;
 
         onTriggered: {
-            // Return current bigDesktop to calculated state.
+            // Return current bigDesktop to grid state.
             // Desktops only have to be in original state for opening/closing animations.
         easingType = noAnimation;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).
-                    bigDesktop.updateToCalculated();
+                    bigDesktop.updateToGrid();
         }
     }
     }
@@ -241,10 +241,10 @@ Window {
                 for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                     const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                     currentBigDesktopItem.calculateTransformations();
-                    currentBigDesktopItem.updateToCalculated();
+                    currentBigDesktopItem.updateToGrid();
                     const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
                     currentDesktopBarItem.calculateTransformations();
-                    currentDesktopBarItem.updateToCalculated();
+                    currentDesktopBarItem.updateToGrid();
                 }
             }
         }
@@ -271,10 +271,10 @@ Window {
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                 const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
                 currentBigDesktopItem.calculateTransformations();
-                currentBigDesktopItem.updateToCalculated();
+                currentBigDesktopItem.updateToGrid();
                 const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
                 currentDesktopBarItem.calculateTransformations();
-                currentDesktopBarItem.updateToCalculated();
+                currentDesktopBarItem.updateToGrid();
             }
         }
         desktopsInitialized = true;
