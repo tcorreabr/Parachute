@@ -15,6 +15,7 @@ Item {
     property int padding: 10
     property int clientsPadding: big ? 10 : 0
     property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
+    property real ratio: width / height
 
     Rectangle {
         id: colorBackground
@@ -170,7 +171,11 @@ Item {
 
     Item {
         id: clientsArea
-        anchors.fill: parent
+        anchors.centerIn: parent
+        width: desktopItem.ratio <= screenItem.ratio ? desktopItem.width - (mainWindow.desktopMargin * 2)
+                : clientsArea.height / screenItem.height * screenItem.width
+        height: desktopItem.ratio > screenItem.ratio ? desktopItem.height - (mainWindow.desktopMargin * 2)
+                : clientsArea.width / screenItem.width * screenItem.height
 
         Repeater {
             id: clientsRepeater
@@ -189,16 +194,44 @@ Item {
                     return;
                 }
 
-                if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x, point.position.y) &&
+            if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y) &&
                         point.position !== Qt.point(0, 0) &&
                         (!mainWindow.pointKeyboardSelected ||
                         Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
                         Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
-                    mainWindow.selectedClientItem = clientsArea.childAt(point.position.x, point.position.y);
+                mainWindow.selectedClientItem = clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y);
                     mainWindow.pointKeyboardSelected = null;
                 }
             }
         }
+
+    TapHandler {
+        acceptedButtons: Qt.AllButtons
+        enabled: mainWindow.handlersEnabled
+
+        onTapped: {
+            switch (eventPoint.event.button) {
+                case Qt.LeftButton:
+                case Qt.NoButton:
+                    if (workspace.currentDesktop === model.index + 1)
+                        mainWindow.toggleActive();
+                    else
+                        workspace.currentDesktop = model.index + 1;
+                    break;
+                case Qt.MiddleButton:
+                    if (mainWindow.selectedClientItem) mainWindow.selectedClientItem.client.closeWindow();
+                    break;
+                case Qt.RightButton:
+                    if (!mainWindow.selectedClientItem) break;
+
+                    if (mainWindow.selectedClientItem.client.desktop === -1)
+                        mainWindow.selectedClientItem.client.desktop = model.index + 1;
+                    else
+                        mainWindow.selectedClientItem.client.desktop = -1;
+                    break;
+            }
+        }
+    }
 
     function rearrangeClients() {
         if (!mainWindow.desktopsInitialized) return;

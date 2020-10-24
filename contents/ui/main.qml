@@ -41,9 +41,8 @@ Window {
 
     // Consts
     property int noAnimation: 0
-    property int bigDesktopMargin: 10
-    property int smallDesktopMargin: 15
-    property int desktopBarSpacing: 15
+    property int desktopMargin: 5
+    property int desktopsBarSpacing: 15
 
     Item {
         id: keyboardHandler
@@ -135,14 +134,14 @@ Window {
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToOriginal();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToOriginal();
                 avoidEmptyFrameTimer.start();
             }
         } else {
             easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToOriginal();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToOriginal();
             }
 
             activated = true;
@@ -151,7 +150,7 @@ Window {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.opacity = 1;
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.updateToGrid();
+                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToGrid();
             }
         }
 
@@ -194,11 +193,9 @@ Window {
             // Return current bigDesktop to grid state.
             // Desktops only have to be in original state for opening/closing animations.
         easingType = noAnimation;
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).
-                    bigDesktop.updateToGrid();
+            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).updateToGrid();
         }
-    }
     }
 
     function clientActivated(client) {
@@ -240,7 +237,7 @@ Window {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
-                    const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
+                    const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop);
                     currentBigDesktopItem.calculateTransformations();
                     currentBigDesktopItem.updateToGrid();
                     const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
@@ -270,7 +267,7 @@ Window {
             // Update desktops
             easingType = noAnimation;
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
-                const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop;
+                const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop);
                 currentBigDesktopItem.calculateTransformations();
                 currentBigDesktopItem.updateToGrid();
                 const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
@@ -283,14 +280,13 @@ Window {
 
     function selectFirstClient() {
         keyboardSelected = true;
-        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentDesktop).
-                bigDesktop.clientsRepeater.itemAt(0);
+        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentDesktop).clientsRepeater.itemAt(0);
     }
 
     function selectLastClient() {
         keyboardSelected = true;
         const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                itemAt(currentDesktop).bigDesktop.clientsRepeater;
+                itemAt(currentDesktop).clientsRepeater;
         selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
     }
 
@@ -308,7 +304,7 @@ Window {
         let candidateClientDistance = Number.MAX_VALUE;
         for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
             const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            const currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).bigDesktop.clientsRepeater;
+            const currentClientsRepeater = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).clientsRepeater;
             for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
                 const currentClientItem = currentClientsRepeater.itemAt(currentClient);
                 const currentClientItemX = currentClientItem.x + currentScreenItem.x;

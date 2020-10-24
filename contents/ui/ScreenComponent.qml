@@ -65,8 +65,8 @@ Rectangle {
                     target: desktopsWrapper
                     columns: desktopsBarRepeater.count
                     rows: 1
-                    leftPadding: mainWindow.desktopBarSpacing
-                    rightPadding: mainWindow.desktopBarSpacing
+                    leftPadding: mainWindow.desktopsBarSpacing
+                    rightPadding: mainWindow.desktopsBarSpacing
                 }
             },
             State {
@@ -86,16 +86,16 @@ Rectangle {
                     target: desktopsWrapper
                     columns: 1
                     rows: desktopsBarRepeater.count
-                    topPadding: mainWindow.desktopBarSpacing
-                    bottomPadding: mainWindow.desktopBarSpacing
+                    topPadding: mainWindow.desktopsBarSpacing
+                    bottomPadding: mainWindow.desktopsBarSpacing
                 }
             }
         ]
 
         Grid {
             id: desktopsWrapper
-            spacing: mainWindow.desktopBarSpacing
-            // anchors.centerIn: parent // <== don't know why but this doesn't work here
+            spacing: mainWindow.desktopsBarSpacing
+            // anchors.centerIn: parent // <== don't know why but this doesn't work here, so we have to set x and y
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
             y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
 
@@ -111,48 +111,23 @@ Rectangle {
                             when: mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
-                                width: (smallDesktop.height / screenItem.height) * screenItem.width
-                                height: desktopsBar.height - mainWindow.desktopBarSpacing * 2
+                                width: smallDesktop.height / screenItem.height * screenItem.width
+                                height: desktopsBar.height - mainWindow.desktopsBarSpacing * 2
                             }
                         },
                         State {
                             when: !mainWindow.horizontalDesktopsLayout
                             PropertyChanges {
                                 target: smallDesktop
-                                width: desktopsBar.width - mainWindow.desktopBarSpacing * 2
-                                height: (smallDesktop.width / screenItem.width) * screenItem.height
+                                width: desktopsBar.width - mainWindow.desktopsBarSpacing * 2
+                                height: smallDesktop.width / screenItem.width * screenItem.height
                             }
                         }
                     ]
-
-                    TapHandler {
-                        acceptedButtons: Qt.AllButtons
-                        enabled: mainWindow.handlersEnabled
-
-                        onTapped: {
-                            switch (eventPoint.event.button) {
-                                case Qt.LeftButton:
-                            if (workspace.currentDesktop === model.index + 1)
-                                mainWindow.toggleActive();
-                            else
-                                workspace.currentDesktop = model.index + 1;
-                                    break;
-                                case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
-                                    break;
-                                case Qt.RightButton:
-                                        if (mainWindow.selectedClientItem.client.desktop === -1)
-                                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
-                                        else
-                                            mainWindow.selectedClientItem.client.desktop = -1;
-                                    break;
                             }
                         }
                     }
                 }
-            }
-        }
-    }
 
     SwipeView {
         id: bigDesktops
@@ -168,46 +143,9 @@ Rectangle {
             id: bigDesktopsRepeater
             model: workspace.desktops
 
-            Item { // Cannot set geometry of SwipeView's root item
-                property alias bigDesktop: bigDesktop
-
-                TapHandler {
-                    acceptedButtons: Qt.AllButtons
-                    enabled: mainWindow.handlersEnabled
-
-                    onTapped: {
-                        if (mainWindow.selectedClientItem)
-                            switch (eventPoint.event.button) {
-                                case Qt.LeftButton:
-                                    mainWindow.toggleActive();
-                                    break;
-                                case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
-                                    break;
-                                case Qt.RightButton:
-                                        if (mainWindow.selectedClientItem.client.desktop === -1)
-                                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
-                                        else
-                                            mainWindow.selectedClientItem.client.desktop = -1;
-                                    break;
-                            }
-                        else 
-                            mainWindow.toggleActive();
-                    }
-                }
-
-                DesktopComponent {
-                    id: bigDesktop
+            DesktopComponent { // Cannot set geometry of SwipeView's root item
                     visible: model.index === mainWindow.currentDesktop
                     big: true
-                    anchors.centerIn: parent
-                    width: desktopRatio < ratio ? parent.width - mainWindow.bigDesktopMargin
-                            : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
-                    height: desktopRatio > ratio ? parent.height - mainWindow.bigDesktopMargin
-                            : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
-
-                    property real desktopRatio: parent.width / parent.height
-                }
             }
         }
 
