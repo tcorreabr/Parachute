@@ -12,7 +12,6 @@ Item {
     property int desktopIndex: model.index
     property bool big: false
     property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
-    property int padding: 10
     property int clientsPadding: big ? 10 : 0
     property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
     property real ratio: width / height
@@ -246,15 +245,15 @@ Item {
 
         // Calculate the number of rows and columns
         const clientsCount = clientsRepeater.count;
-        const addToColumns = Math.floor((clientsArea.width - padding * 2) / (clientsArea.height - padding * 2));
+        const addToColumns = Math.floor(screenItem.ratio);
         let columns = Math.floor(Math.sqrt(clientsCount));
-        (columns + addToColumns >= clientsCount) ? columns = clientsCount : columns += addToColumns;
+        columns = (columns + addToColumns >= clientsCount) ? clientsCount : columns + addToColumns;
         let rows = Math.ceil(clientsCount / columns);
         while ((columns - 1) * rows >= clientsCount) columns--;
 
         // Calculate client's geometry transformations
-        const gridItemWidth = Math.floor((clientsArea.width - padding * 2) / columns);
-        const gridItemHeight = Math.floor((clientsArea.height - padding * 2) / rows);
+        const gridItemWidth = clientsArea.width / columns;
+        const gridItemHeight = clientsArea.height / rows;
         const gridItemRatio = gridItemWidth / gridItemHeight;
 
         let currentClient = 0;
@@ -271,8 +270,8 @@ Item {
                     clientItem.gridWidth = Math.min(gridItemWidth, clientItem.client.width);
                     clientItem.gridHeight = clientItem.gridWidth / clientItem.client.width * clientItem.client.height;
                 }
-                clientItem.gridX = column * gridItemWidth + padding + (gridItemWidth - clientItem.gridWidth) / 2;
-                clientItem.gridY = row * gridItemHeight + padding + (gridItemHeight - clientItem.gridHeight) / 2;
+                clientItem.gridX = column * gridItemWidth + (gridItemWidth - clientItem.gridWidth) / 2;
+                clientItem.gridY = row * gridItemHeight + (gridItemHeight - clientItem.gridHeight) / 2;
 
                 currentClient++;
                 if (currentClient === clientsCount) {
