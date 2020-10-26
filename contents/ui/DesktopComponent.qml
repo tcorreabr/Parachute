@@ -235,7 +235,7 @@ Item {
     function rearrangeClients() {
         if (!mainWindow.desktopsInitialized) return;
 
-        mainWindow.easingType = mainWindow.activated ? Easing.OutExpo : mainWindow.noAnimation;
+        mainWindow.easingType = Easing.OutExpo;
         calculateTransformations();
         updateToGrid();
     }

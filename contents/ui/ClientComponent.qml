@@ -16,22 +16,22 @@ Item {
     property real gridHeight
 
     Behavior on x {
-        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        enabled: mainWindow.activated
         NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on y {
-        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        enabled: mainWindow.activated
         NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on width {
-        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        enabled: mainWindow.activated
         NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 
     Behavior on height {
-        enabled: mainWindow.easingType !== mainWindow.noAnimation
+        enabled: mainWindow.activated
         NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
     }
 

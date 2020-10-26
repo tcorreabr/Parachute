@@ -19,7 +19,7 @@ Window {
     property int currentDesktop: workspace.currentDesktop - 1 // workspace.currentDesktop is one based
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
             configDesktopsBarPlacement === Enums.Position.Bottom
-    property int easingType: noAnimation
+    property int easingType
     property bool animating: false
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
@@ -40,7 +40,6 @@ Window {
     property bool keyboardSelected: false
 
     // Consts
-    property int noAnimation: 0
     property int desktopMargin: 5
     property int desktopsBarSpacing: 15
 
@@ -138,7 +137,6 @@ Window {
                 avoidEmptyFrameTimer.start();
             }
         } else {
-            easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToOriginal();
@@ -192,7 +190,6 @@ Window {
         onTriggered: {
             // Return current bigDesktop to grid state.
             // Desktops only have to be in original state for opening/closing animations.
-        easingType = noAnimation;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).updateToGrid();
         }
@@ -232,8 +229,8 @@ Window {
         const tmpConfigDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
         if (configDesktopsBarPlacement !== tmpConfigDesktopsBarPlacement) {
             configDesktopsBarPlacement = tmpConfigDesktopsBarPlacement;
-            easingType = noAnimation;
 
+            easingType = Easing.OutExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 const currentScreenItem = screensRepeater.itemAt(currentScreen);
                 for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
@@ -265,7 +262,7 @@ Window {
                 Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
 
             // Update desktops
-            easingType = noAnimation;
+            easingType = Easing.OutExpo;
             for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
                 const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop);
                 currentBigDesktopItem.calculateTransformations();
