@@ -182,27 +182,27 @@ Item {
         }
     }
 
-        HoverHandler {
-            id: desktopItemHoverHandler
+    HoverHandler {
+        id: desktopItemHoverHandler
         enabled: mainWindow.handlersEnabled
 
-            onPointChanged: {
-                if (mainWindow.keyboardSelected) {
-                    mainWindow.keyboardSelected = false;
-                    mainWindow.pointKeyboardSelected = point.position;
-                    return;
-                }
+        onPointChanged: {
+            if (mainWindow.keyboardSelected) {
+                mainWindow.keyboardSelected = false;
+                mainWindow.pointKeyboardSelected = point.position;
+                return;
+            }
 
             if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y) &&
-                        point.position !== Qt.point(0, 0) &&
-                        (!mainWindow.pointKeyboardSelected ||
-                        Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
-                        Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
+                    point.position !== Qt.point(0, 0) &&
+                    (!mainWindow.pointKeyboardSelected ||
+                    Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
+                    Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
                 mainWindow.selectedClientItem = clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y);
-                    mainWindow.pointKeyboardSelected = null;
-                }
+                mainWindow.pointKeyboardSelected = null;
             }
         }
+    }
 
     TapHandler {
         acceptedButtons: Qt.AllButtons

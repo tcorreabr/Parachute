@@ -137,9 +137,9 @@ Item {
 
     Component.onCompleted: {
         // client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
-            noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
         desktopItem.rearrangeClients();
-        }
+    }
 
     Component.onDestruction: {
         desktopItem.rearrangeClients();

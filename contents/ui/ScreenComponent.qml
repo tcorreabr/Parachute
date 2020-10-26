@@ -40,12 +40,12 @@ Rectangle {
         id: desktopsBar
 
         background: Rectangle {
-        id: desktopsBarBackground
+            id: desktopsBarBackground
             anchors.fill: parent
-        color: "black"
-        opacity: 0.1
-        visible: mainWindow.configShowDesktopsBarBackground
-    }
+            color: "black"
+            opacity: 0.1
+            visible: mainWindow.configShowDesktopsBarBackground
+        }
 
         states: [
             State {
@@ -124,10 +124,10 @@ Rectangle {
                             }
                         }
                     ]
-                            }
-                        }
-                    }
                 }
+            }
+        }
+    }
 
     SwipeView {
         id: bigDesktops
@@ -144,8 +144,8 @@ Rectangle {
             model: workspace.desktops
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
-                    visible: model.index === mainWindow.currentDesktop
-                    big: true
+                visible: model.index === mainWindow.currentDesktop
+                big: true
             }
         }
 

@@ -161,9 +161,8 @@ Window {
         onTriggered: {
             // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
             // in the end of closing animation. This Timer runs 10ms before endAnimationTimer to avoid this.
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                 screensRepeater.itemAt(currentScreen).opacity = 0;
-        }
         }
     }
 
@@ -172,10 +171,10 @@ Window {
 
         onTriggered: {
             if (easingType === Easing.InExpo) {
-        activated = false;
+                activated = false;
 
-        workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
-        selectedClientItem = null;
+                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
+                selectedClientItem = null;
 
                 updateToGridTimer.start();
             }
@@ -206,7 +205,7 @@ Window {
                 if (currentScreenItem.desktopBackground.winId === 0)
                     currentScreenItem.desktopBackground.winId = workspace.activeClient.windowId;
             }
-    }
+        }
     }
 
     function loadConfig() {
