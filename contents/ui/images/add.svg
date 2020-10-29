@@ -7,11 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 24 24"
+   viewBox="0 0 22 22"
    version="1.1"
    id="svg8"
    sodipodi:docname="add.svg"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)">
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   width="22"
+   height="22">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -20,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -35,11 +37,11 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="999"
+     inkscape:window-height="1013"
      id="namedview10"
      showgrid="false"
      inkscape:zoom="29.791667"
-     inkscape:cx="5.7902098"
+     inkscape:cx="0.16783224"
      inkscape:cy="12"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -57,19 +59,18 @@
   </defs>
   <g
      style="fill:#333333;fill-opacity:1"
-     transform="translate(1,1)"
      id="g6">
     <path
        style="fill:#333333;fill-opacity:1"
        class="ColorScheme-Text"
-       d="M 3 7 L 3 9 L 13 9 L 13 7 L 3 7 z"
-       transform="translate(3 3)"
+       d="M 3,7 V 9 H 13 V 7 Z"
+       transform="translate(3,3)"
        id="path4" />
   </g>
   <g
      style="fill:#333333;fill-opacity:1"
      id="g6-3"
-     transform="rotate(90,11,12)">
+     transform="rotate(90,11,11)">
     <path
        id="path4-6"
        transform="translate(3,3)"

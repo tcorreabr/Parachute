@@ -13,7 +13,7 @@ Item {
     property bool big: false
     property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
     property int clientsPadding: big ? 10 : 0
-    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 24 : 0
+    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? mainWindow.buttonsSize : 0
     property real ratio: width / height
 
     Rectangle {
@@ -70,22 +70,21 @@ Item {
         timeout: 5000
     }
 
-    RowLayout {
-        height: 20
+    Row {
         spacing: 10
         anchors.top: parent.top
-        anchors.topMargin: -10
+        anchors.topMargin: -mainWindow.buttonsSize / 2
         anchors.horizontalCenter: parent.horizontalCenter
         visible: false // !big && hovered
 
         RoundButton {
             id: removeButton
-            implicitHeight: parent.height
-            implicitWidth: parent.height
+            implicitHeight: mainWindow.buttonsSize
+            implicitWidth: mainWindow.buttonsSize
             radius: height / 2
             focusPolicy: Qt.NoFocus
 
-            Image { source: "images/remove.svg"; anchors.fill: parent; }
+            Image { source: "images/remove.svg" }
 
             onClicked: {
                 workspace.removeDesktop(desktopIndex);
@@ -94,12 +93,12 @@ Item {
 
         RoundButton {
             id: addButton
-            implicitHeight: parent.height
-            implicitWidth: parent.height
+            implicitHeight: mainWindow.buttonsSize
+            implicitWidth: mainWindow.buttonsSize
             radius: height / 2
             focusPolicy: Qt.NoFocus
 
-            Image { source: "images/add.svg"; anchors.fill: parent; }
+            Image { source: "images/add.svg" }
 
             onClicked: {
                 workspace.createDesktop(desktopIndex + 1, "New desktop");

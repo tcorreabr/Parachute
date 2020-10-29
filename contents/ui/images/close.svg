@@ -7,11 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="close.svg"
    id="svg8"
    version="1.1"
-   viewBox="0 0 24 24">
+   viewBox="0 0 22 22"
+   width="22"
+   height="22">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -20,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -30,11 +32,11 @@
      inkscape:window-y="0"
      inkscape:window-x="0"
      inkscape:cy="12"
-     inkscape:cx="5.7902098"
+     inkscape:cx="0.16783224"
      inkscape:zoom="29.791667"
      showgrid="false"
      id="namedview10"
-     inkscape:window-height="999"
+     inkscape:window-height="1013"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
@@ -57,7 +59,7 @@
   </defs>
   <g
      id="g6"
-     transform="matrix(0.83333332,0.83333333,-0.83333332,0.83333333,12,-6.3333333)"
+     transform="matrix(0.83333332,0.83333333,-0.83333332,0.83333333,11,-7.3333333)"
      style="fill:#f9f9f9">
     <path
        id="path4"
@@ -67,7 +69,7 @@
        style="fill:#f9f9f9" />
   </g>
   <g
-     transform="matrix(-0.83333332,0.83333333,-0.83333332,-0.83333333,30.333333,12)"
+     transform="matrix(-0.83333332,0.83333333,-0.83333332,-0.83333333,29.333333,11)"
      id="g6-3"
      style="fill:#f9f9f9">
     <path
