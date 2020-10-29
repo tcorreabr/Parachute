@@ -10,10 +10,51 @@ Item {
     property var client: model.client
     property int noBorderMargin // margin to add to clients without borders (mainly gtk csd or fullscreen windows)
 
-    property real gridX
-    property real gridY
-    property real gridWidth
-    property real gridHeight
+    property int clientX
+    property int clientY
+    property int clientWidth
+    property int clientHeight
+
+    property real originalX: (clientX - screenItem.x) * desktopItem.scale
+    property real originalY: (clientY - screenItem.y) * desktopItem.scale
+    property real originalWidth: clientWidth * desktopItem.scale
+    property real originalHeight: clientHeight * desktopItem.scale
+
+    // property bool shouldScaleToGridItemHeight: desktopItem.gridItemRatio > clientWidth / clientHeight
+    property int column: model.index - desktopItem.columns * row
+    property int row: Math.floor(model.index / desktopItem.columns)
+
+    property real gridX: clientsRepeater.count === 1 ? (desktopItem.clientsArea.width - gridWidth) / 2 :
+            column * desktopItem.gridItemWidth + (desktopItem.gridItemWidth - gridWidth) / 2
+    property real gridY: clientsRepeater.count === 1 ? (desktopItem.clientsArea.height - gridHeight) / 2 :
+            row * desktopItem.gridItemHeight + (desktopItem.gridItemHeight - gridHeight) / 2
+    property real gridWidth: desktopItem.gridItemRatio > clientWidth / clientHeight ? gridHeight / clientHeight * clientWidth :
+            desktopItem.gridItemWidth
+    property real gridHeight: desktopItem.gridItemRatio > clientWidth / clientHeight ? desktopItem.gridItemHeight :
+            gridWidth / clientWidth * clientHeight
+
+    states: [
+        State {
+            when: !desktopItem.gridView
+            PropertyChanges {
+                target: clientItem
+                x: originalX
+                y: originalY
+                width: originalWidth
+                height: originalHeight
+            }
+        },
+        State {
+            when: desktopItem.gridView
+            PropertyChanges {
+                target: clientItem
+                x: gridX
+                y: gridY
+                width: gridWidth
+                height: gridHeight
+            }
+        }
+    ]
 
     Behavior on x {
         enabled: mainWindow.activated
@@ -136,12 +177,15 @@ Item {
     }
 
     Component.onCompleted: {
-        // client.moveResizedChanged.connect(function() { mainWindow.desktopsInitialized = false; });
-        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
-        desktopItem.rearrangeClients();
+        updateClientRect();
+        // client.clientFinishUserMovedResized.connect(function(client) { print("teste"); });
+        noBorderMargin = client && client.noBorder ? desktopItem.big ? 18 : 4 : 0;
     }
 
-    Component.onDestruction: {
-        desktopItem.rearrangeClients();
+    function updateClientRect() {
+        clientX = client.x;
+        clientY = client.y;
+        clientWidth = client.width;
+        clientHeight = client.height;
     }
 }

@@ -15,7 +15,6 @@ Window {
     property bool activated: false
     property bool dragging: false
     property real qtVersion
-    property bool desktopsInitialized: false
     property int currentDesktop: workspace.currentDesktop - 1 // workspace.currentDesktop is one based
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
             configDesktopsBarPlacement === Enums.Position.Bottom
@@ -30,6 +29,7 @@ Window {
     property bool configShowDesktopsBarBackground
     property bool configShowWindowTitles
     property bool configShowDesktopShadows
+    property bool configShowNotificationWindows
     property real configAnimationsDuration
     property int configDesktopsBarPlacement
 
@@ -84,6 +84,12 @@ Window {
 
     KWinComponents.ClientModelByScreenAndDesktop {
         id: clientsByScreenAndDesktop
+        exclusions: configShowNotificationWindows ?
+                KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion :
+                KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
+                KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
+                KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
     }
 
     Repeater {
@@ -127,41 +133,37 @@ Window {
 
     function toggleActive() {
         if (animating) return;
-        if (!desktopsInitialized) updateAllDesktops();
         animating = true;
 
         if (activated) {
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToOriginal();
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
                 avoidEmptyFrameTimer.start();
             }
         } else {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToOriginal();
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
+                screensRepeater.itemAt(currentScreen).opacity = 1
             }
 
             activated = true;
 
             easingType = Easing.OutExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.opacity = 1;
-                currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop).updateToGrid();
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
             }
         }
 
         endAnimationTimer.start();
     }
 
+    // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
+    // in the end of closing animation. This Timer runs 10ms before endAnimationTimer to avoid this.
     Timer {
         id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 10; repeat: false; triggeredOnStart: false;
 
         onTriggered: {
-            // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
-            // in the end of closing animation. This Timer runs 10ms before endAnimationTimer to avoid this.
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                 screensRepeater.itemAt(currentScreen).opacity = 0;
         }
@@ -177,21 +179,20 @@ Window {
                 workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
                 selectedClientItem = null;
 
-                updateToGridTimer.start();
+                returnToGridTimer.start();
             }
 
             animating = false;
         }
     }
 
+    // Return current bigDesktop to grid state. Desktops only have to be in original state for opening/closing animations.
     Timer {
-        id: updateToGridTimer; interval: 10; repeat: false; triggeredOnStart: false;
+        id: returnToGridTimer; interval: 10; repeat: false; triggeredOnStart: false;
 
         onTriggered: {
-            // Return current bigDesktop to grid state.
-            // Desktops only have to be in original state for opening/closing animations.
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).updateToGrid();
+                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
         }
     }
 
@@ -215,34 +216,8 @@ Window {
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
         configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
-
-        if (KWin.readConfig("showNotificationWindows", true)) {
-            clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
-                    KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion;
-        } else {
-            clientsByScreenAndDesktop.exclusions = KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
-                    KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
-                    KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
-        }
-
-        // updating configDesktopsBarPlacement is a little more tricky than the others options
-        const tmpConfigDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
-        if (configDesktopsBarPlacement !== tmpConfigDesktopsBarPlacement) {
-            configDesktopsBarPlacement = tmpConfigDesktopsBarPlacement;
-
-            easingType = Easing.OutExpo;
-            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
-                    const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop);
-                    currentBigDesktopItem.calculateTransformations();
-                    currentBigDesktopItem.updateToGrid();
-                    const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
-                    currentDesktopBarItem.calculateTransformations();
-                    currentDesktopBarItem.updateToGrid();
-                }
-            }
-        }
+        configShowNotificationWindows = KWin.readConfig("showNotificationWindows", true);
+        configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
     }
 
     function updateAllDesktops() {
@@ -260,19 +235,7 @@ Window {
 
             if (qtVersion >= 5.14 && currentScreenItem.children.length < 6)
                 Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
-
-            // Update desktops
-            easingType = Easing.OutExpo;
-            for (let currentDesktop = 0; currentDesktop < currentScreenItem.bigDesktopsRepeater.count; currentDesktop++) {
-                const currentBigDesktopItem = currentScreenItem.bigDesktopsRepeater.itemAt(currentDesktop);
-                currentBigDesktopItem.calculateTransformations();
-                currentBigDesktopItem.updateToGrid();
-                const currentDesktopBarItem = currentScreenItem.desktopsBarRepeater.itemAt(currentDesktop);
-                currentDesktopBarItem.calculateTransformations();
-                currentDesktopBarItem.updateToGrid();
-            }
         }
-        desktopsInitialized = true;
     }
 
     function selectFirstClient() {

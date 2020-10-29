@@ -10,7 +10,6 @@ Rectangle {
     antialiasing: false
     enabled: mainWindow.activated
 
-    property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
     property alias desktopBackground: desktopBackground
 

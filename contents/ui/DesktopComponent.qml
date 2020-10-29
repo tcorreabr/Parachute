@@ -8,6 +8,7 @@ Item {
     id: desktopItem
 
     property alias clientsRepeater: clientsRepeater
+    property alias clientsArea : clientsArea
 
     property int desktopIndex: model.index
     property bool big: false
@@ -15,6 +16,19 @@ Item {
     property int clientsPadding: big ? 10 : 0
     property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? mainWindow.buttonsSize : 0
     property real ratio: width / height
+
+    property real scale: clientsArea.width / screenItem.width
+    property bool gridView: true
+
+    // Calculate the number of rows and columns of the desktop grid
+    property real sqrtOfCount: Math.sqrt(clientsRepeater.count)
+    property int addToColumns: (screenItem.ratio >= 2 && clientsRepeater.count > 2) ? 2 : (sqrtOfCount % 1 === 0) ? 0 : 1
+    property int columns: Math.floor(sqrtOfCount) + addToColumns
+    property int rows: Math.ceil(clientsRepeater.count / columns)
+
+    property real gridItemWidth: columns !== 0 ? clientsRepeater.count === 1 ? clientsArea.width * 0.75 : clientsArea.width / columns : 0
+    property real gridItemHeight: rows !== 0 ? clientsRepeater.count === 1 ? clientsArea.height * 0.75 : clientsArea.height / rows : 0
+    property real gridItemRatio: gridItemHeight !== 0 ? gridItemWidth / gridItemHeight : 0
 
     Rectangle {
         id: colorBackground
@@ -152,10 +166,12 @@ Item {
         }
 
         items.onChanged: update();
-        // onFilterItemChanged: update();
+        onFilterItemChanged: update();
         
         property var filterItem: function(item) {
-            return !item.model.client.caption.endsWith(" — Yakuake") && !item.model.client.caption.endsWith(" — krunner");
+            const client = item.model.client;
+            return client && !client.caption.endsWith(" — Yakuake") && !client.caption.endsWith(" — krunner") &&
+                    client.width !== 0 && client.height !== 0; // To avoid division by zero later
         }
 
         function update() {
@@ -228,76 +244,6 @@ Item {
                         mainWindow.selectedClientItem.client.desktop = -1;
                     break;
             }
-        }
-    }
-
-    function rearrangeClients() {
-        if (!mainWindow.desktopsInitialized) return;
-
-        mainWindow.easingType = Easing.OutExpo;
-        calculateTransformations();
-        updateToGrid();
-    }
-
-    function calculateTransformations() {
-        if (clientsRepeater.count < 1) return;
-
-        // Calculate the number of rows and columns
-        const clientsCount = clientsRepeater.count;
-        const addToColumns = Math.floor(screenItem.ratio);
-        let columns = Math.floor(Math.sqrt(clientsCount));
-        columns = (columns + addToColumns >= clientsCount) ? clientsCount : columns + addToColumns;
-        let rows = Math.ceil(clientsCount / columns);
-        while ((columns - 1) * rows >= clientsCount) columns--;
-
-        // Calculate client's geometry transformations
-        const gridItemWidth = clientsArea.width / columns;
-        const gridItemHeight = clientsArea.height / rows;
-        const gridItemRatio = gridItemWidth / gridItemHeight;
-
-        let currentClient = 0;
-        for (let row = 0; row < rows; row++) {
-            for (let column = 0; column < columns; column++) {
-                // TODO FIXME sometimes clientItem is null (something related with yakuake or krunner?)
-                const clientItem = clientsRepeater.itemAt(currentClient);
-
-                // calculate the scaling factor, avoiding windows bigger than original size
-                if (gridItemRatio > clientItem.client.width / clientItem.client.height) {
-                    clientItem.gridHeight = Math.min(gridItemHeight, clientItem.client.height);
-                    clientItem.gridWidth = clientItem.gridHeight / clientItem.client.height * clientItem.client.width;
-                } else {
-                    clientItem.gridWidth = Math.min(gridItemWidth, clientItem.client.width);
-                    clientItem.gridHeight = clientItem.gridWidth / clientItem.client.width * clientItem.client.height;
-                }
-                clientItem.gridX = column * gridItemWidth + (gridItemWidth - clientItem.gridWidth) / 2;
-                clientItem.gridY = row * gridItemHeight + (gridItemHeight - clientItem.gridHeight) / 2;
-
-                currentClient++;
-                if (currentClient === clientsCount) {
-                    column = columns; // exit inner for
-                    row = rows; // exit outer for
-                }
-            }
-        }
-    }
-
-    function updateToGrid() {
-        for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
-            const currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.x = currentClientItem.gridX;
-            currentClientItem.y = currentClientItem.gridY;
-            currentClientItem.width = currentClientItem.gridWidth;
-            currentClientItem.height = currentClientItem.gridHeight;
-        }
-    }
-
-    function updateToOriginal() {
-        for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
-            const currentClientItem = clientsRepeater.itemAt(currentClient);
-            currentClientItem.x = currentClientItem.client.x - screenItem.x;
-            currentClientItem.y = currentClientItem.client.y - screenItem.y;
-            currentClientItem.width = currentClientItem.client.width;
-            currentClientItem.height = currentClientItem.client.height;
         }
     }
 }
