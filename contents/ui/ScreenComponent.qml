@@ -151,7 +151,7 @@ Rectangle {
         onCurrentIndexChanged: workspace.currentDesktop = currentIndex + 1;
     }
 
-    function updateDesktopWindowId() {
+    function getDesktopWindowId() {
         const clients = workspace.clientList(); 
         for (let i = 0; i < clients.length; i++) {
             if (clients[i].desktopWindow && clients[i].screen === screenIndex) {
@@ -162,6 +162,6 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        updateDesktopWindowId();
+        getDesktopWindowId();
     }
 }

@@ -100,9 +100,7 @@ Item {
 
             Image { source: "images/remove.svg" }
 
-            onClicked: {
-                workspace.removeDesktop(desktopIndex);
-            }
+            onClicked: { workspace.removeDesktop(desktopIndex); }
         }
 
         RoundButton {
@@ -114,9 +112,7 @@ Item {
 
             Image { source: "images/add.svg" }
 
-            onClicked: {
-                workspace.createDesktop(desktopIndex + 1, "New desktop");
-            }
+            onClicked: { workspace.createDesktop(desktopIndex + 1, "New desktop"); }
         }
     }
 
