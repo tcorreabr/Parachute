@@ -29,7 +29,7 @@
 		  <label>Where desktops bar should be placed</label>
 		  <default>0</default>
 		</entry>
-        <entry name="closeOnMiddleClick" type="bool">
+		<entry name="closeOnMiddleClick" type="bool">
 		  <label>Close on middle click</label>
 		  <default>true</default>
 		</entry>
