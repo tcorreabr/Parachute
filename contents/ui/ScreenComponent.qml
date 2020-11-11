@@ -152,7 +152,8 @@ Item {
                                 workspace.currentDesktop = model.index + 1;
                                     break;
                                 case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
+                                    if (mainWindow.configCloseOnMiddleClick)
+                                        mainWindow.selectedClientItem.client.closeWindow();
                                     break;
                                 case Qt.RightButton:
                                     if (mainWindow.workWithActivities)
@@ -266,7 +267,8 @@ Item {
                                     mainWindow.toggleActive();
                                     break;
                                 case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
+                                    if (mainWindow.configCloseOnMiddleClick)
+                                        mainWindow.selectedClientItem.client.closeWindow();
                                     break;
                                 case Qt.RightButton:
                                     if (mainWindow.workWithActivities)

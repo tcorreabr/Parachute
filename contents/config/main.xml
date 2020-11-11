@@ -29,6 +29,10 @@
 		  <label>Where desktops bar should be placed</label>
 		  <default>0</default>
 		</entry>
+        <entry name="closeOnMiddleClick" type="bool">
+		  <label>Close on middle click</label>
+		  <default>true</default>
+		</entry>
 		<entry name="animationsDuration" type="int">
 		  <label>Duration of the animations</label>
 		  <default>250</default>
