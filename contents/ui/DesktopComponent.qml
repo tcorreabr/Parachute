@@ -168,17 +168,17 @@ Item {
             enabled: mainWindow.handlersEnabled
 
             onPointChanged: {
-                // Just to get the point where client was selected by keyboard
-                if (mainWindow.keyboardSelected) {
-                    mainWindow.keyboardSelected = false;
-                    mainWindow.pointKeyboardSelected = point.position;
+                // Just to get pointAvoidUpdatingSelection
+                if (mainWindow.avoidUpdatingSelection) {
+                    mainWindow.avoidUpdatingSelection = false;
+                    mainWindow.pointAvoidUpdatingSelection = point.position;
                     return;
                 }
 
-                // Continue only if client was selected by keyboard and mouse moved by more than 3 pixels
-                if (mainWindow.pointKeyboardSelected &&
-                        Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) < 3 &&
-                        Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) < 3) {
+                // Continue only if mouse moved by more than 2 pixels from pointAvoidUpdatingSelection
+                if (mainWindow.pointAvoidUpdatingSelection &&
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.x - point.position.x) < 3 &&
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.y - point.position.y) < 3) {
                     return;
                 }
 
@@ -186,7 +186,7 @@ Item {
                 const clientAtMousePosition = clientAtPos(point.position.x + mouseAreaX, point.position.y + mouseAreaY);
                 if (mainWindow.selectedClientItem !== clientAtMousePosition) {
                     mainWindow.selectedClientItem = clientAtMousePosition;
-                    mainWindow.pointKeyboardSelected = point.position;
+                    mainWindow.pointAvoidUpdatingSelection = point.position;
                 }
             }
 

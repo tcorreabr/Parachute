@@ -35,11 +35,11 @@ Window {
     property real configAnimationsDuration
     property int configDesktopsBarPlacement
 
-    // Selection (with mouse or keyboard)
+    // Selection (by mouse or keyboard)
     property var selectedClientItem: null
     property var outsideSelectedClient: null
-    property var pointKeyboardSelected: null
-    property bool keyboardSelected: false
+    property var pointAvoidUpdatingSelection: null
+    property bool avoidUpdatingSelection: false
 
     // Consts
     property int desktopMargin: 5
@@ -117,7 +117,7 @@ Window {
         loadConfig();
         updateScreens();
         keyboardHandler.forceActiveFocus();
-        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", toggleActive);
+        KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
 
         options.configChanged.connect(loadConfig);
@@ -146,6 +146,8 @@ Window {
 
             avoidEmptyFrameTimer.start();
         } else {
+            selectOutsideSelectedClient();
+
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
                 screensRepeater.itemAt(currentScreen).opacity = 1;
@@ -243,20 +245,18 @@ Window {
     }
 
     function selectFirstClient() {
-        keyboardSelected = true;
         selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentDesktop).clientsRepeater.itemAt(0);
+        avoidUpdatingSelection = true;
     }
 
     function selectLastClient() {
-        keyboardSelected = true;
         const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
                 itemAt(currentDesktop).clientsRepeater;
         selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
+        avoidUpdatingSelection = true;
     }
 
     function selectNextClientOn(position) {
-        keyboardSelected = true;
-        
         // Make the clients positions consider the screens positions.
         // The clients centers will be used to calculate distance between clients.
         const selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
@@ -311,7 +311,26 @@ Window {
                 }
             }
         }
-        if (candidateClientItem) selectedClientItem = candidateClientItem;
+
+        if (candidateClientItem) {
+            selectedClientItem = candidateClientItem;
+            avoidUpdatingSelection = true;
+        }
+    }
+
+    function selectOutsideSelectedClient() {
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            const currentClientsRepeater = screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.
+                    itemAt(currentDesktop).clientsRepeater;
+
+            for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
+                if (currentClientsRepeater.itemAt(currentClient).client === mainWindow.outsideSelectedClient) {
+                    selectedClientItem = currentClientsRepeater.itemAt(currentClient);
+                    avoidUpdatingSelection = true;
+                    return;
+                }
+            }
+        }
     }
 
     function getQtVersion() {
