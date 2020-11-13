@@ -76,29 +76,25 @@ Item {
         id: clientsModel
         model: clientsByScreenAndDesktop
         rootIndex: clientsByScreenAndDesktop.index(desktopItem.desktopIndex, 0, clientsByScreenAndDesktop.index(screenItem.screenIndex,0))
-        filterOnGroup: "visible"
+        filterOnGroup: "showing"
 
         delegate: ClientComponent {}
 
         groups: DelegateModelGroup {
-            name: "visible"
+            name: "showing"
             includeByDefault: false
         }
 
-        items.onChanged: update();
-        onFilterItemChanged: update();
-        
-        property var filterItem: function(item) {
-            const client = item.model.client;
-            return client && !client.caption.endsWith(" — Yakuake") && !client.caption.endsWith(" — krunner") &&
-                    client.width !== 0 && client.height !== 0; // To avoid division by zero later
-        }
+        items.onChanged: if (mainWindow.ready) update();
 
         function update() {
             for (let i = 0; i < items.count; ++i) {
                 const item = items.get(i);
-                if (item.inVisible !== filterItem(item))
-                    item.inVisible = !item.inVisible;
+                const client = item.model.client;
+                const show = client && !client.caption.endsWith(" — Yakuake") && !client.caption.endsWith(" — krunner") &&
+                        client.width !== 0 && client.height !== 0; // To avoid division by zero later
+
+                if (item.inShowing !== show) item.inShowing = !item.inShowing;
             }
         }
     }

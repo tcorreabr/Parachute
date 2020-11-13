@@ -23,6 +23,7 @@ Window {
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
     property bool handlersEnabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
+    property bool ready: false
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
@@ -124,6 +125,8 @@ Window {
         workspace.numberScreensChanged.connect(function(count) { updateScreens(); });
         workspace.screenResized.connect(function(screen) { updateScreens(); });
         workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; } );
+
+        ready = true;
     }
 
     Component.onDestruction: {
