@@ -196,15 +196,19 @@ Item {
     onClientChanged: {
         if (!client) return;
 
-        updateClientDimensions();
-        client.clientFinishUserMovedResized.connect(updateClientDimensions);
-        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+        updateClientProperties();
+        client.clientFinishUserMovedResized.connect(function(clientParam) { updateClientProperties(); });
+        client.clientMaximizedStateChanged.connect(function(clientParam, h, v) { updateClientProperties(); });
     }
 
-    function updateClientDimensions() {
+    function updateClientProperties() {
+        if (!client) return;
+
         clientX = client.x - screenItem.x;
         clientY = client.y - screenItem.y;
         clientWidth = client.width;
         clientHeight = client.height;
+
+        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
     }
 }
