@@ -18,11 +18,12 @@ Window {
     property int currentDesktop: workspace.currentDesktop - 1 // workspace.currentDesktop is one based
     property bool horizontalDesktopsLayout: configDesktopsBarPlacement === Enums.Position.Top ||
             configDesktopsBarPlacement === Enums.Position.Bottom
-    property int easingType
+    property int easingType: Easing.OutExpo
     property bool animating: false
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
     property bool handlersEnabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
+    property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
     property bool configBlurBackground
@@ -42,7 +43,6 @@ Window {
     // Consts
     property int desktopMargin: 5
     property int desktopsBarSpacing: 15
-    property int buttonsSize: 22
 
     Item {
         id: keyboardHandler
@@ -139,12 +139,13 @@ Window {
             easingType = Easing.InExpo;
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
-                avoidEmptyFrameTimer.start();
             }
+
+            avoidEmptyFrameTimer.start();
         } else {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
-                screensRepeater.itemAt(currentScreen).opacity = 1
+                screensRepeater.itemAt(currentScreen).opacity = 1;
             }
 
             activated = true;
@@ -159,9 +160,9 @@ Window {
     }
 
     // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
-    // in the end of closing animation. This Timer runs 10ms before endAnimationTimer to avoid this.
+    // in the end of closing animation. This timer runs just before endAnimationTimer to avoid this.
     Timer {
-        id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 10; repeat: false; triggeredOnStart: false;
+        id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 60; repeat: false; triggeredOnStart: false;
 
         onTriggered: {
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)

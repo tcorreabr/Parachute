@@ -9,43 +9,56 @@ Item {
 
     property var client: model.client
     property int noBorderMargin // margin to add to clients without borders (mainly gtk csd or fullscreen windows)
+    property bool ready: false
 
+    // Client dimensions are non notifyable
     property int clientX
     property int clientY
     property int clientWidth
     property int clientHeight
-
-    property real originalX: (clientX - screenItem.x) * desktopItem.scale
-    property real originalY: (clientY - screenItem.y) * desktopItem.scale
-    property real originalWidth: clientWidth * desktopItem.scale
-    property real originalHeight: clientHeight * desktopItem.scale
-
-    // property bool shouldScaleToGridItemHeight: desktopItem.gridItemRatio > clientWidth / clientHeight
-    property int column: model.index - desktopItem.columns * row
+    
+    ////////////////////////////
+    // Grid view calculations //
+    ////////////////////////////
     property int row: Math.floor(model.index / desktopItem.columns)
+    property int column: model.index - desktopItem.columns * row
 
-    property real gridX: clientsRepeater.count === 1 ? (desktopItem.clientsArea.width - gridWidth) / 2 :
-            column * desktopItem.gridItemWidth + (desktopItem.gridItemWidth - gridWidth) / 2
-    property real gridY: clientsRepeater.count === 1 ? (desktopItem.clientsArea.height - gridHeight) / 2 :
-            row * desktopItem.gridItemHeight + (desktopItem.gridItemHeight - gridHeight) / 2
-    property real gridWidth: desktopItem.gridItemRatio > clientWidth / clientHeight ? gridHeight / clientHeight * clientWidth :
-            desktopItem.gridItemWidth
-    property real gridHeight: desktopItem.gridItemRatio > clientWidth / clientHeight ? desktopItem.gridItemHeight :
-            gridWidth / clientWidth * clientHeight
+    property real clientGridScale: clientWidth / clientHeight > desktopItem.gridItemAspectRatio ?
+            desktopItem.gridItemWidth / clientWidth :
+            desktopItem.gridItemHeight / clientHeight
+    property real gridX: clientsRepeater.count === 1 ?
+            desktopItem.gridAreaX + (desktopItem.gridAreaWidth - gridWidth) / 2 :
+            desktopItem.gridAreaX + column * desktopItem.gridItemWidth + (desktopItem.gridItemWidth - gridWidth) / 2
+    property real gridY: clientsRepeater.count === 1 ?
+            desktopItem.gridAreaY + (desktopItem.gridAreaHeight - gridHeight) / 2 :
+            desktopItem.gridAreaY + row * desktopItem.gridItemHeight + (desktopItem.gridItemHeight - gridHeight) / 2
+    property real gridWidth: clientWidth * clientGridScale
+    property real gridHeight: clientHeight * clientGridScale
+    ////////////////////////////
 
     states: [
         State {
-            when: !desktopItem.gridView
+            when: !ready
             PropertyChanges {
                 target: clientItem
-                x: originalX
-                y: originalY
-                width: originalWidth
-                height: originalHeight
+                x: desktopItem.gridAreaX
+                y: desktopItem.gridAreaY
+                width: 250
+                height: 250
             }
         },
         State {
-            when: desktopItem.gridView
+            when: !desktopItem.gridView && ready
+            PropertyChanges {
+                target: clientItem
+                x: clientX
+                y: clientY
+                width: clientWidth
+                height: clientHeight
+            }
+        },
+        State {
+            when: desktopItem.gridView && ready
             PropertyChanges {
                 target: clientItem
                 x: gridX
@@ -144,6 +157,8 @@ Item {
         anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         Drag.source: clientItem.client
+        clip: true
+        clipTo: screenItem
         
         states: State {
             when: clientThumbnail.Drag.active
@@ -176,15 +191,19 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        updateClientRect();
-        // client.clientFinishUserMovedResized.connect(function(client) { print("teste"); });
-        noBorderMargin = client && client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+    Component.onCompleted: ready = true;
+
+    onClientChanged: {
+        if (!client) return;
+
+        updateClientDimensions();
+        client.clientFinishUserMovedResized.connect(updateClientDimensions);
+        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
     }
 
-    function updateClientRect() {
-        clientX = client.x;
-        clientY = client.y;
+    function updateClientDimensions() {
+        clientX = client.x - screenItem.x;
+        clientY = client.y - screenItem.y;
         clientWidth = client.width;
         clientHeight = client.height;
     }

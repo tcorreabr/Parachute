@@ -8,27 +8,35 @@ Item {
     id: desktopItem
 
     property alias clientsRepeater: clientsRepeater
-    property alias clientsArea : clientsArea
 
     property int desktopIndex: model.index
     property bool big: false
-    property bool hovered: desktopItemHoverHandler.hovered || addButton.hovered || removeButton.hovered
-    property int clientsPadding: big ? 10 : 0
-    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? mainWindow.buttonsSize : 0
-    property real ratio: width / height
-
-    property real scale: clientsArea.width / screenItem.width
     property bool gridView: true
+    property int clientsPadding: big ? 10 : 0
+    property int clientsDecorationsHeight: big && mainWindow.configShowWindowTitles ? 22 : 0
 
-    // Calculate the number of rows and columns of the desktop grid
+    property real mouseAreaX
+    property real mouseAreaY
+    property real mouseAreaWidth
+    property real mouseAreaHeight
+
+    ////////////////////////////
+    // Grid view calculations //
+    ////////////////////////////
+    property real gridAreaX
+    property real gridAreaY
+    property real gridAreaWidth
+    property real gridAreaHeight
+
     property real sqrtOfCount: Math.sqrt(clientsRepeater.count)
-    property int addToColumns: (screenItem.ratio >= 2 && clientsRepeater.count > 2) ? 2 : (sqrtOfCount % 1 === 0) ? 0 : 1
+    property int addToColumns: (screenItem.aspectRatio >= 2 && clientsRepeater.count > 2) ? 2 : (sqrtOfCount % 1 === 0) ? 0 : 1
     property int columns: Math.floor(sqrtOfCount) + addToColumns
     property int rows: Math.ceil(clientsRepeater.count / columns)
 
-    property real gridItemWidth: columns !== 0 ? clientsRepeater.count === 1 ? clientsArea.width * 0.75 : clientsArea.width / columns : 0
-    property real gridItemHeight: rows !== 0 ? clientsRepeater.count === 1 ? clientsArea.height * 0.75 : clientsArea.height / rows : 0
-    property real gridItemRatio: gridItemHeight !== 0 ? gridItemWidth / gridItemHeight : 0
+    property real gridItemWidth: clientsRepeater.count === 1 ? gridAreaWidth * 0.75 : gridAreaWidth / columns
+    property real gridItemHeight: clientsRepeater.count === 1 ? gridAreaHeight * 0.75 : gridAreaHeight / rows
+    property real gridItemAspectRatio: gridItemWidth / gridItemHeight
+    //////////////////////////////
 
     Rectangle {
         id: colorBackground
@@ -57,95 +65,11 @@ Item {
         cached: true
     }
 
-    Rectangle {
-        id: colorizeRect
-        anchors.fill: parent
-        color: "transparent"
-        radius: 10
-        border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
-        border.color: "white"
-
-        states: [
-            State {
-                when: desktopDropArea.containsDrag
-                PropertyChanges { target: colorizeRect; color: "#3F006600"; }
-            },
-            State {
-                when: !big && hovered
-                PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
-            }
-        ]
-    }
-
     ToolTip {
-        visible: !big && hovered
+        visible: !big && hoverHandler.hovered
         text: workspace.desktopName(desktopIndex + 1);
         delay: 1000
         timeout: 5000
-    }
-
-    Row {
-        spacing: 10
-        anchors.top: parent.top
-        anchors.topMargin: -mainWindow.buttonsSize / 2
-        anchors.horizontalCenter: parent.horizontalCenter
-        visible: false // !big && hovered
-
-        RoundButton {
-            id: removeButton
-            implicitHeight: mainWindow.buttonsSize
-            implicitWidth: mainWindow.buttonsSize
-            radius: height / 2
-            focusPolicy: Qt.NoFocus
-
-            Image { source: "images/remove.svg" }
-
-            onClicked: { workspace.removeDesktop(desktopIndex); }
-        }
-
-        RoundButton {
-            id: addButton
-            implicitHeight: mainWindow.buttonsSize
-            implicitWidth: mainWindow.buttonsSize
-            radius: height / 2
-            focusPolicy: Qt.NoFocus
-
-            Image { source: "images/add.svg" }
-
-            onClicked: { workspace.createDesktop(desktopIndex + 1, "New desktop"); }
-        }
-    }
-
-    DropArea {
-        id: desktopDropArea
-        anchors.fill: parent
-
-        onEntered: {
-            drag.accepted = false;            
-            if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
-                drag.accepted = true;
-                return;
-            }
-            if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
-                drag.accepted = true;
-        }
-
-        onDropped: {
-            if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
-                // Ensures mainWindow.outsideSelectedClient stays on current desktop
-                if (drag.source === mainWindow.outsideSelectedClient) {
-                    if (clientsRepeater.itemAt(0))
-                        mainWindow.outsideSelectedClient = clientsRepeater.itemAt(0);
-                    // TODO: create screenItem.desktopWindow?
-                    // else
-                    //      mainWindow.outsideSelectedClient = ??
-                }
-
-                drag.source.desktop = desktopIndex + 1;
-            }
-            if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
-                workspace.sendClientToScreen(drag.source, screenItem.screenIndex);
-        }
     }
 
     DelegateModel {
@@ -179,66 +103,135 @@ Item {
         }
     }
 
+    Repeater {
+        id: clientsRepeater
+        model: clientsModel
+    }
+
     Item {
-        id: clientsArea
-        anchors.centerIn: parent
-        width: desktopItem.ratio <= screenItem.ratio ? desktopItem.width - (mainWindow.desktopMargin * 2)
-                : clientsArea.height / screenItem.height * screenItem.width
-        height: desktopItem.ratio > screenItem.ratio ? desktopItem.height - (mainWindow.desktopMargin * 2)
-                : clientsArea.width / screenItem.width * screenItem.height
+        id: mouseArea
+        x: mouseAreaX
+        y: mouseAreaY
+        width: mouseAreaWidth
+        height: mouseAreaHeight
 
-        Repeater {
-            id: clientsRepeater
-            model: clientsModel
+        Rectangle {
+            id: colorizeRect
+            anchors.fill: parent
+            color: "transparent"
+            radius: 10
+            border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
+            border.color: "white"
+
+            states: [
+                State {
+                    when: dropArea.containsDrag
+                    PropertyChanges { target: colorizeRect; color: "#3F006600"; }
+                },
+                State {
+                    when: !big && hoverHandler.hovered
+                    PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
+                }
+            ]
         }
-    }
 
-    HoverHandler {
-        id: desktopItemHoverHandler
-        enabled: mainWindow.handlersEnabled
+        DropArea {
+            id: dropArea
+            anchors.fill: parent
 
-        onPointChanged: {
-            if (mainWindow.keyboardSelected) {
-                mainWindow.keyboardSelected = false;
-                mainWindow.pointKeyboardSelected = point.position;
-                return;
+            onEntered: {
+                drag.accepted = false;            
+                if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
+                    drag.accepted = true;
+                    return;
+                }
+                if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
+                    drag.accepted = true;
             }
 
-            if (mainWindow.selectedClientItem !== clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y) &&
-                    point.position !== Qt.point(0, 0) &&
-                    (!mainWindow.pointKeyboardSelected ||
-                    Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) > 3 ||
-                    Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) > 3)) {
-                mainWindow.selectedClientItem = clientsArea.childAt(point.position.x - clientsArea.x, point.position.y - clientsArea.y);
-                mainWindow.pointKeyboardSelected = null;
+            onDropped: {
+                if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
+                    // Ensures mainWindow.outsideSelectedClient stays on current desktop
+                    if (drag.source === mainWindow.outsideSelectedClient) {
+                        const tmpDragSourceDesktop = drag.source.desktop;
+                        drag.source.desktop = desktopIndex + 1;
+                        workspace.currentDesktop = desktopIndex + 1;
+                        workspace.currentDesktop = tmpDragSourceDesktop; // To select a new mainWindow.outsideSelectedClient
+                    } else {
+                        drag.source.desktop = desktopIndex + 1;
+                    }
+                }
+
+                if (screenItem.screenIndex !== drag.source.screen && drag.source.moveableAcrossScreens)
+                    workspace.sendClientToScreen(drag.source, screenItem.screenIndex);
             }
         }
-    }
 
-    TapHandler {
-        acceptedButtons: Qt.AllButtons
-        enabled: mainWindow.handlersEnabled
+        HoverHandler {
+            id: hoverHandler
+            enabled: mainWindow.handlersEnabled
 
-        onTapped: {
-            switch (eventPoint.event.button) {
-                case Qt.LeftButton:
-                case Qt.NoButton:
-                    if (workspace.currentDesktop === model.index + 1)
-                        mainWindow.toggleActive();
-                    else
-                        workspace.currentDesktop = model.index + 1;
-                    break;
-                case Qt.MiddleButton:
-                    if (mainWindow.selectedClientItem) mainWindow.selectedClientItem.client.closeWindow();
-                    break;
-                case Qt.RightButton:
-                    if (!mainWindow.selectedClientItem) break;
+            onPointChanged: {
+                // Just to get the point where client was selected by keyboard
+                if (mainWindow.keyboardSelected) {
+                    mainWindow.keyboardSelected = false;
+                    mainWindow.pointKeyboardSelected = point.position;
+                    return;
+                }
 
-                    if (mainWindow.selectedClientItem.client.desktop === -1)
-                        mainWindow.selectedClientItem.client.desktop = model.index + 1;
-                    else
-                        mainWindow.selectedClientItem.client.desktop = -1;
-                    break;
+                // Continue only if client was selected by keyboard and mouse moved by more than 3 pixels
+                if (mainWindow.pointKeyboardSelected &&
+                        Math.abs(mainWindow.pointKeyboardSelected.x - point.position.x) < 3 &&
+                        Math.abs(mainWindow.pointKeyboardSelected.y - point.position.y) < 3) {
+                    return;
+                }
+
+                // Update selected client if needed
+                const clientAtMousePosition = clientAtPos(point.position.x + mouseAreaX, point.position.y + mouseAreaY);
+                if (mainWindow.selectedClientItem !== clientAtMousePosition) {
+                    mainWindow.selectedClientItem = clientAtMousePosition;
+                    mainWindow.pointKeyboardSelected = point.position;
+                }
+            }
+
+            function clientAtPos(posX, posY) {
+                for (let currentClient = 0; currentClient < clientsRepeater.count; currentClient++) {
+                    const currentClientItem = clientsRepeater.itemAt(currentClient);
+                    if (posX >= currentClientItem.x && posX <= currentClientItem.x + currentClientItem.width &&
+                        posY >= currentClientItem.y && posY <= currentClientItem.y + currentClientItem.height) {
+                        return currentClientItem;
+                    }
+                }
+                return null;
+            }
+        }
+
+        TapHandler {
+            acceptedButtons: Qt.AllButtons
+            enabled: mainWindow.handlersEnabled
+
+            onTapped: {
+                switch (eventPoint.event.button) {
+                    case Qt.LeftButton:
+                    case Qt.NoButton:
+                        if (workspace.currentDesktop === model.index + 1)
+                            mainWindow.toggleActive();
+                        else
+                            workspace.currentDesktop = model.index + 1;
+                        break;
+                    case Qt.MiddleButton:
+                        if (mainWindow.selectedClientItem)
+                            mainWindow.selectedClientItem.client.closeWindow();
+                        break;
+                    case Qt.RightButton:
+                        if (!mainWindow.selectedClientItem) break;
+
+                        if (mainWindow.selectedClientItem.client.desktop === -1)
+                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
+                        else
+                            mainWindow.selectedClientItem.client.desktop = -1;
+                        break;
+                }
             }
         }
     }
