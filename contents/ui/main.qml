@@ -44,6 +44,7 @@ Window {
     // Consts
     property int desktopMargin: 5
     property int desktopsBarSpacing: 15
+    property int clientsDecorationsHeight: 24
 
     Item {
         id: keyboardHandler

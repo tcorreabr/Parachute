@@ -1,17 +1,16 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
 import org.kde.kwin 2.0 as KWinComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
 
 Item {
     id: clientItem
 
     property var client: model.client
-    property int noBorderMargin // margin to add to clients without borders (mainly gtk csd or fullscreen windows)
+    property int noBorderSpacing // Space to add between clientThumbnail and clientDecorations when client has no borders (mainly gtk csd or fullscreen windows)
     property bool ready: false
 
-    // Client dimensions are non notifyable
     property int clientX
     property int clientY
     property int clientWidth
@@ -38,7 +37,7 @@ Item {
 
     states: [
         State {
-            when: !ready
+            when: !ready // To animate when a new window is created
             PropertyChanges {
                 target: clientItem
                 x: desktopItem.gridAreaX
@@ -91,82 +90,80 @@ Item {
 
     PlasmaCore.FrameSvgItem {
         id: selectedFrame
-        anchors.fill : parent
+        anchors.fill: parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
         visible: desktopItem.big && !mainWindow.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.7
     }
 
-    Item {
+    Row {
         id: clientDecorations
-        height: desktopItem.clientsDecorationsHeight
-        width: clientThumbnail.width * 0.8
-        anchors.top: parent.top
-        anchors.topMargin: desktopItem.clientsPadding
-        anchors.horizontalCenter: parent.horizontalCenter
+        x: (clientItem.gridWidth - clientDecorations.width) / 2 // Anchors are purposely avoided to centralize this because of animations
+        y: desktopItem.clientsPadding
         visible: desktopItem.big && mainWindow.configShowWindowTitles && !mainWindow.animating && !clientThumbnail.Drag.active
+        spacing: 10
 
-        RowLayout {
-            anchors.horizontalCenter: parent.horizontalCenter
-            height: parent.height
-            spacing: 10
+        PlasmaCore.IconItem {
+            id: icon
+            source: clientItem.client ? clientItem.client.icon : null
+            height: mainWindow.clientsDecorationsHeight // PlasmaCore.Units.iconSizes.medium?
+            width: height
+        }
 
-            PlasmaCore.IconItem {
-                id: icon
-                source: clientItem.client ? clientItem.client.icon : null
-                implicitHeight: parent.height
-                implicitWidth: parent.height
-            }
+        Text {
+            id: caption
+            height: mainWindow.clientsDecorationsHeight
+            text: clientItem.client ? clientItem.client.caption : ""
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+            color: "white"
 
-            Text {
-                id: caption
-                height: parent.height
-                text: clientItem.client ? clientItem.client.caption : null
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                color: "white"
-                Layout.maximumWidth: clientDecorations.width - icon.width - parent.spacing - closeButton.width - parent.spacing
-            }
+            property real maxWidth: clientItem.gridWidth - 5 * icon.width
 
-            // This wrapper is needed because QML recalculate Layouts when children visibility change 
-            Item {
-                id: closeButtonWrapper
-                implicitHeight: parent.height
-                implicitWidth: parent.height
+            onMaxWidthChanged: updateWidth();
+            onTextChanged: updateWidth();
 
-                RoundButton {
-                    id: closeButton
-                    anchors.fill: parent
-                    visible: selectedFrame.visible
-                    focusPolicy: Qt.NoFocus
-                    background: Rectangle { color: "firebrick"; radius: height / 2; }
-
-                    Image { source: "images/close.svg" }
-
-                    onClicked: clientItem.client.closeWindow();
-                }
+            function updateWidth() {
+                caption.width = undefined;
+                if (caption.width > caption.maxWidth) caption.width = caption.maxWidth;
             }
         }
+    }
+
+    PlasmaComponents.ToolButton {
+        id: closeButton
+        y: desktopItem.clientsPadding
+        height: mainWindow.clientsDecorationsHeight
+        width: height
+        anchors.right: parent.right
+        anchors.rightMargin: desktopItem.clientsPadding
+        visible: selectedFrame.visible && mainWindow.configShowWindowTitles
+        iconName: "dialog-close"
+        flat: true
+
+        onClicked: clientItem.client.closeWindow();
     }
 
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
         anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
-        anchors.margins: desktopItem.clientsPadding + noBorderMargin
-        anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
-        wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
+        anchors.margins: desktopItem.clientsPadding + noBorderSpacing
+        anchors.topMargin: desktopItem.big && mainWindow.configShowWindowTitles ?
+                desktopItem.clientsPadding + noBorderSpacing + mainWindow.clientsDecorationsHeight :
+                desktopItem.clientsPadding + noBorderSpacing
         Drag.source: clientItem.client
+        wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clip: true
         clipTo: screenItem
-        
+
         states: State {
             when: clientThumbnail.Drag.active
 
             PropertyChanges {
                 target: clientThumbnail
-                x: desktopItem.clientsPadding + clientDragHandler.centroid.position.x - clientThumbnail.width / 2
-                y: desktopItem.clientsPadding + desktopItem.clientsDecorationsHeight + clientDragHandler.centroid.position.y - clientThumbnail.height / 2
+                x: clientDragHandler.centroid.position.x - clientThumbnail.width / 2
+                y: clientDragHandler.centroid.position.y - clientThumbnail.height / 2
                 width: 250; height: 250; clip: false
                 Drag.hotSpot.x: clientThumbnail.width / 2
                 Drag.hotSpot.y: clientThumbnail.height / 2
@@ -174,20 +171,13 @@ Item {
         }
     }
 
-    Item {
-        id: dragPlaceholder
-        anchors.fill: parent
-        anchors.margins: desktopItem.clientsPadding + noBorderMargin
-        anchors.topMargin: desktopItem.clientsPadding + noBorderMargin + desktopItem.clientsDecorationsHeight
+    DragHandler {
+        id: clientDragHandler
+        target: null
 
-        DragHandler {
-            id: clientDragHandler
-            target: null
-
-            onActiveChanged: {
-                mainWindow.dragging = active;
-                active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
-            }
+        onActiveChanged: {
+            mainWindow.dragging = active;
+            active ? clientThumbnail.Drag.active = true : clientThumbnail.Drag.drop();
         }
     }
 
@@ -201,6 +191,7 @@ Item {
         client.clientMaximizedStateChanged.connect(function(clientParam, h, v) { updateClientProperties(); });
     }
 
+    // Update non-notifiable properties
     function updateClientProperties() {
         if (!client) return;
 
@@ -209,6 +200,6 @@ Item {
         clientWidth = client.width;
         clientHeight = client.height;
 
-        noBorderMargin = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
+        noBorderSpacing = client.noBorder ? desktopItem.big ? 18 : 4 : 0;
     }
 }
