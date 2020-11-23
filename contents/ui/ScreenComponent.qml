@@ -41,14 +41,13 @@ Item {
 
         property real mouseAreaX
         property real mouseAreaY
-        property real mouseAreaWidth: screenItem.width * gridAreaScale
-        property real mouseAreaHeight: screenItem.height * gridAreaScale
+        property real mouseAreaWidth
+        property real mouseAreaHeight
 
-        property real gridAreaScale
         property real gridAreaX
         property real gridAreaY
-        property real gridAreaWidth: screenItem.width * gridAreaScale
-        property real gridAreaHeight: screenItem.height * gridAreaScale
+        property real gridAreaWidth
+        property real gridAreaHeight
 
         states: [
             State {
@@ -62,11 +61,12 @@ Item {
                     mouseAreaWidth: screenItem.width
                     mouseAreaHeight: screenItem.height - screenItem.desktopsBarSize
 
-                    gridAreaScale: (mouseAreaHeight - mainWindow.desktopMargin * 2) / screenItem.height
                     gridAreaX: (screenItem.width - bigDesktops.gridAreaWidth) / 2
                     gridAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
                             screenItem.desktopsBarSize + mainWindow.desktopMargin :
                             mainWindow.desktopMargin
+                    gridAreaWidth: bigDesktops.gridAreaHeight * screenItem.aspectRatio
+                    gridAreaHeight: mouseAreaHeight - mainWindow.desktopMargin * 2
                 }
             },
             State {
@@ -80,11 +80,12 @@ Item {
                     mouseAreaWidth: screenItem.width - screenItem.desktopsBarSize
                     mouseAreaHeight: screenItem.height
 
-                    gridAreaScale: (mouseAreaWidth - mainWindow.desktopMargin * 2) / screenItem.width
                     gridAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
                             screenItem.desktopsBarSize + mainWindow.desktopMargin :
                             mainWindow.desktopMargin
                     gridAreaY: (screenItem.height - bigDesktops.gridAreaHeight) / 2
+                    gridAreaWidth: mouseAreaWidth - mainWindow.desktopMargin * 2
+                    gridAreaHeight: bigDesktops.gridAreaWidth * screenItem.aspectRatio
                 }
             }
         ]
