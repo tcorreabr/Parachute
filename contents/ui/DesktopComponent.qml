@@ -32,8 +32,8 @@ Item {
     property int columns: Math.floor(sqrtOfCount) + addToColumns
     property int rows: Math.ceil(clientsRepeater.count / columns)
 
-    property real gridItemWidth: clientsRepeater.count === 1 ? gridAreaWidth * 0.75 : gridAreaWidth / columns
-    property real gridItemHeight: clientsRepeater.count === 1 ? gridAreaHeight * 0.75 : gridAreaHeight / rows
+    property real gridItemWidth: clientsRepeater.count <= 1 ? gridAreaWidth * 0.75 : gridAreaWidth / columns
+    property real gridItemHeight: clientsRepeater.count <= 1 ? gridAreaHeight * 0.75 : gridAreaHeight / rows
     property real gridItemAspectRatio: gridItemWidth / gridItemHeight
     //////////////////////////////
 

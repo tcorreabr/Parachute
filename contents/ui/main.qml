@@ -23,7 +23,6 @@ Window {
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
     property bool handlersEnabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
-    property bool ready: false
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
@@ -121,18 +120,11 @@ Window {
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
 
-        options.configChanged.connect(loadConfig);
-        workspace.clientActivated.connect(clientActivated);
+        options.configChanged.connect(function() { loadConfig(); });
+        workspace.clientActivated.connect(function(client) { clientActivated(); });
         workspace.numberScreensChanged.connect(function(count) { updateScreens(); });
         workspace.screenResized.connect(function(screen) { updateScreens(); });
-        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; } );
-
-        ready = true;
-    }
-
-    Component.onDestruction: {
-        workspace.clientActivated.disconnect(clientActivated);
-        options.configChanged.disconnect(loadConfig);
+        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; });
     }
 
     function toggleActive() {
