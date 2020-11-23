@@ -132,7 +132,7 @@ Item {
 
         HoverHandler {
             id: hoverHandler
-            enabled: mainWindow.handlersEnabled
+            enabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
 
             onPointChanged: {
                 // Just to get pointAvoidUpdatingSelection
@@ -171,7 +171,6 @@ Item {
 
         TapHandler {
             acceptedButtons: Qt.AllButtons
-            enabled: mainWindow.handlersEnabled
 
             onTapped: {
                 switch (eventPoint.event.button) {
@@ -222,6 +221,12 @@ Item {
                         client.width !== 0 && client.height !== 0; // To avoid division by zero later
 
                 if (item.inShowing !== show) item.inShowing = !item.inShowing;
+            }
+
+            if (mainWindow.activated) {
+                mainWindow.animating = true;
+                mainWindow.easingType = Easing.OutExpo;
+                mainWindow.endAnimationTimer.start();
             }
         }
     }

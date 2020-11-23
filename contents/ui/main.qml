@@ -12,6 +12,8 @@ Window {
     x: activated ? 0 : mainWindow.width * 2
     y: activated ? 0 : mainWindow.height * 2
 
+    property alias endAnimationTimer: endAnimationTimer
+
     property bool activated: false
     property bool dragging: false
     property real qtVersion
@@ -22,7 +24,6 @@ Window {
     property bool animating: false
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
-    property bool handlersEnabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
