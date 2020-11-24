@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
 import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
 
 Item {
     id: screenItem
@@ -129,6 +130,14 @@ Item {
             visible: mainWindow.configShowDesktopsBarBackground
         }
 
+        Item {
+            anchors.fill: parent
+
+            HoverHandler {
+                id: hoverHandler
+            }
+        }
+
         Behavior on anchors.topMargin {
             enabled: mainWindow.activated
             NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
@@ -206,17 +215,16 @@ Item {
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter
 
-            RoundButton {
+            PlasmaComponents.ToolButton {
                 id: removeDesktop
-                implicitHeight: 36
-                implicitWidth: 36
-                radius: height / 2
-                focusPolicy: Qt.NoFocus
-
-                Image { source: "images/remove.svg"; anchors.fill: parent; }
+                height: 48
+                width: 48
+                iconName: "remove"
+                flat: true
+                opacity: hoverHandler.hovered ? 1 : 0
 
                 onClicked: {
-                    // Evita ir pro primeiro desktop
+                    // Avoid going to the first desktop
                     const currentDesktop = workspace.currentDesktop === workspace.desktops ?
                             workspace.currentDesktop - 1 : workspace.currentDesktop;
                     workspace.desktops--; // workspace.removeDesktop(desktopIndex);
@@ -244,16 +252,16 @@ Item {
                 }
             }
 
-            RoundButton {
+            PlasmaComponents.ToolButton {
                 id: addDesktop
-                implicitHeight: 36
-                implicitWidth: 36
-                radius: height / 2
-                focusPolicy: Qt.NoFocus
-
-                Image { source: "images/add.svg"; anchors.fill: parent; }
+                height: 48
+                width: 48
+                iconName: "add"
+                flat: true
+                opacity: hoverHandler.hovered ? 1 : 0
 
                 onClicked: {
+                    // Avoid going to the first desktop
                     const currentDesktop = workspace.currentDesktop;
                     workspace.desktops++; // workspace.createDesktop(desktopIndex + 1, "New desktop");
                     workspace.currentDesktop = currentDesktop; 
