@@ -8,7 +8,7 @@ Window {
     id: mainWindow
     flags: Qt.X11BypassWindowManagerHint
     visible: true
-    color: "transparent"
+    color: "#333333"
     x: activated ? 0 : mainWindow.width * 2
     y: activated ? 0 : mainWindow.height * 2
 
@@ -22,6 +22,7 @@ Window {
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: Easing.OutExpo
     property bool animating: false
+    property bool idle: activated && !animating && !dragging
     property bool mustUpdateScreens: true
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
@@ -150,13 +151,13 @@ Window {
                     Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
             }
 
-            let desktopWindowsGot = 0;
+            let desktopWindowsPicked = 0;
             const clients = workspace.clientList();
             for (let i = 0; i < clients.length; i++) {
                 if (clients[i].desktopWindow) {
                     screensRepeater.itemAt(clients[i].screen).desktopBackground.winId = clients[i].windowId;
-                    desktopWindowsGot++;
-                    if (desktopWindowsGot === screensRepeater.count) {
+                    desktopWindowsPicked++;
+                    if (desktopWindowsPicked === screensRepeater.count) {
                         mainWindow.mustUpdateScreens = false;
                         attempt = 0;
                         return;
@@ -172,12 +173,42 @@ Window {
         }
     }
 
+    // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
+    // in the end of closing animation. This timer runs just before endAnimationTimer to avoid this.
+    Timer {
+        id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 60; repeat: false; triggeredOnStart: false;
+
+        onTriggered: {
+            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
+                screensRepeater.itemAt(currentScreen).opacity = 0;
+        }
+    }
+
+    Timer {
+        id: endAnimationTimer; interval: mainWindow.configAnimationsDuration; repeat: false; triggeredOnStart: false;
+
+        onTriggered: {
+            if (easingType === Easing.InExpo) {
+                activated = false;
+
+                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
+                selectedClientItem = null;
+
+                // Return current big desktop to grid state. Desktops only have to be in original state for opening/closing animations.
+                for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
+                    screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
+            }
+
+            animating = false;
+        }
+    }
+
     Component.onCompleted: {
         getQtVersion();
         loadConfig();
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
-        clientActivated(workspace.activeClient);
+        clientActivated();
 
         options.configChanged.connect(function() { loadConfig(); });
         workspace.clientActivated.connect(function(client) { clientActivated(); });
@@ -216,46 +247,7 @@ Window {
         endAnimationTimer.start();
     }
 
-    // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
-    // in the end of closing animation. This timer runs just before endAnimationTimer to avoid this.
-    Timer {
-        id: avoidEmptyFrameTimer; interval: mainWindow.configAnimationsDuration - 60; repeat: false; triggeredOnStart: false;
-
-        onTriggered: {
-            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-                screensRepeater.itemAt(currentScreen).opacity = 0;
-        }
-    }
-
-    Timer {
-        id: endAnimationTimer; interval: mainWindow.configAnimationsDuration; repeat: false; triggeredOnStart: false;
-
-        onTriggered: {
-            if (easingType === Easing.InExpo) {
-                activated = false;
-
-                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
-                selectedClientItem = null;
-
-                returnToGridTimer.start();
-            }
-
-            animating = false;
-        }
-    }
-
-    // Return current bigDesktop to grid state. Desktops only have to be in original state for opening/closing animations.
-    Timer {
-        id: returnToGridTimer; interval: 10; repeat: false; triggeredOnStart: false;
-
-        onTriggered: {
-            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
-                screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
-        }
-    }
-
-    function clientActivated(client) {
-        // The correct thing to do would be to use the client parameter but sometimes it doesn't seem to be with the right value
+    function clientActivated() {
         if (workspace.activeClient) {
             outsideSelectedClient = workspace.activeClient;
 
@@ -291,7 +283,7 @@ Window {
     }
 
     function selectNextClientOn(position) {
-        // Make the clients positions consider the screens positions.
+        // Make client positions consider screen positions.
         // The clients centers will be used to calculate distance between clients.
         const selectedClientItemX = selectedClientItem.x + screensRepeater.itemAt(selectedClientItem.client.screen).x;
         const selectedClientItemY = selectedClientItem.y + screensRepeater.itemAt(selectedClientItem.client.screen).y;

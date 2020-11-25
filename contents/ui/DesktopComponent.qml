@@ -2,7 +2,6 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQml.Models 2.2
 import QtGraphicalEffects 1.12
-import QtQuick.Layouts 1.12
 
 Item {
     id: desktopItem
@@ -38,9 +37,9 @@ Item {
     //////////////////////////////
 
     Rectangle {
-        id: colorBackground
+        id: roundedRect
         anchors.fill: parent
-        visible: !big && !screenItem.desktopBackground.thumbnailAvailable
+        visible: false
         color: "#222222"
         radius: 10
     }
@@ -51,17 +50,36 @@ Item {
         verticalOffset: 3
         color: "#55000000"
         visible: !big && mainWindow.configShowDesktopShadows
-        source: colorBackground
+        source: roundedRect
         cached: true
     }
 
-    OpacityMask {
-        id: thumbBackground
+    OpacityMask { // Desktop background
         anchors.fill: parent
         source: screenItem.desktopBackground
-        maskSource: colorBackground // has to be opaque
+        maskSource: roundedRect
         visible: !big && screenItem.desktopBackground.thumbnailAvailable
         cached: true
+    }
+
+    Rectangle {
+        id: colorizeRect
+        anchors.fill: parent
+        color: "transparent"
+        radius: 10
+        border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
+        border.color: "white"
+
+        states: [
+            State {
+                when: dropArea.containsDrag
+                PropertyChanges { target: colorizeRect; color: "#3F006600"; }
+            },
+            State {
+                when: !big && hoverHandler.hovered
+                PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
+            }
+        ]
     }
 
     ToolTip {
@@ -77,26 +95,6 @@ Item {
         y: mouseAreaY
         width: mouseAreaWidth
         height: mouseAreaHeight
-
-        Rectangle {
-            id: colorizeRect
-            anchors.fill: parent
-            color: "transparent"
-            radius: 10
-            border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
-            border.color: "white"
-
-            states: [
-                State {
-                    when: dropArea.containsDrag
-                    PropertyChanges { target: colorizeRect; color: "#3F006600"; }
-                },
-                State {
-                    when: !big && hoverHandler.hovered
-                    PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
-                }
-            ]
-        }
 
         DropArea {
             id: dropArea
@@ -132,7 +130,7 @@ Item {
 
         HoverHandler {
             id: hoverHandler
-            enabled: mainWindow.activated && !mainWindow.animating && !mainWindow.dragging
+            enabled: mainWindow.idle
 
             onPointChanged: {
                 // Just to get pointAvoidUpdatingSelection
@@ -142,10 +140,10 @@ Item {
                     return;
                 }
 
-                // Continue only if mouse moved by more than 2 pixels from pointAvoidUpdatingSelection
+                // Continue only if mouse moved by more than 1 pixels from pointAvoidUpdatingSelection
                 if (mainWindow.pointAvoidUpdatingSelection &&
-                        Math.abs(mainWindow.pointAvoidUpdatingSelection.x - point.position.x) < 3 &&
-                        Math.abs(mainWindow.pointAvoidUpdatingSelection.y - point.position.y) < 3) {
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.x - point.position.x) < 2 &&
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.y - point.position.y) < 2) {
                     return;
                 }
 
@@ -172,7 +170,7 @@ Item {
         TapHandler {
             acceptedButtons: Qt.AllButtons
 
-            onTapped: {
+            onSingleTapped: {
                 switch (eventPoint.event.button) {
                     case Qt.LeftButton:
                     case Qt.NoButton:

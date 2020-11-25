@@ -8,7 +8,6 @@ Item {
     id: screenItem
     smooth: false // Applied to children
     antialiasing: false // Applied to children
-    enabled: mainWindow.activated
     clip: true
 
     property alias bigDesktopsRepeater: bigDesktopsRepeater
@@ -177,7 +176,6 @@ Item {
                 }
                 PropertyChanges {
                     target: desktopsWrapper
-                    columns: desktopsBarRepeater.count + 2 // 2 for add and remove buttons
                     rows: 1
                 }
             },
@@ -200,7 +198,6 @@ Item {
                 PropertyChanges {
                     target: desktopsWrapper
                     columns: 1
-                    rows: desktopsBarRepeater.count + 2 // 2 for add and remove buttons
                 }
             }
         ]
@@ -209,7 +206,7 @@ Item {
             id: desktopsWrapper
             spacing: mainWindow.desktopsBarSpacing
             padding: mainWindow.desktopsBarSpacing
-            // anchors.centerIn: parent // <== don't know why but this doesn't work here, so we have to set x and y
+            // anchors.centerIn: parent // <== Don't know why but this doesn't work here, so we have to set x and y
             x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
             y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
             horizontalItemAlignment: Grid.AlignHCenter

@@ -93,7 +93,7 @@ Item {
         anchors.fill: parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: desktopItem.big && !mainWindow.animating && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
+        visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem
         opacity: 0.7
     }
 
@@ -101,14 +101,14 @@ Item {
         id: clientDecorations
         x: (clientItem.gridWidth - clientDecorations.width) / 2 // Anchors are purposely avoided to centralize this because of animations
         y: desktopItem.clientsPadding
-        visible: desktopItem.big && mainWindow.configShowWindowTitles && !mainWindow.animating && !clientThumbnail.Drag.active
+        visible: desktopItem.big && mainWindow.idle && mainWindow.configShowWindowTitles
         spacing: 10
 
         PlasmaCore.IconItem {
             id: icon
-            source: clientItem.client ? clientItem.client.icon : null
             height: mainWindow.clientsDecorationsHeight // PlasmaCore.Units.iconSizes.medium?
             width: height
+            source: clientItem.client ? clientItem.client.icon : null
         }
 
         Text {
@@ -139,7 +139,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: desktopItem.clientsPadding
         visible: selectedFrame.visible && mainWindow.configShowWindowTitles
-        iconName: "dialog-close"
+        iconName: "window-close"
         flat: true
 
         onClicked: clientItem.client.closeWindow();
@@ -187,8 +187,8 @@ Item {
         if (!client) return;
 
         updateClientProperties();
-        client.clientFinishUserMovedResized.connect(function(clientParam) { updateClientProperties(); });
-        client.clientMaximizedStateChanged.connect(function(clientParam, h, v) { updateClientProperties(); });
+        client.clientFinishUserMovedResized.connect(function(clientParam) { if (clientItem) updateClientProperties(); });
+        client.clientMaximizedStateChanged.connect(function(clientParam, h, v) { if (clientItem) updateClientProperties(); });
     }
 
     // Update non-notifiable properties
