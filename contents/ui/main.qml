@@ -22,6 +22,7 @@ Window {
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: Easing.OutExpo
     property bool animating: false
+    property bool mustUpdateScreens: true
     property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
             PlasmaCore.Theme.buttonHoverColor.b, 0.25)
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
@@ -113,18 +114,75 @@ Window {
         onTriggered: requestActivate();
     }
 
+    // Right after boot, KWin does not return:
+    // 1 - Screen positions correctly. Screens overlap at position (0, 0).
+    // 2 - Desktop windows id's.
+    // This timer tries to recover this info by running one sec after the script initialization.
+    Timer {
+        id: updateScreensTimer; interval: 1000; repeat: true; triggeredOnStart: false;
+        running: mainWindow.mustUpdateScreens
+
+        property int attempt
+
+        onTriggered: {
+            attempt++;
+
+            mainWindow.width = workspace.displayWidth;
+            mainWindow.height = workspace.displayHeight;
+
+            let screensOnPositionZero = 0;
+            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+                // KWin.ScreenArea not working here, but KWin.ScreenArea === 7
+                const screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
+                const currentScreenItem = screensRepeater.itemAt(currentScreen);
+                currentScreenItem.x = screenRect.x;
+                currentScreenItem.y = screenRect.y;
+                currentScreenItem.width = screenRect.width;
+                currentScreenItem.height = screenRect.height;
+
+                if (screenRect.x === 0 && screenRect.y === 0) {
+                    if (screensOnPositionZero > 0) return;
+
+                    screensOnPositionZero++;
+                }
+
+                if (qtVersion >= 5.14 && currentScreenItem.children.length < 5)
+                    Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
+            }
+
+            let desktopWindowsGot = 0;
+            const clients = workspace.clientList();
+            for (let i = 0; i < clients.length; i++) {
+                if (clients[i].desktopWindow) {
+                    screensRepeater.itemAt(clients[i].screen).desktopBackground.winId = clients[i].windowId;
+                    desktopWindowsGot++;
+                    if (desktopWindowsGot === screensRepeater.count) {
+                        mainWindow.mustUpdateScreens = false;
+                        attempt = 0;
+                        return;
+                    }
+                }
+            }
+
+            // Give up if this timer can't recover the correct info after 3 attempts
+            if (attempt === 3) {
+                mainWindow.mustUpdateScreens = false;
+                attempt = 0;
+            }
+        }
+    }
+
     Component.onCompleted: {
         getQtVersion();
         loadConfig();
-        updateScreens();
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         clientActivated(workspace.activeClient);
 
         options.configChanged.connect(function() { loadConfig(); });
         workspace.clientActivated.connect(function(client) { clientActivated(); });
-        workspace.numberScreensChanged.connect(function(count) { updateScreens(); });
-        workspace.screenResized.connect(function(screen) { updateScreens(); });
+        workspace.numberScreensChanged.connect(function(count) { mainWindow.mustUpdateScreens = true; });
+        workspace.screenResized.connect(function(screen) { mainWindow.mustUpdateScreens = true; });
         workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; });
     }
 
@@ -218,24 +276,6 @@ Window {
         configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
         configShowNotificationWindows = KWin.readConfig("showNotificationWindows", true);
         configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
-    }
-
-    function updateScreens() {
-        mainWindow.width = workspace.displaySize.width;
-        mainWindow.height = workspace.displaySize.height;
-
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-            // Kwin.ScreenArea not working here, but Kwin.ScreenArea === 7
-            const screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
-            const currentScreenItem = screensRepeater.itemAt(currentScreen);
-            currentScreenItem.x = screenRect.x;
-            currentScreenItem.y = screenRect.y;
-            currentScreenItem.width = screenRect.width;
-            currentScreenItem.height = screenRect.height;
-
-            if (qtVersion >= 5.14 && currentScreenItem.children.length < 6)
-                Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
-        }
     }
 
     function selectFirstClient() {

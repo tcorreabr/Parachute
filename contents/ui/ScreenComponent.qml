@@ -93,7 +93,7 @@ Item {
 
         Repeater {
             id: bigDesktopsRepeater
-            model: screenItem.width > 0 && screenItem.height > 0 ? workspace.desktops : 0
+            model: mainWindow.mustUpdateScreens ? 0 : workspace.desktops
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
                 visible: Math.abs(model.index - mainWindow.currentDesktop) < 2
@@ -234,7 +234,7 @@ Item {
 
             Repeater {
                 id: desktopsBarRepeater
-                model: screenItem.width > 0 && screenItem.height > 0 ? workspace.desktops : 0
+                model: mainWindow.mustUpdateScreens ? 0 : workspace.desktops
 
                 DesktopComponent {
                     width: desktopsBar.desktopsWidth
@@ -268,19 +268,5 @@ Item {
                 }
             }
         }
-    }
-
-    function getDesktopWindowId() {
-        const clients = workspace.clientList(); 
-        for (let i = 0; i < clients.length; i++) {
-            if (clients[i].desktopWindow && clients[i].screen === screenIndex) {
-                desktopBackground.winId = clients[i].windowId;
-                return;
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        getDesktopWindowId();
     }
 }
