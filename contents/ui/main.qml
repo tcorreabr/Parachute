@@ -109,6 +109,19 @@ Window {
         service: "org.kde.KWin"; path: "/KWin"; method: "reconfigure";
     }
 
+    Connections {
+        target: workspace
+        function onClientActivated(client) { getOutsideSelectedClient(); }
+        function onNumberScreensChanged(count) { mainWindow.mustUpdateScreens = true; }
+        function onScreenResized(screen) { mainWindow.mustUpdateScreens = true; }
+        function onCurrentDesktopChanged(desktop, client) { selectedClientItem = null; }
+    }
+
+    Connections {
+        target: options
+        function onConfigChanged() { loadConfig(); }
+    }
+
     // Get keyboard focus back when this script is activated and a client is activated externally
     Timer {
         id: requestActivateTimer; interval: 10; repeat: true; triggeredOnStart: true;
@@ -209,13 +222,7 @@ Window {
         loadConfig();
         keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
-        clientActivated();
-
-        options.configChanged.connect(function() { loadConfig(); });
-        workspace.clientActivated.connect(function(client) { clientActivated(); });
-        workspace.numberScreensChanged.connect(function(count) { mainWindow.mustUpdateScreens = true; });
-        workspace.screenResized.connect(function(screen) { mainWindow.mustUpdateScreens = true; });
-        workspace.currentDesktopChanged.connect(function(desktop, client) { selectedClientItem = null; });
+        getOutsideSelectedClient();
     }
 
     function toggleActive() {
@@ -248,7 +255,7 @@ Window {
         endAnimationTimer.start();
     }
 
-    function clientActivated() {
+    function getOutsideSelectedClient() {
         if (workspace.activeClient) {
             outsideSelectedClient = workspace.activeClient;
 

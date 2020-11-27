@@ -182,20 +182,19 @@ Item {
         }
     }
 
-    Component.onCompleted: ready = true;
-
-    onClientChanged: {
-        if (!client) return;
-
+    Component.onCompleted: {
         updateClientProperties();
-        client.clientFinishUserMovedResized.connect(function(clientParam) { if (clientItem) updateClientProperties(); });
-        client.clientMaximizedStateChanged.connect(function(clientParam, h, v) { if (clientItem) updateClientProperties(); });
+        ready = true;
+    }
+
+    Connections {
+        target: client
+        function onClientFinishUserMovedResized(clientParam) { updateClientProperties(); }
+        function onClientMaximizedStateChanged(clientParam, h, v) { updateClientProperties(); }
     }
 
     // Update non-notifiable properties
     function updateClientProperties() {
-        if (!client) return;
-
         clientX = client.x - screenItem.x;
         clientY = client.y - screenItem.y;
         clientWidth = client.width;
