@@ -8,7 +8,7 @@ Window {
     id: mainWindow
     flags: Qt.X11BypassWindowManagerHint
     visible: true
-    color: "#333333"
+    color: "transparent"
     x: activated ? 0 : mainWindow.width * 2
     y: activated ? 0 : mainWindow.height * 2
 
@@ -22,10 +22,8 @@ Window {
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: Easing.OutExpo
     property bool animating: false
-    property bool idle: activated && !animating && !dragging
+    property bool idle: activated && !animating
     property bool mustUpdateScreens: true
-    property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
-            PlasmaCore.Theme.buttonHoverColor.b, 0.25)
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
@@ -188,18 +186,18 @@ Window {
         id: endAnimationTimer; interval: mainWindow.configAnimationsDuration; repeat: false; triggeredOnStart: false;
 
         onTriggered: {
+            animating = false;
+
             if (easingType === Easing.InExpo) {
                 activated = false;
-
-                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
-                selectedClientItem = null;
 
                 // Return current big desktop to grid state. Desktops only have to be in original state for opening/closing animations.
                 for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                     screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
-            }
 
-            animating = false;
+                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
+                selectedClientItem = null;
+            }
         }
     }
 

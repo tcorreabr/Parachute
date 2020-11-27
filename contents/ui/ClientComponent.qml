@@ -93,7 +93,7 @@ Item {
         anchors.fill: parent
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem
+        visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
         opacity: 0.7
     }
 
@@ -101,7 +101,7 @@ Item {
         id: clientDecorations
         x: (clientItem.gridWidth - clientDecorations.width) / 2 // Anchors are purposely avoided to centralize this because of animations
         y: desktopItem.clientsPadding
-        visible: desktopItem.big && mainWindow.idle && mainWindow.configShowWindowTitles
+        visible: desktopItem.big && mainWindow.idle && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
         spacing: 10
 
         PlasmaCore.IconItem {

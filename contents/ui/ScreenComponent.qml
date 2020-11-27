@@ -96,6 +96,7 @@ Item {
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
                 visible: Math.abs(model.index - mainWindow.currentDesktop) < 2
+                enabled: model.index === mainWindow.currentDesktop
                 big: true
 
                 mouseAreaX: bigDesktops.mouseAreaX
@@ -134,6 +135,7 @@ Item {
 
             HoverHandler {
                 id: hoverHandler
+                enabled: mainWindow.idle
             }
         }
 
