@@ -117,7 +117,8 @@ Item {
             text: clientItem.client ? clientItem.client.caption : ""
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
-            color: "white"
+            color: PlasmaCore.Theme.textColor
+            textFormat: Text.PlainText
 
             property real maxWidth: clientItem.gridWidth - 5 * icon.width
 

@@ -68,7 +68,7 @@ Item {
         color: "transparent"
         radius: 10
         border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
-        border.color: "white"
+        border.color: mainWindow.highlightColor
 
         states: [
             State {
