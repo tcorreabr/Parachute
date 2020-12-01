@@ -44,17 +44,8 @@ Item {
         radius: 10
     }
 
-    DropShadow {
-        anchors.fill: parent
-        horizontalOffset: 3
-        verticalOffset: 3
-        color: "#55000000"
-        visible: !big && mainWindow.configShowDesktopShadows
-        source: roundedRect
-        cached: true
-    }
-
-    OpacityMask { // Desktop background
+    OpacityMask {
+        id: desktopBackground
         anchors.fill: parent
         source: screenItem.desktopBackground
         maskSource: roundedRect
@@ -62,9 +53,20 @@ Item {
         cached: true
     }
 
-    Rectangle {
-        id: colorizeRect
+    DropShadow {
         anchors.fill: parent
+        horizontalOffset: 3
+        verticalOffset: 3
+        color: "#99333333"
+        visible: !big && mainWindow.configShowDesktopShadows
+        source: desktopBackground
+        cached: true
+    }
+
+    Rectangle {
+        id: selectedOverlay
+        anchors.fill: parent
+        anchors.margins: border.width === 0 ? 0 : -1
         color: "transparent"
         radius: 10
         border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
@@ -73,11 +75,11 @@ Item {
         states: [
             State {
                 when: dropArea.containsDrag
-                PropertyChanges { target: colorizeRect; color: "#3F006600"; }
+                PropertyChanges { target: selectedOverlay; color: "#3F006600"; }
             },
             State {
                 when: !big && hoverHandler.hovered
-                PropertyChanges { target: colorizeRect; color: mainWindow.hoverColor; }
+                PropertyChanges { target: selectedOverlay; color: mainWindow.hoverColor; }
             }
         ]
     }

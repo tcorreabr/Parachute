@@ -46,8 +46,8 @@ Window {
     property int desktopsBarSpacing: 15
     property int clientsDecorationsHeight: 24
     property color highlightColor: PlasmaCore.Theme.highlightColor
-    property color hoverColor: Qt.rgba(PlasmaCore.Theme.buttonHoverColor.r, PlasmaCore.Theme.buttonHoverColor.g,
-            PlasmaCore.Theme.buttonHoverColor.b, 0.25)
+    property color hoverColor: Qt.rgba(PlasmaCore.Theme.highlightColor.r, PlasmaCore.Theme.highlightColor.g,
+            PlasmaCore.Theme.highlightColor.b, 0.4)
 
     Item {
         id: keyboardHandler
