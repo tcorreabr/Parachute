@@ -31,6 +31,7 @@ Window {
     property bool configShowDesktopsBarBackground
     property bool configShowWindowTitles
     property bool configShowDesktopShadows
+    property bool configCloseOnMiddleClick
     property bool configShowNotificationWindows
     property real configAnimationsDuration
     property int configDesktopsBarPlacement
@@ -286,6 +287,7 @@ Window {
         configShowDesktopsBarBackground = KWin.readConfig("showDesktopsBarBackground", true);
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
+        configCloseOnMiddleClick = KWin.readConfig("closeOnMiddleClick", true)
         configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
         configShowNotificationWindows = KWin.readConfig("showNotificationWindows", true);
         configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
