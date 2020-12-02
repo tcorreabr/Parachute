@@ -13,15 +13,22 @@ This *KWin* script was inspired by the excellent work of several projects like: 
 ## Installation or upgrade
 
   ```
-  git clone https://github.com/tcorreabr/Parachute.git
-  kpackagetool5 --type KWin/Script --install ./Parachute || kpackagetool5 --type KWin/Script --upgrade ./Parachute
+  git clone https://github.com/tcorreabr/Parachute.git && cd Parachute
+  make install
   ```
 
-To install the configuration dialog you must execute the following commands, even if you have installed through Plasma's Get Hot New Stuff or [Kde Store](https://store.kde.org/). You only need to do this once.
+If you have installed through Plasma's Get Hot New Stuff ([Kde Store](https://store.kde.org/p/1370195/)) you must execute the following commands on terminal to install the configuration dialog. You only need to do this once.
 
   ```
   mkdir -p ~/.local/share/kservices5
   ln -s ~/.local/share/kwin/scripts/Parachute/metadata.desktop ~/.local/share/kservices5/Parachute.desktop
+  ```
+
+To uninstall:
+
+  ```
+  # First go to the folder where you cloned Parachute
+  make uninstall
   ```
 
 ## Usage
