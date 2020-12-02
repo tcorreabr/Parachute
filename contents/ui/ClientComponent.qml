@@ -90,7 +90,8 @@ Item {
 
     PlasmaCore.FrameSvgItem {
         id: selectedFrame
-        anchors.fill: parent
+        width: clientItem.gridWidth
+        height: clientItem.gridHeight
         imagePath: "widgets/viewitem"
         prefix: "hover"
         visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
@@ -99,7 +100,7 @@ Item {
 
     Row {
         id: clientDecorations
-        x: (clientItem.gridWidth - clientDecorations.width) / 2 // Anchors are purposely avoided to centralize this because of animations
+        x: (clientItem.gridWidth - clientDecorations.width) / 2
         y: desktopItem.clientsPadding
         visible: desktopItem.big && mainWindow.idle && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
         spacing: 10
@@ -134,11 +135,10 @@ Item {
 
     PlasmaComponents.ToolButton {
         id: closeButton
+        x: clientItem.gridWidth - desktopItem.clientsPadding - closeButton.width
         y: desktopItem.clientsPadding
         height: mainWindow.clientsDecorationsHeight
         width: height
-        anchors.right: parent.right
-        anchors.rightMargin: desktopItem.clientsPadding
         visible: selectedFrame.visible && mainWindow.configShowWindowTitles
         iconName: "window-close"
         flat: true
@@ -148,15 +148,18 @@ Item {
 
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
-        anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
-        anchors.margins: desktopItem.clientsPadding + noBorderSpacing
-        anchors.topMargin: desktopItem.big && mainWindow.configShowWindowTitles ?
-                desktopItem.clientsPadding + noBorderSpacing + mainWindow.clientsDecorationsHeight :
-                desktopItem.clientsPadding + noBorderSpacing
+        x: thumbnailPadding
+        y: desktopItem.big && mainWindow.configShowWindowTitles ?
+                thumbnailPadding + mainWindow.clientsDecorationsHeight :
+                thumbnailPadding
+        width: parent.width - thumbnailPadding - clientThumbnail.x
+        height: parent.height - thumbnailPadding - clientThumbnail.y
         Drag.source: clientItem.client
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clip: true
         clipTo: screenItem
+
+        property int thumbnailPadding: desktopItem.clientsPadding + noBorderSpacing
 
         states: State {
             when: clientThumbnail.Drag.active
@@ -195,6 +198,8 @@ Item {
 
     // Update non-notifiable properties
     function updateClientProperties() {
+        if (!client) return;
+
         clientX = client.x - screenItem.x;
         clientY = client.y - screenItem.y;
         clientWidth = client.width;
