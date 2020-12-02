@@ -14,13 +14,98 @@ Item {
     property alias desktopBackground: desktopBackground
 
     property int screenIndex: model.index
-    property int desktopsBarSize: mainWindow.horizontalDesktopsLayout ? Math.round(height / 6) : Math.round(width / 6)
     property real aspectRatio: width / height
+
+    states: [
+        State {
+            when: mainWindow.horizontalDesktopsLayout
+            PropertyChanges {
+                target: bigDesktops
+                orientation: Qt.Horizontal
+
+                mouseAreaX: 0
+                mouseAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? desktopsBar.height : 0
+                mouseAreaWidth: screenItem.width
+                mouseAreaHeight: screenItem.height - desktopsBar.height
+
+                gridAreaX: (screenItem.width - bigDesktops.gridAreaWidth) / 2
+                gridAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
+                        desktopsBar.height + mainWindow.desktopMargin :
+                        mainWindow.desktopMargin
+                gridAreaWidth: bigDesktops.gridAreaHeight * screenItem.aspectRatio
+                gridAreaHeight: mouseAreaHeight - mainWindow.desktopMargin * 2
+            }
+
+            PropertyChanges {
+                target: desktopsBar
+                x: 0
+                y: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
+                        mainWindow.showDesktopsBar ? 0 : -desktopsBar.height :
+                        mainWindow.showDesktopsBar ? screenItem.height - desktopsBar.height : screenItem.height
+                height: Math.round(screenItem.height / 6)
+                width: screenItem.width
+
+                desktopsFullSize: (desktopsBar.height - desktopsWrapper.padding * 2) * screenItem.aspectRatio
+                shrinkDesktopsToFit: desktopsBar.width < (desktopsBar.desktopsFullSize + desktopsWrapper.spacing) * workspace.desktops +
+                        2 * desktopsWrapper.padding + removeDesktop.width + addDesktop.width
+                desktopsWidth: desktopsBar.shrinkDesktopsToFit ?
+                        ((desktopsBar.width - (2 * desktopsWrapper.padding + removeDesktop.width + addDesktop.width)) / workspace.desktops) - desktopsWrapper.spacing :
+                        desktopsBar.desktopsFullSize
+                desktopsHeight: desktopsBar.desktopsWidth / screenItem.aspectRatio
+            }
+
+            PropertyChanges {
+                target: desktopsWrapper
+                rows: 1
+            }
+        },
+        State {
+            when: !mainWindow.horizontalDesktopsLayout
+            PropertyChanges {
+                target: bigDesktops
+                orientation: Qt.Vertical
+
+                mouseAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? desktopsBar.width : 0
+                mouseAreaY: 0
+                mouseAreaWidth: screenItem.width - desktopsBar.width
+                mouseAreaHeight: screenItem.height
+
+                gridAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        desktopsBar.width + mainWindow.desktopMargin :
+                        mainWindow.desktopMargin
+                gridAreaY: (screenItem.height - bigDesktops.gridAreaHeight) / 2
+                gridAreaWidth: mouseAreaWidth - mainWindow.desktopMargin * 2
+                gridAreaHeight: bigDesktops.gridAreaWidth / screenItem.aspectRatio
+            }
+
+            PropertyChanges {
+                target: desktopsBar
+                x: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        mainWindow.showDesktopsBar ? 0 : -desktopsBar.width :
+                        mainWindow.showDesktopsBar ? screenItem.width - desktopsBar.width : screenItem.width
+                y: 0
+                width: Math.round(screenItem.width / 6)
+                height: screenItem.height
+
+                desktopsFullSize: (desktopsBar.width - desktopsWrapper.padding * 2) / screenItem.aspectRatio
+                shrinkDesktopsToFit: desktopsBar.height < (desktopsBar.desktopsFullSize + desktopsWrapper.spacing) * workspace.desktops +
+                        2 * desktopsWrapper.padding + removeDesktop.height + addDesktop.height
+                desktopsWidth: desktopsBar.desktopsHeight * screenItem.aspectRatio
+                desktopsHeight: desktopsBar.shrinkDesktopsToFit ?
+                        ((desktopsBar.height - (2 * desktopsWrapper.padding + removeDesktop.height + addDesktop.height)) / workspace.desktops) - desktopsWrapper.spacing :
+                        desktopsBar.desktopsFullSize
+            }
+
+            PropertyChanges {
+                target: desktopsWrapper
+                columns: 1
+            }
+        }
+    ]
 
     PlasmaCore.WindowThumbnail {
         id: desktopBackground
-        width: parent.width / 2
-        height: parent.height / 2
+        anchors.fill: parent
         visible: winId !== 0
         opacity: mainWindow.configBlurBackground ? 0 : 1
     }
@@ -49,47 +134,6 @@ Item {
         property real gridAreaWidth
         property real gridAreaHeight
 
-        states: [
-            State {
-                when: mainWindow.horizontalDesktopsLayout
-                PropertyChanges {
-                    target: bigDesktops
-                    orientation: Qt.Horizontal
-
-                    mouseAreaX: 0
-                    mouseAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? screenItem.desktopsBarSize : 0
-                    mouseAreaWidth: screenItem.width
-                    mouseAreaHeight: screenItem.height - screenItem.desktopsBarSize
-
-                    gridAreaX: (screenItem.width - bigDesktops.gridAreaWidth) / 2
-                    gridAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
-                            screenItem.desktopsBarSize + mainWindow.desktopMargin :
-                            mainWindow.desktopMargin
-                    gridAreaWidth: bigDesktops.gridAreaHeight * screenItem.aspectRatio
-                    gridAreaHeight: mouseAreaHeight - mainWindow.desktopMargin * 2
-                }
-            },
-            State {
-                when: !mainWindow.horizontalDesktopsLayout
-                PropertyChanges {
-                    target: bigDesktops
-                    orientation: Qt.Vertical
-
-                    mouseAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? screenItem.desktopsBarSize : 0
-                    mouseAreaY: 0
-                    mouseAreaWidth: screenItem.width - screenItem.desktopsBarSize
-                    mouseAreaHeight: screenItem.height
-
-                    gridAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
-                            screenItem.desktopsBarSize + mainWindow.desktopMargin :
-                            mainWindow.desktopMargin
-                    gridAreaY: (screenItem.height - bigDesktops.gridAreaHeight) / 2
-                    gridAreaWidth: mouseAreaWidth - mainWindow.desktopMargin * 2
-                    gridAreaHeight: bigDesktops.gridAreaWidth * screenItem.aspectRatio
-                }
-            }
-        ]
-
         Repeater {
             id: bigDesktopsRepeater
             model: mainWindow.ready ? workspace.desktops : 0
@@ -114,15 +158,15 @@ Item {
         onCurrentIndexChanged: workspace.currentDesktop = currentIndex + 1;
     }
 
-    ScrollView {
+    Item {
         id: desktopsBar
-        property real desktopsScale
-        property real desktopsWidth: screenItem.width * desktopsBar.desktopsScale
-        property real desktopsHeight: screenItem.height * desktopsBar.desktopsScale
-        property real gridAreaWidth: desktopsWidth - mainWindow.desktopMargin * 2
-        property real gridAreaHeight: desktopsHeight - mainWindow.desktopMargin * 2
 
-        background: Rectangle {
+        property real desktopsFullSize // Size of desktops if we don't need to shrink them more to fit in the bar
+        property bool shrinkDesktopsToFit
+        property real desktopsWidth
+        property real desktopsHeight
+
+        Rectangle {
             id: desktopsBarBackground
             anchors.fill: parent
             color: "black"
@@ -130,87 +174,26 @@ Item {
             visible: mainWindow.configShowDesktopsBarBackground
         }
 
-        Item {
-            anchors.fill: parent
-
-            HoverHandler {
-                id: hoverHandler
-                enabled: mainWindow.idle
-            }
+        HoverHandler {
+            id: desktopsBarHoverHandler
+            enabled: mainWindow.idle && !mainWindow.dragging
         }
 
-        Behavior on anchors.topMargin {
+        Behavior on x {
             enabled: mainWindow.activated
             NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
         }
 
-        Behavior on anchors.bottomMargin {
+        Behavior on y {
             enabled: mainWindow.activated
             NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
         }
-
-        Behavior on anchors.leftMargin {
-            enabled: mainWindow.activated
-            NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
-        }
-
-        Behavior on anchors.rightMargin {
-            enabled: mainWindow.activated
-            NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
-        }
-
-        states: [
-            State {
-                when: mainWindow.horizontalDesktopsLayout
-                PropertyChanges {
-                    target: desktopsBar
-                    height: desktopsBarSize
-                    desktopsScale: (desktopsBar.height - mainWindow.desktopsBarSpacing * 2) / screenItem.height
-                    anchors.topMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
-                            mainWindow.showDesktopsBar ? 0 : -screenItem.desktopsBarSize :
-                            mainWindow.showDesktopsBar ? -screenItem.desktopsBarSize : 0
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.top: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? screenItem.top : screenItem.bottom
-                    anchors.left: screenItem.left
-                    anchors.right: screenItem.right
-                }
-                PropertyChanges {
-                    target: desktopsWrapper
-                    rows: 1
-                }
-            },
-            State {
-                when: !mainWindow.horizontalDesktopsLayout
-                PropertyChanges {
-                    target: desktopsBar
-                    width: desktopsBarSize
-                    desktopsScale: (desktopsBar.width - mainWindow.desktopsBarSpacing * 2) / screenItem.width
-                    anchors.leftMargin: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
-                            mainWindow.showDesktopsBar ? 0 : -screenItem.desktopsBarSize :
-                            mainWindow.showDesktopsBar ? -screenItem.desktopsBarSize : 0
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.top: screenItem.top
-                    anchors.bottom: screenItem.bottom
-                    anchors.left: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? screenItem.left : screenItem.right
-                }
-                PropertyChanges {
-                    target: desktopsWrapper
-                    columns: 1
-                }
-            }
-        ]
 
         Grid {
             id: desktopsWrapper
             spacing: mainWindow.desktopsBarSpacing
             padding: mainWindow.desktopsBarSpacing
-            // anchors.centerIn: parent // <== Don't know why but this doesn't work here, so we have to set x and y
-            x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
-            y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
+            anchors.centerIn: parent
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter
 
@@ -220,14 +203,13 @@ Item {
                 width: 48
                 iconName: "remove"
                 flat: true
-                opacity: hoverHandler.hovered ? 1 : 0
+                opacity: desktopsBarHoverHandler.hovered ? 1 : 0
 
                 onClicked: {
-                    // Avoid going to the first desktop
                     const currentDesktop = workspace.currentDesktop === workspace.desktops ?
                             workspace.currentDesktop - 1 : workspace.currentDesktop;
                     workspace.desktops--; // workspace.removeDesktop(desktopIndex);
-                    workspace.currentDesktop = currentDesktop;
+                    workspace.currentDesktop = currentDesktop; // Avoid going to the first desktop
                 }
             }
 
@@ -246,8 +228,8 @@ Item {
 
                     gridAreaX: mainWindow.desktopMargin
                     gridAreaY: mainWindow.desktopMargin
-                    gridAreaWidth: desktopsBar.gridAreaWidth
-                    gridAreaHeight: desktopsBar.gridAreaHeight
+                    gridAreaWidth: desktopsBar.desktopsWidth - mainWindow.desktopMargin * 2
+                    gridAreaHeight: desktopsBar.desktopsHeight - mainWindow.desktopMargin * 2
                 }
             }
 
@@ -257,13 +239,12 @@ Item {
                 width: 48
                 iconName: "add"
                 flat: true
-                opacity: hoverHandler.hovered ? 1 : 0
+                opacity: desktopsBarHoverHandler.hovered ? 1 : 0
 
                 onClicked: {
-                    // Avoid going to the first desktop
                     const currentDesktop = workspace.currentDesktop;
                     workspace.desktops++; // workspace.createDesktop(desktopIndex + 1, "New desktop");
-                    workspace.currentDesktop = currentDesktop; 
+                    workspace.currentDesktop = currentDesktop; // Avoid going to the first desktop
                 }
             }
         }
