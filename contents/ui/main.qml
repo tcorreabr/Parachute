@@ -249,9 +249,10 @@ Window {
             currentScreenItem.width = screenRect.width;
             currentScreenItem.height = screenRect.height;
 
-            // if (qtVersion >= 5.14 && currentScreenItem.children.length < 5) {
-            //     Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
-            // }
+            if (qtVersion >= 5.14 && !currentScreenItem.wheelHandlerCreated) {
+                Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
+                currentScreenItem.wheelHandlerCreated = true;
+            }
         }
 
         let desktopWindowsPicked = 0;

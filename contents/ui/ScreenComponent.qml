@@ -15,6 +15,7 @@ Item {
 
     property int screenIndex: model.index
     property real aspectRatio: width / height
+    property bool wheelHandlerCreated: false
 
     states: [
         State {
