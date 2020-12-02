@@ -92,7 +92,7 @@ Item {
 
         Repeater {
             id: bigDesktopsRepeater
-            model: mainWindow.mustUpdateScreens ? 0 : workspace.desktops
+            model: mainWindow.ready ? workspace.desktops : 0
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
                 visible: Math.abs(model.index - mainWindow.currentDesktop) < 2
@@ -233,7 +233,7 @@ Item {
 
             Repeater {
                 id: desktopsBarRepeater
-                model: mainWindow.mustUpdateScreens ? 0 : workspace.desktops
+                model: mainWindow.ready ? workspace.desktops : 0
 
                 DesktopComponent {
                     width: desktopsBar.desktopsWidth

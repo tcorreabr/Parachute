@@ -14,6 +14,7 @@ Window {
 
     property alias endAnimationTimer: endAnimationTimer
 
+    property bool ready: false
     property bool activated: false
     property bool dragging: false
     property real qtVersion
@@ -23,7 +24,6 @@ Window {
     property int easingType: Easing.OutExpo
     property bool animating: false
     property bool idle: activated && !animating
-    property bool mustUpdateScreens: true
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
 
     // Config
@@ -101,7 +101,11 @@ Window {
         id: screensRepeater
         model: workspace.numScreens
 
-        ScreenComponent {}
+        // Initial full hd dimensions to avoid division by zero on some internal calculations of ScreenComponent
+        ScreenComponent {
+            width: 1920
+            height: 1080
+        }
     }
 
     KWinComponents.DBusCall {
@@ -112,8 +116,8 @@ Window {
     Connections {
         target: workspace
         function onClientActivated(client) { getOutsideSelectedClient(); }
-        function onNumberScreensChanged(count) { mainWindow.mustUpdateScreens = true; }
-        function onScreenResized(screen) { mainWindow.mustUpdateScreens = true; }
+        function onNumberScreensChanged(count) { updateScreens(); }
+        function onScreenResized(screen) { updateScreens(); }
         function onCurrentDesktopChanged(desktop, client) { selectedClientItem = null; }
     }
 
@@ -132,59 +136,12 @@ Window {
     // Right after boot, KWin does not return:
     // 1 - Screen positions correctly. Screens overlap at position (0, 0).
     // 2 - Desktop windows id's.
-    // This timer tries to recover this info by running one sec after the script initialization.
+    // This timer tries to recover this info by running every second after the script initialization.
     Timer {
-        id: updateScreensTimer; interval: 1000; repeat: true; triggeredOnStart: false;
-        running: mainWindow.mustUpdateScreens
+        id: getCorrectScreensInfo; interval: 1000; repeat: true; triggeredOnStart: false;
+        running: !ready
 
-        property int attempt
-
-        onTriggered: {
-            attempt++;
-
-            mainWindow.width = workspace.displayWidth;
-            mainWindow.height = workspace.displayHeight;
-
-            let screensOnPositionZero = 0;
-            for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-                // KWin.ScreenArea not working here, but KWin.ScreenArea === 7
-                const screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
-                const currentScreenItem = screensRepeater.itemAt(currentScreen);
-                currentScreenItem.x = screenRect.x;
-                currentScreenItem.y = screenRect.y;
-                currentScreenItem.width = screenRect.width;
-                currentScreenItem.height = screenRect.height;
-
-                if (screenRect.x === 0 && screenRect.y === 0) {
-                    if (screensOnPositionZero > 0) return;
-
-                    screensOnPositionZero++;
-                }
-
-                if (qtVersion >= 5.14 && currentScreenItem.children.length < 5)
-                    Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
-            }
-
-            let desktopWindowsPicked = 0;
-            const clients = workspace.clientList();
-            for (let i = 0; i < clients.length; i++) {
-                if (clients[i].desktopWindow) {
-                    screensRepeater.itemAt(clients[i].screen).desktopBackground.winId = clients[i].windowId;
-                    desktopWindowsPicked++;
-                    if (desktopWindowsPicked === screensRepeater.count) {
-                        mainWindow.mustUpdateScreens = false;
-                        attempt = 0;
-                        return;
-                    }
-                }
-            }
-
-            // Give up if this timer can't recover the correct info after 3 attempts
-            if (attempt === 3) {
-                mainWindow.mustUpdateScreens = false;
-                attempt = 0;
-            }
-        }
+        onTriggered: updateScreens();
     }
 
     // ThumbnailItem hides before ScreenComponent when activated = false, showing a empty frame (background image without windows)
@@ -253,6 +210,46 @@ Window {
         }
 
         endAnimationTimer.start();
+    }
+
+    function updateScreens() {
+        mainWindow.width = workspace.displayWidth;
+        mainWindow.height = workspace.displayHeight;
+
+        let screensOnPositionZero = 0;
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            // KWin.ScreenArea not working here, but KWin.ScreenArea === 7
+            const screenRect = workspace.clientArea(7, currentScreen, workspace.currentDesktop);
+            if (screenRect.x === 0 && screenRect.y === 0) {
+                if (screensOnPositionZero > 0) return;
+
+                screensOnPositionZero++;
+            }
+
+            const currentScreenItem = screensRepeater.itemAt(currentScreen);
+            currentScreenItem.x = screenRect.x;
+            currentScreenItem.y = screenRect.y;
+            currentScreenItem.width = screenRect.width;
+            currentScreenItem.height = screenRect.height;
+
+            // if (qtVersion >= 5.14 && currentScreenItem.children.length < 5) {
+            //     Qt.createComponent("WheelHandlerComponent.qml").createObject(currentScreenItem);
+            // }
+        }
+
+        let desktopWindowsPicked = 0;
+        const clients = workspace.clientList();
+        for (let i = 0; i < clients.length; i++) {
+            if (clients[i].desktopWindow) {
+                screensRepeater.itemAt(clients[i].screen).desktopBackground.winId = clients[i].windowId;
+                
+                desktopWindowsPicked++;
+                if (desktopWindowsPicked === screensRepeater.count) {
+                    ready = true;
+                    return;
+                }
+            }
+        }
     }
 
     function getOutsideSelectedClient() {
