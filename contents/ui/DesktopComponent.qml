@@ -65,7 +65,7 @@ Item {
 
     Rectangle {
         id: selectedOverlay
-        anchors.fill: parent
+        anchors.fill: mouseArea
         anchors.margins: border.width === 0 ? 0 : -1
         color: "transparent"
         radius: 10
@@ -78,7 +78,7 @@ Item {
                 PropertyChanges { target: selectedOverlay; color: "#3F006600"; }
             },
             State {
-                when: !big && hoverHandler.hovered
+                when: !big && mainWindow.idle && !mainWindow.dragging && hoverHandler.hovered
                 PropertyChanges { target: selectedOverlay; color: mainWindow.hoverColor; }
             }
         ]
@@ -103,7 +103,7 @@ Item {
             anchors.fill: parent
 
             onEntered: {
-                drag.accepted = false;            
+                drag.accepted = false;
                 if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
                     drag.accepted = true;
                     return;
