@@ -2,21 +2,106 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
 import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.components 2.0 as PlasmaComponents
 
 Item {
     id: screenItem
-    visible: false
+    smooth: false // Applied to children
+    antialiasing: false // Applied to children
     clip: true
 
-    property alias desktopsBarRepeater: desktopsBarRepeater
     property alias bigDesktopsRepeater: bigDesktopsRepeater
     property alias desktopBackground: desktopBackground
 
-    property int desktopsBarHeight: Math.round(height / 6) // valid only if position of desktopsBar is top or bottom
-    property int desktopsBarWidth: Math.round(width / 6) // valid only if position of desktopsBar is left or right
-    property real ratio: width / height
-
     property int screenIndex: model.index
+    property real aspectRatio: width / height
+
+    states: [
+        State {
+            when: mainWindow.horizontalDesktopsLayout
+            PropertyChanges {
+                target: bigDesktops
+                orientation: Qt.Horizontal
+
+                mouseAreaX: 0
+                mouseAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? desktopsBar.height : 0
+                mouseAreaWidth: screenItem.width
+                mouseAreaHeight: screenItem.height - desktopsBar.height
+
+                gridAreaX: (screenItem.width - bigDesktops.gridAreaWidth) / 2
+                gridAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
+                        desktopsBar.height + mainWindow.desktopMargin :
+                        mainWindow.desktopMargin
+                gridAreaWidth: bigDesktops.gridAreaHeight * screenItem.aspectRatio
+                gridAreaHeight: mouseAreaHeight - mainWindow.desktopMargin * 2
+            }
+
+            PropertyChanges {
+                target: desktopsBar
+                x: 0
+                y: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
+                        mainWindow.showDesktopsBar ? 0 : -desktopsBar.height :
+                        mainWindow.showDesktopsBar ? screenItem.height - desktopsBar.height : screenItem.height
+                height: Math.round(screenItem.height / 6)
+                width: screenItem.width
+
+                desktopsFullSize: (desktopsBar.height - desktopsWrapper.padding * 2) * screenItem.aspectRatio
+                shrinkDesktopsToFit: desktopsBar.width < (desktopsBar.desktopsFullSize + desktopsWrapper.spacing) * workspace.desktops +
+                        2 * desktopsWrapper.padding + removeDesktop.width + addDesktop.width
+                desktopsWidth: desktopsBar.shrinkDesktopsToFit ?
+                        ((desktopsBar.width - (2 * desktopsWrapper.padding + removeDesktop.width + addDesktop.width)) / workspace.desktops) - desktopsWrapper.spacing :
+                        desktopsBar.desktopsFullSize
+                desktopsHeight: desktopsBar.desktopsWidth / screenItem.aspectRatio
+            }
+
+            PropertyChanges {
+                target: desktopsWrapper
+                rows: 1
+            }
+        },
+        State {
+            when: !mainWindow.horizontalDesktopsLayout
+            PropertyChanges {
+                target: bigDesktops
+                orientation: Qt.Vertical
+
+                mouseAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ? desktopsBar.width : 0
+                mouseAreaY: 0
+                mouseAreaWidth: screenItem.width - desktopsBar.width
+                mouseAreaHeight: screenItem.height
+
+                gridAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        desktopsBar.width + mainWindow.desktopMargin :
+                        mainWindow.desktopMargin
+                gridAreaY: (screenItem.height - bigDesktops.gridAreaHeight) / 2
+                gridAreaWidth: mouseAreaWidth - mainWindow.desktopMargin * 2
+                gridAreaHeight: bigDesktops.gridAreaWidth / screenItem.aspectRatio
+            }
+
+            PropertyChanges {
+                target: desktopsBar
+                x: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        mainWindow.showDesktopsBar ? 0 : -desktopsBar.width :
+                        mainWindow.showDesktopsBar ? screenItem.width - desktopsBar.width : screenItem.width
+                y: 0
+                width: Math.round(screenItem.width / 6)
+                height: screenItem.height
+
+                desktopsFullSize: (desktopsBar.width - desktopsWrapper.padding * 2) / screenItem.aspectRatio
+                shrinkDesktopsToFit: desktopsBar.height < (desktopsBar.desktopsFullSize + desktopsWrapper.spacing) * workspace.desktops +
+                        2 * desktopsWrapper.padding + removeDesktop.height + addDesktop.height
+                desktopsWidth: desktopsBar.desktopsHeight * screenItem.aspectRatio
+                desktopsHeight: desktopsBar.shrinkDesktopsToFit ?
+                        ((desktopsBar.height - (2 * desktopsWrapper.padding + removeDesktop.height + addDesktop.height)) / workspace.desktops) - desktopsWrapper.spacing :
+                        desktopsBar.desktopsFullSize
+            }
+
+            PropertyChanges {
+                target: desktopsWrapper
+                columns: 1
+            }
+        }
+    ]
 
     PlasmaCore.WindowThumbnail {
         id: desktopBackground
@@ -31,317 +116,137 @@ Item {
         source: desktopBackground
         radius: 64
         visible: desktopBackground.winId !== 0 && mainWindow.configBlurBackground
-        // cached: true
-    }
-
-    Rectangle { // To apply some transparency without interfere with children transparency
-        id: desktopsBarBackground
-        anchors.fill: desktopsBar
-        color: "black"
-        opacity: 0.1
-        visible: mainWindow.configShowDesktopsBarBackground
-    }
-
-    ScrollView {
-        id: desktopsBar
-        contentWidth: desktopsWrapper.width
-        contentHeight: desktopsWrapper.height
-        clip: true
-
-        states: [
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Top
-                PropertyChanges {
-                    target: desktopsBar
-                    height: desktopsBarHeight
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.bottom: bigDesktops.top
-                    anchors.right: screenItem.right
-                    anchors.left: screenItem.left
-                }
-            },
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
-                PropertyChanges {
-                    target: desktopsBar
-                    height: desktopsBarHeight
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.top: bigDesktops.bottom
-                    anchors.right: screenItem.right
-                    anchors.left: screenItem.left
-                }
-            },
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Left
-                PropertyChanges {
-                    target: desktopsBar
-                    width: desktopsBarWidth
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.bottom: screenItem.bottom
-                    anchors.top: screenItem.top
-                    anchors.right: bigDesktops.left
-                }
-            },
-            State {
-                when: mainWindow.configDesktopsBarPlacement === Enums.Position.Right
-                PropertyChanges {
-                    target: desktopsBar
-                    width: desktopsBarWidth
-                }
-                AnchorChanges {
-                    target: desktopsBar
-                    anchors.bottom: screenItem.bottom
-                    anchors.top: screenItem.top
-                    anchors.left: bigDesktops.right
-                }
-            }
-        ]
-
-        Item { // To centralize children
-            id: desktopsWrapper
-            width: childrenRect.width + mainWindow.smallDesktopMargin
-            height: childrenRect.height + mainWindow.smallDesktopMargin
-            x: desktopsBar.width < desktopsWrapper.width ? 0 : (desktopsBar.width - desktopsWrapper.width) / 2
-            y: desktopsBar.height < desktopsWrapper.height ? 0 : (desktopsBar.height - desktopsWrapper.height) / 2
-
-            Repeater {
-                id: desktopsBarRepeater
-                model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
-
-                DesktopComponent {
-                    id: smallDesktop
-                    activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
-
-                    states: [
-                        State {
-                            when: mainWindow.horizontalDesktopsLayout
-                            PropertyChanges {
-                                target: smallDesktop
-                                x: mainWindow.smallDesktopMargin + model.index * (smallDesktop.width + mainWindow.smallDesktopMargin)
-                                y: mainWindow.smallDesktopMargin
-                                width: (smallDesktop.height / screenItem.height) * screenItem.width
-                                height: desktopsBar.height - mainWindow.smallDesktopMargin * 2
-                            }
-                        },
-                        State {
-                            when: !mainWindow.horizontalDesktopsLayout
-                            PropertyChanges {
-                                target: smallDesktop
-                                x: mainWindow.smallDesktopMargin
-                                y: mainWindow.smallDesktopMargin + model.index * (smallDesktop.height + mainWindow.smallDesktopMargin)
-                                width: desktopsBar.width - mainWindow.smallDesktopMargin * 2
-                                height: (smallDesktop.width / screenItem.width) * screenItem.height
-                            }
-                        }
-                    ]
-
-                    TapHandler {
-                        acceptedButtons: Qt.AllButtons
-                        onTapped: {
-                            switch (eventPoint.event.button) {
-                                case Qt.LeftButton:
-                            if (workspace.currentDesktop === model.index + 1)
-                                mainWindow.toggleActive();
-                            else
-                                workspace.currentDesktop = model.index + 1;
-                                    break;
-                                case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
-                                    break;
-                                case Qt.RightButton:
-                                    if (mainWindow.workWithActivities)
-                                        if (mainWindow.selectedClientItem.client.activities.length === 0)
-                                            mainWindow.selectedClientItem.client.activities.push(workspace.activities[model.index]);
-                                        else
-                                            mainWindow.selectedClientItem.client.activities = [];
-                                    else
-                                        if (mainWindow.selectedClientItem.client.desktop === -1)
-                                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
-                                        else
-                                            mainWindow.selectedClientItem.client.desktop = -1;
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        cached: true
     }
 
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        currentIndex: mainWindow.currentActivityOrDesktop
-        orientation: mainWindow.horizontalDesktopsLayout ? Qt.Horizontal : Qt.Vertical
-        clip: true
+        currentIndex: mainWindow.currentDesktop
 
-        Behavior on anchors.topMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Top
+        property real mouseAreaX
+        property real mouseAreaY
+        property real mouseAreaWidth
+        property real mouseAreaHeight
 
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }  
-            }
-        }
-
-        Behavior on anchors.bottomMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Bottom
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }   
-            }
-        }
-
-        Behavior on anchors.leftMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Left
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }
-            }
-        }
-
-        Behavior on anchors.rightMargin {
-            enabled: mainWindow.easingType !== mainWindow.noAnimation && mainWindow.configDesktopsBarPlacement === Enums.Position.Right
-
-            NumberAnimation {
-                duration: mainWindow.configAnimationsDuration
-                easing.type: mainWindow.easingType
-
-                onRunningChanged: {
-                    mainWindow.animating = running;
-
-                    if (!running && mainWindow.activated && mainWindow.easingType === Easing.InExpo) {
-                        mainWindow.deactivate();
-                    }
-                }
-            }
-        }
+        property real gridAreaX
+        property real gridAreaY
+        property real gridAreaWidth
+        property real gridAreaHeight
 
         Repeater {
             id: bigDesktopsRepeater
-            model: mainWindow.workWithActivities ? workspace.activities.length : workspace.desktops
+            model: mainWindow.ready ? workspace.desktops : 0
 
-            Item { // Cannot set geometry of SwipeView's root item
-                property alias bigDesktop: bigDesktop
+            DesktopComponent { // Cannot set geometry of SwipeView's root item
+                visible: Math.abs(model.index - mainWindow.currentDesktop) < 2
+                enabled: model.index === mainWindow.currentDesktop
+                big: true
 
-                TapHandler {
-                    acceptedButtons: Qt.AllButtons
+                mouseAreaX: bigDesktops.mouseAreaX
+                mouseAreaY: bigDesktops.mouseAreaY
+                mouseAreaWidth: bigDesktops.mouseAreaWidth
+                mouseAreaHeight: bigDesktops.mouseAreaHeight
 
-                    onTapped: {
-                        if (mainWindow.selectedClientItem)
-                            switch (eventPoint.event.button) {
-                                case Qt.LeftButton:
-                                    mainWindow.toggleActive();
-                                    break;
-                                case Qt.MiddleButton:
-                                    mainWindow.selectedClientItem.client.closeWindow();
-                                    break;
-                                case Qt.RightButton:
-                                    if (mainWindow.workWithActivities)
-                                        if (mainWindow.selectedClientItem.client.activities.length === 0)
-                                            mainWindow.selectedClientItem.client.activities.push(workspace.activities[model.index]);
-                                        else
-                                            mainWindow.selectedClientItem.client.activities = [];
-                                    else
-                                        if (mainWindow.selectedClientItem.client.desktop === -1)
-                                            mainWindow.selectedClientItem.client.desktop = model.index + 1;
-                                        else
-                                            mainWindow.selectedClientItem.client.desktop = -1;
-                                    break;
-                            }
-                        else 
-                            mainWindow.toggleActive();
-                    }
+                gridAreaX: bigDesktops.gridAreaX
+                gridAreaY: bigDesktops.gridAreaY
+                gridAreaWidth: bigDesktops.gridAreaWidth
+                gridAreaHeight: bigDesktops.gridAreaHeight
+            }
+        }
+
+        onCurrentIndexChanged: workspace.currentDesktop = currentIndex + 1;
+    }
+
+    Item {
+        id: desktopsBar
+
+        property real desktopsFullSize // Size of desktops if we don't need to shrink them more to fit in the bar
+        property bool shrinkDesktopsToFit
+        property real desktopsWidth
+        property real desktopsHeight
+
+        Rectangle {
+            id: desktopsBarBackground
+            anchors.fill: parent
+            color: "black"
+            opacity: 0.1
+            visible: mainWindow.configShowDesktopsBarBackground
+        }
+
+        HoverHandler {
+            id: desktopsBarHoverHandler
+            enabled: mainWindow.idle && !mainWindow.dragging
+        }
+
+        Behavior on x {
+            enabled: mainWindow.activated
+            NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
+        }
+
+        Behavior on y {
+            enabled: mainWindow.activated
+            NumberAnimation { duration: mainWindow.configAnimationsDuration; easing.type: mainWindow.easingType; }
+        }
+
+        Grid {
+            id: desktopsWrapper
+            spacing: mainWindow.desktopsBarSpacing
+            padding: mainWindow.desktopsBarSpacing
+            anchors.centerIn: parent
+            horizontalItemAlignment: Grid.AlignHCenter
+            verticalItemAlignment: Grid.AlignVCenter
+
+            PlasmaComponents.ToolButton {
+                id: removeDesktop
+                height: 48
+                width: 48
+                iconName: "remove"
+                flat: true
+                opacity: desktopsBarHoverHandler.hovered ? 1 : 0
+
+                onClicked: {
+                    const currentDesktop = workspace.currentDesktop === workspace.desktops ?
+                            workspace.currentDesktop - 1 : workspace.currentDesktop;
+                    workspace.desktops--; // workspace.removeDesktop(desktopIndex);
+                    workspace.currentDesktop = currentDesktop; // Avoid going to the first desktop
                 }
+            }
+
+            Repeater {
+                id: desktopsBarRepeater
+                model: mainWindow.ready ? workspace.desktops : 0
 
                 DesktopComponent {
-                    id: bigDesktop
-                    big: true
-                    activity: mainWindow.workWithActivities ? workspace.activities[model.index] : ""
-                    anchors.centerIn: parent
-                    width: desktopRatio < ratio ? parent.width - mainWindow.bigDesktopMargin
-                            : parent.height / screenItem.height * screenItem.width - mainWindow.bigDesktopMargin
-                    height: desktopRatio > ratio ? parent.height - mainWindow.bigDesktopMargin
-                            : parent.width / screenItem.width * screenItem.height - mainWindow.bigDesktopMargin
+                    width: desktopsBar.desktopsWidth
+                    height: desktopsBar.desktopsHeight
 
-                    property real desktopRatio: parent.width / parent.height
+                    mouseAreaX: 0
+                    mouseAreaY: 0
+                    mouseAreaWidth: desktopsBar.desktopsWidth
+                    mouseAreaHeight: desktopsBar.desktopsHeight
+
+                    gridAreaX: mainWindow.desktopMargin
+                    gridAreaY: mainWindow.desktopMargin
+                    gridAreaWidth: desktopsBar.desktopsWidth - mainWindow.desktopMargin * 2
+                    gridAreaHeight: desktopsBar.desktopsHeight - mainWindow.desktopMargin * 2
+                }
+            }
+
+            PlasmaComponents.ToolButton {
+                id: addDesktop
+                height: 48
+                width: 48
+                iconName: "add"
+                flat: true
+                opacity: desktopsBarHoverHandler.hovered ? 1 : 0
+
+                onClicked: {
+                    const currentDesktop = workspace.currentDesktop;
+                    workspace.desktops++; // workspace.createDesktop(desktopIndex + 1, "New desktop");
+                    workspace.currentDesktop = currentDesktop; // Avoid going to the first desktop
                 }
             }
         }
-
-        onCurrentIndexChanged: {
-            mainWindow.workWithActivities ? workspace.currentActivity = workspace.activities[currentIndex]
-                    : workspace.currentDesktop = currentIndex + 1;
-        }
-    }
-
-    function showDesktopsBar() {
-        switch (mainWindow.configDesktopsBarPlacement) {
-            case Enums.Position.Top:
-                bigDesktops.anchors.topMargin = desktopsBarHeight;
-                break;
-            case Enums.Position.Bottom:
-                bigDesktops.anchors.bottomMargin = desktopsBarHeight;
-                break;
-            case Enums.Position.Left:
-                bigDesktops.anchors.leftMargin = desktopsBarWidth;
-                break;
-            case Enums.Position.Right:
-                bigDesktops.anchors.rightMargin = desktopsBarWidth;
-                break;
-        }
-    }
-
-    function hideDesktopsBar() {
-        bigDesktops.anchors.topMargin = 0;
-        bigDesktops.anchors.bottomMargin = 0;
-        bigDesktops.anchors.leftMargin = 0;
-        bigDesktops.anchors.rightMargin = 0;
-    }
-
-    function updateDesktopWindowId() {
-        const clients = workspace.clientList(); 
-        for (let i = 0; i < clients.length; i++) {
-            if (clients[i].desktopWindow && clients[i].screen === screenIndex) {
-                desktopBackground.winId = clients[i].windowId;
-                return;
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        updateDesktopWindowId();
     }
 }

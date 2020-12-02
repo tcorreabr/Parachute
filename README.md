@@ -13,15 +13,22 @@ This *KWin* script was inspired by the excellent work of several projects like: 
 ## Installation or upgrade
 
   ```
-  git clone https://github.com/tcorreabr/Parachute.git
-  kpackagetool5 --type KWin/Script --install ./Parachute || kpackagetool5 --type KWin/Script --upgrade ./Parachute
+  git clone https://github.com/tcorreabr/Parachute.git && cd Parachute
+  make install
   ```
 
-To install the configuration dialog you must execute the following commands, even if you have installed through Plasma's Get Hot New Stuff or [Kde Store](https://store.kde.org/). You only need to do this once.
+If you have installed through Plasma's Get Hot New Stuff ([Kde Store](https://store.kde.org/p/1370195/)) you must execute the following commands on terminal to install the configuration dialog. You only need to do this once.
 
   ```
   mkdir -p ~/.local/share/kservices5
   ln -s ~/.local/share/kwin/scripts/Parachute/metadata.desktop ~/.local/share/kservices5/Parachute.desktop
+  ```
+
+To uninstall:
+
+  ```
+  # First go to the folder where you cloned Parachute
+  make uninstall
   ```
 
 ## Usage
@@ -49,10 +56,3 @@ Controls:
 * If you are using "Slide" animation to switch desktops, you may want to enable the "Slide docks" option to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
 * If you are having poor performance on animations, try to change "Scale method" to "Smooth" or "Crisp" in Compositor settings.
 * If you have [Virtual Desktop Bar](https://github.com/wsdfhjxc/virtual-desktop-bar) installed, [Parachute keyboard shortcut may be ineffective](https://github.com/tcorreabr/Parachute/issues/14) until KWin restart or dynamic desktop operations.
-
-## Possible improvements
-
-* Insert, move and delete *Plasma* activities and virtual desktops. This should be supported only when *KWin* 5.20 arrives.
-* More *Plasma* theming support.
-* Click on desktops bar to animate it to fullscreen (simulating *KWin's* Desktop Grid effect).
-* One more shortcut to invoke Parachute in this Desktop Grid like mode.
