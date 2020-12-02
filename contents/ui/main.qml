@@ -61,24 +61,24 @@ Window {
                 case Qt.Key_End:
                     selectLastClient();
                     break;
-                case Qt.Key_Left: case Qt.Key_H:
+                case Qt.Key_Left:
                     if (event.modifiers == Qt.ShiftModifier) {
                         workspace.currentDesktop--
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Left) : selectLastClient();
                     }
                     break;
-                case Qt.Key_Right: case Qt.Key_L:
+                case Qt.Key_Right:
                     if (event.modifiers == Qt.ShiftModifier) {
                         workspace.currentDesktop++
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Right) : selectFirstClient();
                     }
                     break;
-                case Qt.Key_Up: case Qt.Key_K:
+                case Qt.Key_Up:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Top) : selectLastClient();
                     break;
-                case Qt.Key_Down: case Qt.Key_J:
+                case Qt.Key_Down:
                     selectedClientItem ? selectNextClientOn(Enums.Position.Bottom) : selectFirstClient();
                     break; 
                 case Qt.Key_F5:
