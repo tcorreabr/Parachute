@@ -24,10 +24,9 @@ If you have installed through Plasma's Get Hot New Stuff ([Kde Store](https://st
   ln -s ~/.local/share/kwin/scripts/Parachute/metadata.desktop ~/.local/share/kservices5/Parachute.desktop
   ```
 
-To uninstall:
+To uninstall, first go to the folder where you cloned Parachute, then run:
 
   ```
-  # First go to the folder where you cloned Parachute
   make uninstall
   ```
 
