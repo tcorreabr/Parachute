@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 Item {
     id: screenItem
@@ -198,13 +198,14 @@ Item {
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter
 
-            PlasmaComponents.ToolButton {
+            PlasmaComponents.Button {
                 id: removeDesktop
                 height: 48
                 width: 48
-                iconName: "remove"
+                icon.name: "remove"
                 flat: true
                 opacity: desktopsBarHoverHandler.hovered ? 1 : 0
+                focusPolicy: Qt.NoFocus
 
                 onClicked: {
                     const currentDesktop = workspace.currentDesktop === workspace.desktops ?
@@ -234,13 +235,14 @@ Item {
                 }
             }
 
-            PlasmaComponents.ToolButton {
+            PlasmaComponents.Button {
                 id: addDesktop
                 height: 48
                 width: 48
-                iconName: "add"
+                icon.name: "add"
                 flat: true
                 opacity: desktopsBarHoverHandler.hovered ? 1 : 0
+                focusPolicy: Qt.NoFocus
 
                 onClicked: {
                     const currentDesktop = workspace.currentDesktop;

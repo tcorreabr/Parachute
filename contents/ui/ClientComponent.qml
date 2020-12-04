@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import org.kde.kwin 2.0 as KWinComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 Item {
     id: clientItem
@@ -133,15 +133,16 @@ Item {
         }
     }
 
-    PlasmaComponents.ToolButton {
+    PlasmaComponents.Button {
         id: closeButton
         x: clientItem.gridWidth - desktopItem.clientsPadding - closeButton.width
         y: desktopItem.clientsPadding
         height: mainWindow.clientsDecorationsHeight
         width: height
         visible: selectedFrame.visible && mainWindow.configShowWindowTitles
-        iconName: "window-close"
+        icon.name: "window-close"
         flat: true
+        focusPolicy: Qt.NoFocus
 
         onClicked: clientItem.client.closeWindow();
     }
