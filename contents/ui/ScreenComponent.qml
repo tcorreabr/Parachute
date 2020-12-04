@@ -31,10 +31,16 @@ Item {
 
                 gridAreaX: (screenItem.width - bigDesktops.gridAreaWidth) / 2
                 gridAreaY: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ?
-                        desktopsBar.height + mainWindow.desktopMargin :
-                        mainWindow.desktopMargin
+                        desktopsBar.height + searchFieldContainer.height + mainWindow.desktopMargin :
+                        searchFieldContainer.height + mainWindow.desktopMargin
                 gridAreaWidth: bigDesktops.gridAreaHeight * screenItem.aspectRatio
-                gridAreaHeight: mouseAreaHeight - mainWindow.desktopMargin * 2
+                gridAreaHeight: mouseAreaHeight - searchFieldContainer.height - mainWindow.desktopMargin * 2
+            }
+
+            PropertyChanges {
+                target: searchFieldContainer
+                x: (screenItem.width - searchFieldContainer.width) / 2
+                y: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? desktopsBar.height: 0
             }
 
             PropertyChanges {
@@ -74,9 +80,17 @@ Item {
                 gridAreaX: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
                         desktopsBar.width + mainWindow.desktopMargin :
                         mainWindow.desktopMargin
-                gridAreaY: (screenItem.height - bigDesktops.gridAreaHeight) / 2
+                gridAreaY: searchFieldContainer.height + (screenItem.height - searchFieldContainer.height - bigDesktops.gridAreaHeight) / 2
                 gridAreaWidth: mouseAreaWidth - mainWindow.desktopMargin * 2
                 gridAreaHeight: bigDesktops.gridAreaWidth / screenItem.aspectRatio
+            }
+
+            PropertyChanges {
+                target: searchFieldContainer
+                x: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        desktopsBar.width + (bigDesktops.mouseAreaWidth - searchFieldContainer.width) / 2 :
+                        (bigDesktops.mouseAreaWidth - searchFieldContainer.width) / 2
+                y: 0
             }
 
             PropertyChanges {
@@ -124,6 +138,8 @@ Item {
         id: bigDesktops
         anchors.fill: parent
         currentIndex: mainWindow.currentDesktop
+        focusPolicy: Qt.NoFocus
+        activeFocusOnTab: false
 
         property real mouseAreaX
         property real mouseAreaY
@@ -157,6 +173,47 @@ Item {
         }
 
         onCurrentIndexChanged: workspace.currentDesktop = currentIndex + 1;
+    }
+
+    Item {
+        id: searchFieldContainer
+        height: 120
+        width: 400
+     
+        TextField {
+            id: searchField
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.right: parent.right
+            color: "white"
+            placeholderText: "Type to search"
+            // placeholderTextColor: "red"
+            activeFocusOnTab: true
+
+            background: Rectangle {
+                color: "white"
+                border.width: 1
+                border.color: mainWindow.hoverColor
+                radius: 4
+                opacity: 0.1
+            }
+
+            Keys.onPressed: {
+                if (searchField.text === "") return;
+
+                switch (event.key) {
+                    case Qt.Key_Escape:
+                        searchField.text = "";
+                        event.accepted = true;
+                        break;
+                    case Qt.Key_Down:
+                        keyboardHandler.focus = true;
+                        event.accepted = true;
+                        break;
+                }
+            }
+        }
     }
 
     Item {

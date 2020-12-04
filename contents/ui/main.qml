@@ -53,6 +53,8 @@ Window {
     Item {
         id: keyboardHandler
 
+        activeFocusOnTab: true
+
         Keys.onPressed: {
             switch (event.key) {
                 case Qt.Key_Escape:
@@ -100,7 +102,18 @@ Window {
                     kwinReconfigure.call();
                     break;
             }
-            event.accepted = true;
+            if (event.key !== Qt.Key_Tab) event.accepted = true;
+        }
+
+        Repeater {
+            id: screensRepeater
+            model: workspace.numScreens
+
+            // Initial full hd dimensions to avoid division by zero on some internal calculations of ScreenComponent
+            ScreenComponent {
+                width: 1920
+                height: 1080
+            }
         }
     }
 
@@ -112,17 +125,6 @@ Window {
                 KWinComponents.ClientModel.NotAcceptingFocusExclusion | KWinComponents.ClientModel.DockWindowsExclusion |
                 KWinComponents.ClientModel.OtherActivitiesExclusion | KWinComponents.ClientModel.DesktopWindowsExclusion |
                 KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
-    }
-
-    Repeater {
-        id: screensRepeater
-        model: workspace.numScreens
-
-        // Initial full hd dimensions to avoid division by zero on some internal calculations of ScreenComponent
-        ScreenComponent {
-            width: 1920
-            height: 1080
-        }
     }
 
     KWinComponents.DBusCall {
