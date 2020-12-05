@@ -63,27 +63,6 @@ Item {
         cached: true
     }
 
-    Rectangle {
-        id: selectedOverlay
-        anchors.fill: mouseArea
-        anchors.margins: border.width === 0 ? 0 : -1
-        color: "transparent"
-        radius: 10
-        border.width: !big && desktopIndex === mainWindow.currentDesktop ? 2 : 0
-        border.color: mainWindow.highlightColor
-
-        states: [
-            State {
-                when: dropArea.containsDrag
-                PropertyChanges { target: selectedOverlay; color: "#3F006600"; }
-            },
-            State {
-                when: !big && mainWindow.idle && !mainWindow.dragging && hoverHandler.hovered
-                PropertyChanges { target: selectedOverlay; color: mainWindow.hoverColor; }
-            }
-        ]
-    }
-
     ToolTip {
         visible: !big && hoverHandler.hovered
         text: workspace.desktopName(desktopIndex + 1);
@@ -91,12 +70,27 @@ Item {
         timeout: 5000
     }
 
-    Item {
+    Rectangle {
         id: mouseArea
         x: mouseAreaX
         y: mouseAreaY
         width: mouseAreaWidth
         height: mouseAreaHeight
+        color: "transparent"
+        radius: 10
+        border.width: !big && desktopIndex === mainWindow.currentDesktop ? 3 : 0
+        border.color: mainWindow.highlightColor
+
+        states: [
+            State {
+                when: dropArea.containsDrag
+                PropertyChanges { target: mouseArea; color: "#3F006600"; }
+            },
+            State {
+                when: !big && mainWindow.idle && !mainWindow.dragging && hoverHandler.hovered
+                PropertyChanges { target: mouseArea; color: mainWindow.hoverColor; }
+            }
+        ]
 
         DropArea {
             id: dropArea
