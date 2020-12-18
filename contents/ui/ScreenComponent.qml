@@ -252,8 +252,6 @@ Item {
                         break;
                     case Qt.Key_Return:
                         if (mainWindow.configSearchMethod === Enums.SearchMethod.Krunner) {
-                            mainWindow.activated = false;
-                            mainWindow.selectedClientItem = null;
                             milouResults.runCurrentIndex(event);
                             event.accepted = true;
                         }

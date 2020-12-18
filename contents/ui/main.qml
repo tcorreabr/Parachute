@@ -153,6 +153,8 @@ Window {
         queryString: mainWindow.configSearchMethod === Enums.SearchMethod.Krunner ? searchText : ""
         clip: false
         activeFocusOnTab: false
+
+        onActivated: mainWindow.activated = false;
     }
 
     KWinComponents.DBusCall {
@@ -215,7 +217,6 @@ Window {
                     screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
 
                 workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
-                selectedClientItem = null;
             }
         }
     }
