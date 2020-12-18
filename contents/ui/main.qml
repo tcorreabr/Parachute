@@ -42,7 +42,7 @@ Window {
 
     // Selection (by mouse or keyboard)
     property var selectedClientItem: null
-    property var outsideSelectedClient: null
+    property var externallySelectedClient: null
     property var pointAvoidUpdatingSelection: null
     property bool avoidUpdatingSelection: false
 
@@ -164,7 +164,7 @@ Window {
 
     Connections {
         target: workspace
-        function onClientActivated(client) { getOutsideSelectedClient(); }
+        function onClientActivated(client) { getExternallySelectedClient(); }
         function onNumberScreensChanged(count) { updateScreens(); }
         function onScreenResized(screen) { updateScreens(); }
         function onCurrentDesktopChanged(desktop, client) { selectedClientItem = null; }
@@ -216,7 +216,7 @@ Window {
                 for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++)
                     screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = true;
 
-                workspace.activeClient = selectedClientItem ? selectedClientItem.client : outsideSelectedClient;
+                workspace.activeClient = selectedClientItem ? selectedClientItem.client : externallySelectedClient;
             }
         }
     }
@@ -225,7 +225,7 @@ Window {
         getQtVersion();
         loadConfig();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
-        getOutsideSelectedClient();
+        getExternallySelectedClient();
         getCorrectScreensInfo.start();
     }
 
@@ -249,7 +249,7 @@ Window {
 
             avoidEmptyFrameTimer.start();
         } else {
-            selectOutsideSelectedClient();
+            selectExternallySelectedClient();
             screensRepeater.itemAt(0).searchField.text = "";
             screensRepeater.itemAt(0).searchField.forceActiveFocus();
 
@@ -311,9 +311,9 @@ Window {
         }
     }
 
-    function getOutsideSelectedClient() {
+    function getExternallySelectedClient() {
         if (workspace.activeClient) {
-            outsideSelectedClient = workspace.activeClient;
+            externallySelectedClient = workspace.activeClient;
 
             // Ugly code for KWin < 5.20
             if (workspace.activeClient.desktopWindow) {
@@ -336,16 +336,45 @@ Window {
         configSearchMethod = KWin.readConfig("searchMethod", Enums.SearchMethod.Krunner);
     }
 
+    function selectExternallySelectedClient() {
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            const currentClientsRepeater = screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.
+                    itemAt(currentDesktop).clientsRepeater;
+
+            for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
+                if (currentClientsRepeater.itemAt(currentClient).client === mainWindow.externallySelectedClient) {
+                    selectedClientItem = currentClientsRepeater.itemAt(currentClient);
+                    avoidUpdatingSelection = true;
+                    return;
+                }
+            }
+        }
+    }
+
     function selectFirstClient() {
-        selectedClientItem = screensRepeater.itemAt(0).bigDesktopsRepeater.itemAt(currentDesktop).clientsRepeater.itemAt(0);
-        avoidUpdatingSelection = true;
+        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+            const currentClientsRepeater = screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.
+                    itemAt(currentDesktop).clientsRepeater;
+
+            if (currentClientsRepeater.count > 0) {
+                selectedClientItem = currentClientsRepeater.itemAt(0);
+                avoidUpdatingSelection = true;
+                return;
+            }
+        }
     }
 
     function selectLastClient() {
-        const lastClientsRepeater = screensRepeater.itemAt(screensRepeater.count - 1).bigDesktopsRepeater.
-                itemAt(currentDesktop).clientsRepeater;
-        selectedClientItem = lastClientsRepeater.itemAt(lastClientsRepeater.count - 1);
-        avoidUpdatingSelection = true;
+        for (let currentScreen = screensRepeater.count - 1; currentScreen >= 0; currentScreen--) {
+            const currentClientsRepeater = screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.
+                    itemAt(currentDesktop).clientsRepeater;
+
+            if (currentClientsRepeater.count > 0) {
+                selectedClientItem = currentClientsRepeater.itemAt(currentClientsRepeater.count - 1);
+                avoidUpdatingSelection = true;
+                return;
+            }
+        }
     }
 
     function selectNextClientOn(position) {
@@ -407,21 +436,6 @@ Window {
         if (candidateClientItem) {
             selectedClientItem = candidateClientItem;
             avoidUpdatingSelection = true;
-        }
-    }
-
-    function selectOutsideSelectedClient() {
-        for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
-            const currentClientsRepeater = screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.
-                    itemAt(currentDesktop).clientsRepeater;
-
-            for (let currentClient = 0; currentClient < currentClientsRepeater.count; currentClient++) {
-                if (currentClientsRepeater.itemAt(currentClient).client === mainWindow.outsideSelectedClient) {
-                    selectedClientItem = currentClientsRepeater.itemAt(currentClient);
-                    avoidUpdatingSelection = true;
-                    return;
-                }
-            }
         }
     }
 

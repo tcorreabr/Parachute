@@ -108,12 +108,12 @@ Item {
 
             onDropped: {
                 if (desktopIndex + 1 !== drag.source.desktop && drag.source.desktop !== -1) {
-                    // Ensures mainWindow.outsideSelectedClient stays on current desktop
-                    if (drag.source === mainWindow.outsideSelectedClient) {
+                    // Ensures mainWindow.externallySelectedClient stays on current desktop
+                    if (drag.source === mainWindow.externallySelectedClient) {
                         const tmpDragSourceDesktop = drag.source.desktop;
                         drag.source.desktop = desktopIndex + 1;
                         workspace.currentDesktop = desktopIndex + 1;
-                        workspace.currentDesktop = tmpDragSourceDesktop; // To select a new mainWindow.outsideSelectedClient
+                        workspace.currentDesktop = tmpDragSourceDesktop; // Change desktop to select a new mainWindow.externallySelectedClient
                     } else {
                         drag.source.desktop = desktopIndex + 1;
                     }

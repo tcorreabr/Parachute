@@ -243,9 +243,8 @@ Item {
                                 milouResults.incrementCurrentIndex();
                                 break;
                             case Enums.SearchMethod.Filter:
-                                keyboardHandler.focus = true;
-                                mainWindow.selectedClientItem = bigDesktopsRepeater.itemAt(mainWindow.currentDesktop).clientsRepeater.itemAt(0);
-                                avoidUpdatingSelection = true;
+                                if (!mainWindow.selectedClientItem) mainWindow.selectFirstClient();
+                                if (mainWindow.selectedClientItem) keyboardHandler.focus = true;
                                 break;
                         }
                         event.accepted = true;
