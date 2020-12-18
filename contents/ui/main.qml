@@ -60,7 +60,7 @@ Window {
                     toggleActive();
                     break;
                 case Qt.Key_Return:
-                    if (selectedClientItem) toggleActive();
+                    toggleActive();
                     break;
                 case Qt.Key_Home:
                     selectFirstClient();
