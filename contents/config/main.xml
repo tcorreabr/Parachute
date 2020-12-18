@@ -27,7 +27,7 @@
 		</entry>
 		<entry name="desktopsBarPlacement" type="int">
 		  <label>Where desktops bar should be placed</label>
-		  <default>0</default>
+		  <default>3</default>
 		</entry>
 		<entry name="closeOnMiddleClick" type="bool">
 		  <label>Close on middle click</label>
@@ -35,7 +35,7 @@
 		</entry>
 		<entry name="animationsDuration" type="int">
 		  <label>Duration of the animations</label>
-		  <default>250</default>
+		  <default>300</default>
 		</entry>
 		<entry name="searchMethod" type="int">
 		  <label>Search method</label>

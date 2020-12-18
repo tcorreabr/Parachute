@@ -330,9 +330,9 @@ Window {
         configShowDesktopShadows = KWin.readConfig("showDesktopShadows", false);
         configShowWindowTitles = KWin.readConfig("showWindowTitles", true);
         configCloseOnMiddleClick = KWin.readConfig("closeOnMiddleClick", true)
-        configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
+        configAnimationsDuration = KWin.readConfig("animationsDuration", 300);
         configShowNotificationWindows = KWin.readConfig("showNotificationWindows", true);
-        configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
+        configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Right);
         configSearchMethod = KWin.readConfig("searchMethod", Enums.SearchMethod.Krunner);
     }
 
