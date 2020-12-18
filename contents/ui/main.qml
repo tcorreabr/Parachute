@@ -24,7 +24,7 @@ Window {
             configDesktopsBarPlacement === Enums.Position.Bottom
     property int easingType: Easing.OutExpo
     property bool animating: false
-    property bool idle: activated && !animating
+    property bool idle: activated && !animating && !dragging
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
     property bool focusNextItem // See onActiveFocusItemChanged for explanation
     property string searchText

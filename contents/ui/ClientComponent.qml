@@ -94,7 +94,7 @@ Item {
         height: clientItem.gridHeight
         imagePath: "widgets/viewitem"
         prefix: "hover"
-        visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem && !mainWindow.dragging
+        visible: desktopItem.big && mainWindow.idle && mainWindow.selectedClientItem === clientItem
         opacity: 0.7
     }
 
@@ -102,7 +102,7 @@ Item {
         id: clientDecorations
         x: (clientItem.gridWidth - clientDecorations.width) / 2
         y: desktopItem.clientsPadding
-        visible: desktopItem.big && mainWindow.idle && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
+        visible: desktopItem.big && activated && !animating && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
         spacing: 10
 
         PlasmaCore.IconItem {

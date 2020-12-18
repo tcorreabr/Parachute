@@ -87,7 +87,7 @@ Item {
                 PropertyChanges { target: mouseArea; color: "#3F006600"; }
             },
             State {
-                when: !big && mainWindow.idle && !mainWindow.dragging && hoverHandler.hovered
+                when: !big && mainWindow.idle && hoverHandler.hovered
                 PropertyChanges { target: mouseArea; color: mainWindow.hoverColor; }
             }
         ]

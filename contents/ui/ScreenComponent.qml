@@ -301,7 +301,7 @@ Item {
 
         HoverHandler {
             id: desktopsBarHoverHandler
-            enabled: mainWindow.idle && !mainWindow.dragging
+            enabled: mainWindow.idle
         }
 
         Behavior on x {
