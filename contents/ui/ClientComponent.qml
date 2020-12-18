@@ -191,16 +191,17 @@ Item {
         ready = true;
     }
 
-    Connections {
-        target: client
-        function onClientFinishUserMovedResized(clientParam) { updateClientProperties(); }
-        function onClientMaximizedStateChanged(clientParam, h, v) { updateClientProperties(); }
+    Loader {
+        active: client ? true : false
+        sourceComponent: Connections {
+            target: client
+            function onClientFinishUserMovedResized(clientParam) { updateClientProperties(); }
+            function onClientMaximizedStateChanged(clientParam, h, v) { updateClientProperties(); }
+        }
     }
 
     // Update non-notifiable properties
     function updateClientProperties() {
-        if (!client) return;
-
         clientX = client.x - screenItem.x;
         clientY = client.y - screenItem.y;
         clientWidth = client.width;
