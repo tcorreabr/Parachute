@@ -41,6 +41,7 @@ Controls:
 * Middle mouse button - Close window.
 * Right mouse button - (Un)pin window.
 * Arrow keys - Select a window.
+* Shift + Arrow keys - Switch desktops.
 * Home/End - Select first/last window.
 * Enter - Activate selected window.
 * Esc - Hide Parachute.
@@ -48,10 +49,9 @@ Controls:
 
 ## Notes
 
-* Developed and tested in *Plasma* >= 5.18 and *Qt* >= 5.14.
+* Developed and tested in *Plasma* >= 5.20 and *Qt* >= 5.15.
 * For now it doesn't work on *Wayland*.
-* For now you may have to [click on a empty desktop to show it's wallpaper](https://github.com/tcorreabr/Parachute/issues/6). This should be fixed only when *KWin* 5.20 arrives.
 * You can use *KWin's* global shortcuts normally while using this script. To navigate between your desktops for example.
 * If you are using "Slide" animation to switch desktops, you may want to enable the "Slide docks" option to avoid some [unwanted visual effects](https://github.com/tcorreabr/Parachute/issues/1).
-* If you are having poor performance on animations, try to change "Scale method" to "Smooth" or "Crisp" in Compositor settings.
+* If you are having poor performance on animations, try changing "Scale method" to "Smooth" or "Crisp" in Compositor settings.
 * If you have [Virtual Desktop Bar](https://github.com/wsdfhjxc/virtual-desktop-bar) installed, [Parachute keyboard shortcut may be ineffective](https://github.com/tcorreabr/Parachute/issues/14) until KWin restart or dynamic desktop operations.
