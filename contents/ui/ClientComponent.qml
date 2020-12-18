@@ -159,6 +159,7 @@ Item {
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clip: true
         clipTo: screenItem
+        renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
 
         property int thumbnailPadding: desktopItem.clientsPadding + noBorderSpacing
 

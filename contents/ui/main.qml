@@ -95,7 +95,7 @@ Window {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Top) : selectFirstClient();
 
                         if (tmpSelectedClientItem === selectedClientItem && searchText &&
-                                mainWindow.configSearchMethod === Enums.SearchMethod.Krunner) {       
+                                mainWindow.configSearchMethod === Enums.SearchMethod.Filter) {       
                             const screen = selectedClientItem ? selectedClientItem.client.screen : 0;
                             screensRepeater.itemAt(screen).searchField.focus = true;
                         }

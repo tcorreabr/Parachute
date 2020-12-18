@@ -83,11 +83,7 @@ Item {
 
         states: [
             State {
-                when: dropArea.containsDrag
-                PropertyChanges { target: mouseArea; color: "#3F006600"; }
-            },
-            State {
-                when: !big && mainWindow.idle && hoverHandler.hovered
+                when: dropArea.containsDrag || (!big && mainWindow.idle && hoverHandler.hovered)
                 PropertyChanges { target: mouseArea; color: mainWindow.hoverColor; }
             }
         ]
