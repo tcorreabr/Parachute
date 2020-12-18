@@ -37,5 +37,9 @@
 		  <label>Duration of the animations</label>
 		  <default>250</default>
 		</entry>
+		<entry name="searchMethod" type="int">
+		  <label>Search method</label>
+		  <default>0</default>
+		</entry>
     </group>
 </kcfg>

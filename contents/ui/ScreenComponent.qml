@@ -12,6 +12,7 @@ Item {
 
     property alias bigDesktopsRepeater: bigDesktopsRepeater
     property alias desktopBackground: desktopBackground
+    property alias searchField: searchField
 
     property int screenIndex: model.index
     property real aspectRatio: width / height
@@ -41,6 +42,14 @@ Item {
                 target: searchFieldContainer
                 x: (screenItem.width - searchFieldContainer.width) / 2
                 y: mainWindow.configDesktopsBarPlacement === Enums.Position.Top ? desktopsBar.height: 0
+            }
+
+            PropertyChanges {
+                target: milouBackground
+                x: (screenItem.width - milouBackground.width) / 2
+                y: searchFieldContainer.y + searchFieldContainer.height
+                width: screenItem.width / 2
+                height: screenItem.height - searchFieldContainer.height * 2 - desktopsBar.height
             }
 
             PropertyChanges {
@@ -91,6 +100,16 @@ Item {
                         desktopsBar.width + (bigDesktops.mouseAreaWidth - searchFieldContainer.width) / 2 :
                         (bigDesktops.mouseAreaWidth - searchFieldContainer.width) / 2
                 y: 0
+            }
+
+            PropertyChanges {
+                target: milouBackground
+                x: mainWindow.configDesktopsBarPlacement === Enums.Position.Left ?
+                        desktopsBar.width + (bigDesktops.mouseAreaWidth - milouBackground.width) / 2 :
+                        (bigDesktops.mouseAreaWidth - milouBackground.width) / 2
+                y: searchFieldContainer.y + searchFieldContainer.height
+                width: screenItem.width / 2
+                height: screenItem.height - searchFieldContainer.height * 2
             }
 
             PropertyChanges {
@@ -156,8 +175,7 @@ Item {
             model: mainWindow.ready ? workspace.desktops : 0
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
-                visible: Math.abs(model.index - mainWindow.currentDesktop) < 2
-                enabled: model.index === mainWindow.currentDesktop
+                visible: model.index === mainWindow.currentDesktop
                 big: true
 
                 mouseAreaX: bigDesktops.mouseAreaX
@@ -177,7 +195,7 @@ Item {
 
     Item {
         id: searchFieldContainer
-        height: 120
+        height: 100
         width: 400
      
         TextField {
@@ -187,33 +205,82 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             color: "white"
+            activeFocusOnTab: true
             placeholderText: "Type to search"
             // placeholderTextColor: "red"
-            activeFocusOnTab: true
 
             background: Rectangle {
                 color: "white"
-                border.width: 1
-                border.color: mainWindow.hoverColor
                 radius: 4
-                opacity: 0.1
+                opacity: 0.2
             }
 
             Keys.onPressed: {
-                if (searchField.text === "") return;
+                if (!mainWindow.searchText) return;
 
                 switch (event.key) {
+                    case Qt.Key_Tab:
+                        mainWindow.focusNextItem = true;
+                        break;
+                    case Qt.Key_Backtab:
+                        mainWindow.focusNextItem = false;
+                        break;                    
                     case Qt.Key_Escape:
-                        searchField.text = "";
-                        event.accepted = true;
+                        if (searchField.text) {
+                            searchField.text = "";
+                            event.accepted = true;
+                        }
+                        break;
+                    case Qt.Key_Up:
+                        if (mainWindow.configSearchMethod === Enums.SearchMethod.Krunner) {
+                            milouResults.decrementCurrentIndex();
+                            event.accepted = true;
+                        }
                         break;
                     case Qt.Key_Down:
-                        keyboardHandler.focus = true;
+                        switch (configSearchMethod) {
+                            case Enums.SearchMethod.Krunner:
+                                milouResults.incrementCurrentIndex();
+                                break;
+                            case Enums.SearchMethod.Filter:
+                                keyboardHandler.focus = true;
+                                mainWindow.selectedClientItem = bigDesktopsRepeater.itemAt(mainWindow.currentDesktop).clientsRepeater.itemAt(0);
+                                avoidUpdatingSelection = true;
+                                break;
+                        }
                         event.accepted = true;
+                        break;
+                    case Qt.Key_Return:
+                        if (mainWindow.configSearchMethod === Enums.SearchMethod.Krunner) {
+                            mainWindow.activated = false;
+                            mainWindow.selectedClientItem = null;
+                            milouResults.runCurrentIndex(event);
+                            event.accepted = true;
+                        }
                         break;
                 }
             }
+
+            onTextChanged: {
+                mainWindow.searchText = searchField.text;
+                
+                for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
+                    if (screensRepeater.itemAt(currentScreen).searchField.text !== mainWindow.searchText) {
+                        screensRepeater.itemAt(currentScreen).searchField.text = mainWindow.searchText;
+                    }
+                }
+            }
+
+            onFocusChanged: if (focus) milouResults.parent = milouBackground;
         }
+    }
+
+    Rectangle {
+        id: milouBackground
+        color: PlasmaCore.Theme.viewBackgroundColor
+        opacity: 0.9
+        visible: searchField.focus && searchField.text && mainWindow.configSearchMethod === Enums.SearchMethod.Krunner
+        radius: 4
     }
 
     Item {
