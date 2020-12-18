@@ -185,8 +185,7 @@ Window {
     // 2 - Desktop windows id's.
     // This timer tries to recover this info by running every second after the script initialization.
     Timer {
-        id: getCorrectScreensInfo; interval: 1000; repeat: true; triggeredOnStart: false;
-        running: !ready
+        id: getCorrectScreensInfo; interval: 1000; repeat: true; triggeredOnStart: true;
 
         onTriggered: updateScreens();
     }
@@ -226,6 +225,7 @@ Window {
         loadConfig();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         getOutsideSelectedClient();
+        getCorrectScreensInfo.start();
     }
 
     // Milou.ResultsView put internal ToolButton in focus chain, which we don't want.
@@ -303,6 +303,7 @@ Window {
                 desktopWindowsPicked++;
                 if (desktopWindowsPicked === screensRepeater.count) {
                     ready = true;
+                    if (getCorrectScreensInfo.running) getCorrectScreensInfo.stop();
                     return;
                 }
             }

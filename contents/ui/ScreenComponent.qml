@@ -156,7 +156,7 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        currentIndex: mainWindow.currentDesktop
+        currentIndex: mainWindow.ready ? mainWindow.currentDesktop : 0
         focusPolicy: Qt.NoFocus
         activeFocusOnTab: false
 
