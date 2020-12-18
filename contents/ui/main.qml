@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import org.kde.kwin 2.0 as KWinComponents
 import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.milou 0.3 as Milou
 
 Window {
     id: mainWindow
@@ -25,6 +26,8 @@ Window {
     property bool animating: false
     property bool idle: activated && !animating
     property bool showDesktopsBar: activated && easingType === Easing.OutExpo
+    property bool focusNextItem // See onActiveFocusItemChanged for explanation
+    property string searchText
 
     // Config
     property bool configBlurBackground
@@ -34,6 +37,7 @@ Window {
     property bool configCloseOnMiddleClick
     property bool configShowNotificationWindows
     property real configAnimationsDuration
+    property int configSearchMethod
     property int configDesktopsBarPlacement
 
     // Selection (by mouse or keyboard)
@@ -69,28 +73,36 @@ Window {
                     selectLastClient();
                     break;
                 case Qt.Key_Left:
-                    if (event.modifiers === Qt.ShiftModifier) {
+                    if (event.modifiers & Qt.ShiftModifier) {
                         workspace.currentDesktop--;
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Left) : selectFirstClient();
                     }
                     break;
                 case Qt.Key_Right:
-                    if (event.modifiers === Qt.ShiftModifier) {
+                    if (event.modifiers & Qt.ShiftModifier) {
                         workspace.currentDesktop++;
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Right) : selectLastClient();
                     }
                     break;
                 case Qt.Key_Up:
-                    if (event.modifiers === Qt.ShiftModifier) {
+                    if (event.modifiers & Qt.ShiftModifier) {
                         workspace.currentDesktop--;
                     } else {
+                        let tmpSelectedClientItem = selectedClientItem;
+
                         selectedClientItem ? selectNextClientOn(Enums.Position.Top) : selectFirstClient();
+
+                        if (tmpSelectedClientItem === selectedClientItem && searchText &&
+                                mainWindow.configSearchMethod === Enums.SearchMethod.Krunner) {       
+                            const screen = selectedClientItem ? selectedClientItem.client.screen : 0;
+                            screensRepeater.itemAt(screen).searchField.focus = true;
+                        }
                     }
                     break;
                 case Qt.Key_Down:
-                    if (event.modifiers === Qt.ShiftModifier) {
+                    if (event.modifiers & Qt.ShiftModifier) {
                         workspace.currentDesktop++;
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Bottom) : selectLastClient();
@@ -100,7 +112,19 @@ Window {
                     kwinReconfigure.call();
                     break;
             }
-            event.accepted = true;
+
+            if (event.key !== Qt.Key_Tab && event.key !== Qt.Key_Backtab) event.accepted = true;
+        }
+
+        Repeater {
+            id: screensRepeater
+            model: workspace.numScreens
+
+            // Initial full hd dimensions to avoid division by zero on some internal calculations of ScreenComponent
+            ScreenComponent {
+                width: 1920
+                height: 1080
+            }
         }
     }
 
@@ -114,15 +138,21 @@ Window {
                 KWinComponents.ClientModel.SkipPagerExclusion | KWinComponents.ClientModel.SwitchSwitcherExclusion;
     }
 
-    Repeater {
-        id: screensRepeater
-        model: workspace.numScreens
+    KWinComponents.ClientFilterModel {
+        id: clientsFilterModel
+        clientModel: clientsByScreenAndDesktop
+        filter: mainWindow.configSearchMethod === Enums.SearchMethod.Krunner ? "" : searchText
+    }    
 
-        // Initial full hd dimensions to avoid division by zero on some internal calculations of ScreenComponent
-        ScreenComponent {
-            width: 1920
-            height: 1080
-        }
+    // Milou.ResultsView doesn't work inside a Repeater so it had to be placed here when it should be in ScreenComponent.
+    // It will be reparented according to the searchField that has focus.
+    Milou.ResultsView {
+        id: milouResults
+        anchors.fill: parent
+        anchors.margins: 20
+        queryString: mainWindow.configSearchMethod === Enums.SearchMethod.Krunner ? searchText : ""
+        clip: false
+        activeFocusOnTab: false
     }
 
     KWinComponents.DBusCall {
@@ -194,9 +224,16 @@ Window {
     Component.onCompleted: {
         getQtVersion();
         loadConfig();
-        keyboardHandler.forceActiveFocus();
         KWin.registerShortcut("Parachute", "Parachute", "Ctrl+Meta+D", function() { selectedClientItem = null; toggleActive(); });
         getOutsideSelectedClient();
+    }
+
+    // Milou.ResultsView put internal ToolButton in focus chain, which we don't want.
+    // This hack prevents this button from getting focus.
+    onActiveFocusItemChanged: {
+        if (mainWindow.activeFocusItem.toString().includes("ToolButton")) {
+            mainWindow.activeFocusItem.nextItemInFocusChain(focusNextItem).focus = true;
+        }
     }
 
     function toggleActive() {
@@ -212,6 +249,8 @@ Window {
             avoidEmptyFrameTimer.start();
         } else {
             selectOutsideSelectedClient();
+            screensRepeater.itemAt(0).searchField.text = "";
+            screensRepeater.itemAt(0).searchField.forceActiveFocus();
 
             for (let currentScreen = 0; currentScreen < screensRepeater.count; currentScreen++) {
                 screensRepeater.itemAt(currentScreen).bigDesktopsRepeater.itemAt(currentDesktop).gridView = false;
@@ -292,6 +331,7 @@ Window {
         configAnimationsDuration = KWin.readConfig("animationsDuration", 250); //units.longDuration
         configShowNotificationWindows = KWin.readConfig("showNotificationWindows", true);
         configDesktopsBarPlacement = KWin.readConfig("desktopsBarPlacement", Enums.Position.Top);
+        configSearchMethod = KWin.readConfig("searchMethod", Enums.SearchMethod.Krunner);
     }
 
     function selectFirstClient() {

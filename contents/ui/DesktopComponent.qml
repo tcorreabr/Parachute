@@ -57,7 +57,7 @@ Item {
         anchors.fill: parent
         horizontalOffset: 3
         verticalOffset: 3
-        color: "#99333333"
+        color: "#55000000"
         visible: !big && mainWindow.configShowDesktopShadows
         source: desktopBackground
         cached: true
@@ -136,10 +136,10 @@ Item {
                     return;
                 }
 
-                // Continue only if mouse moved by more than 1 pixels from pointAvoidUpdatingSelection
+                // Continue only if mouse moved from pointAvoidUpdatingSelection
                 if (mainWindow.pointAvoidUpdatingSelection &&
-                        Math.abs(mainWindow.pointAvoidUpdatingSelection.x - point.position.x) < 2 &&
-                        Math.abs(mainWindow.pointAvoidUpdatingSelection.y - point.position.y) < 2) {
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.x - point.position.x) < 1 &&
+                        Math.abs(mainWindow.pointAvoidUpdatingSelection.y - point.position.y) < 1) {
                     return;
                 }
 
@@ -194,8 +194,8 @@ Item {
 
     DelegateModel {
         id: clientsModel
-        model: clientsByScreenAndDesktop
-        rootIndex: clientsByScreenAndDesktop.index(desktopItem.desktopIndex, 0, clientsByScreenAndDesktop.index(screenItem.screenIndex,0))
+        model: clientsFilterModel
+        rootIndex: clientsFilterModel.index(desktopItem.desktopIndex, 0, clientsFilterModel.index(screenItem.screenIndex,0))
         filterOnGroup: "showing"
 
         delegate: ClientComponent {}
@@ -205,9 +205,7 @@ Item {
             includeByDefault: false
         }
 
-        items.onChanged: update();
-
-        function update() {
+        items.onChanged: {
             for (let i = 0; i < items.count; ++i) {
                 const item = items.get(i);
                 const client = item.model.client;
@@ -227,6 +225,6 @@ Item {
 
     Repeater {
         id: clientsRepeater
-        model: clientsModel
+        model: big && mainWindow.searchText && mainWindow.configSearchMethod === Enums.SearchMethod.Krunner ? 0 : clientsModel
     }
 }
