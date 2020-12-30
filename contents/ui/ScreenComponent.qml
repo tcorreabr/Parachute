@@ -274,7 +274,7 @@ Item {
 
     Rectangle {
         id: milouBackground
-        color: PlasmaCore.Theme.viewBackgroundColor
+        color: PlasmaCore.Theme.viewBackgroundColor ? PlasmaCore.Theme.viewBackgroundColor : "#111111"
         opacity: 0.9
         visible: searchField.focus && searchField.text && mainWindow.configSearchMethod === Enums.SearchMethod.Krunner
         radius: 4

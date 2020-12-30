@@ -84,7 +84,7 @@ Item {
         states: [
             State {
                 when: dropArea.containsDrag || (!big && mainWindow.idle && hoverHandler.hovered)
-                PropertyChanges { target: mouseArea; color: mainWindow.hoverColor; }
+                PropertyChanges { target: mouseArea; color: mainWindow.highlightColor; opacity: 0.4; }
             }
         ]
 
