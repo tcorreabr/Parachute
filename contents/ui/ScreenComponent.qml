@@ -322,10 +322,17 @@ Item {
                 id: removeDesktop
                 height: 48
                 width: 48
-                icon.name: "remove"
                 flat: true
                 opacity: desktopsBarHoverHandler.hovered ? 1 : 0
                 focusPolicy: Qt.NoFocus
+
+                Image {
+                    anchors.fill: parent
+                    source: "images/remove.svg"
+                    sourceSize.width: parent.width
+                    sourceSize.height: parent.height
+                    cache: true
+                }
 
                 onClicked: {
                     const currentDesktop = workspace.currentDesktop === workspace.desktops ?
@@ -359,10 +366,17 @@ Item {
                 id: addDesktop
                 height: 48
                 width: 48
-                icon.name: "add"
                 flat: true
                 opacity: desktopsBarHoverHandler.hovered ? 1 : 0
                 focusPolicy: Qt.NoFocus
+
+                Image {
+                    anchors.fill: parent
+                    source: "images/add.svg"
+                    sourceSize.width: parent.width
+                    sourceSize.height: parent.height
+                    cache: true
+                }
 
                 onClicked: {
                     const currentDesktop = workspace.currentDesktop;

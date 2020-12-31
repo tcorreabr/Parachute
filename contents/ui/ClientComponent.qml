@@ -118,7 +118,7 @@ Item {
             text: clientItem.client ? clientItem.client.caption : ""
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
-            color: PlasmaCore.Theme.textColor
+            color: "white"
             textFormat: Text.PlainText
 
             property real maxWidth: clientItem.gridWidth - 5 * icon.width
@@ -140,9 +140,16 @@ Item {
         height: mainWindow.clientsDecorationsHeight
         width: height
         visible: selectedFrame.visible && mainWindow.configShowWindowTitles
-        icon.name: "window-close"
         flat: true
         focusPolicy: Qt.NoFocus
+
+        Image {
+            anchors.fill: parent
+            source: "images/close.svg"
+            sourceSize.width: parent.width
+            sourceSize.height: parent.height
+            cache: true
+        }
 
         onClicked: clientItem.client.closeWindow();
     }
