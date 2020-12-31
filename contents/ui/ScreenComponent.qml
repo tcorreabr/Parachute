@@ -298,6 +298,7 @@ Item {
 
         HoverHandler {
             id: desktopsBarHoverHandler
+            enabled: mainWindow.idle
         }
 
         Behavior on x {

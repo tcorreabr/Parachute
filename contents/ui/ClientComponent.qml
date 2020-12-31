@@ -167,6 +167,7 @@ Item {
         clip: true
         clipTo: screenItem
         renderTarget: KWinComponents.ThumbnailItem.FramebufferObject
+        visible: mainWindow.activated
 
         property int thumbnailPadding: desktopItem.clientsPadding + noBorderSpacing
 
