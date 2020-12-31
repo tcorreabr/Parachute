@@ -214,7 +214,7 @@ Item {
             if (mainWindow.activated) {
                 mainWindow.animating = true;
                 mainWindow.easingType = Easing.OutExpo;
-                mainWindow.endAnimationTimer.start();
+                endAnimationTimer.start();
             }
         }
     }

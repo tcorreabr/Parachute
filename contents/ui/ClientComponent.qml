@@ -102,7 +102,7 @@ Item {
         id: clientDecorations
         x: (clientItem.gridWidth - clientDecorations.width) / 2
         y: desktopItem.clientsPadding
-        visible: desktopItem.big && activated && !animating && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
+        visible: desktopItem.big && mainWindow.activated && !mainWindow.animating && mainWindow.configShowWindowTitles && !clientThumbnail.Drag.active
         spacing: 10
 
         PlasmaCore.IconItem {
@@ -156,12 +156,11 @@ Item {
 
     KWinComponents.ThumbnailItem {
         id: clientThumbnail
-        x: thumbnailPadding
-        y: desktopItem.big && mainWindow.configShowWindowTitles ?
+        anchors.fill: Drag.active ? undefined : parent // tried to change in the state, but doesn't work
+        anchors.margins: thumbnailPadding
+        anchors.topMargin: desktopItem.big && mainWindow.configShowWindowTitles ?
                 thumbnailPadding + mainWindow.clientsDecorationsHeight :
                 thumbnailPadding
-        width: parent.width - thumbnailPadding - clientThumbnail.x
-        height: parent.height - thumbnailPadding - clientThumbnail.y
         Drag.source: clientItem.client
         wId: clientItem.client ? clientItem.client.internalId : "{00000000-0000-0000-0000-000000000000}"
         clip: true
@@ -211,6 +210,8 @@ Item {
 
     // Update non-notifiable properties
     function updateClientProperties() {
+        if (!client) return;
+
         clientX = client.x - screenItem.x;
         clientY = client.y - screenItem.y;
         clientWidth = client.width;

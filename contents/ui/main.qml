@@ -13,8 +13,6 @@ Window {
     x: activated ? 0 : mainWindow.width * 2
     y: activated ? 0 : mainWindow.height * 2
 
-    property alias endAnimationTimer: endAnimationTimer
-
     property bool activated: false
     property bool dragging: false
     property real qtVersion
