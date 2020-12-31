@@ -156,7 +156,7 @@ Item {
     SwipeView {
         id: bigDesktops
         anchors.fill: parent
-        currentIndex: mainWindow.ready ? mainWindow.currentDesktop : 0
+        currentIndex: mainWindow.currentDesktop
         focusPolicy: Qt.NoFocus
         activeFocusOnTab: false
 
@@ -172,7 +172,7 @@ Item {
 
         Repeater {
             id: bigDesktopsRepeater
-            model: mainWindow.ready ? workspace.desktops : 0
+            model: workspace.desktops
 
             DesktopComponent { // Cannot set geometry of SwipeView's root item
                 visible: model.index === mainWindow.currentDesktop
@@ -345,7 +345,7 @@ Item {
 
             Repeater {
                 id: desktopsBarRepeater
-                model: mainWindow.ready ? workspace.desktops : 0
+                model: workspace.desktops
 
                 DesktopComponent {
                     width: desktopsBar.desktopsWidth

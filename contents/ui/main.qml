@@ -15,7 +15,6 @@ Window {
 
     property alias endAnimationTimer: endAnimationTimer
 
-    property bool ready: false
     property bool activated: false
     property bool dragging: false
     property real qtVersion
@@ -293,20 +292,14 @@ Window {
             }
         }
 
-        let desktopWindowsPicked = 0;
         const clients = workspace.clientList();
         for (let i = 0; i < clients.length; i++) {
             if (clients[i].desktopWindow) {
                 screensRepeater.itemAt(clients[i].screen).desktopBackground.winId = clients[i].windowId;
-                
-                desktopWindowsPicked++;
-                if (desktopWindowsPicked === screensRepeater.count) {
-                    ready = true;
-                    if (getCorrectScreensInfo.running) getCorrectScreensInfo.stop();
-                    return;
-                }
             }
         }
+
+        if (getCorrectScreensInfo.running) getCorrectScreensInfo.stop();
     }
 
     function getExternallySelectedClient() {
