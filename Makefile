@@ -1,4 +1,4 @@
-PROJECT_VER = 0.9.0
+PROJECT_VER = 0.9.1
 
 install:
 	git checkout v$(PROJECT_VER)
