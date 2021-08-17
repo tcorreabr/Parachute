@@ -1,5 +1,7 @@
 # Parachute
 
+## This project is paused. Feel free to fork it if you want to improve it
+
 <p align="center">
   <img src="parachute.svg">
 </p>
