@@ -69,21 +69,21 @@ Window {
                     break;
                 case Qt.Key_Left:
                     if (event.modifiers & Qt.ShiftModifier) {
-                        workspace.currentDesktop--;
+                        workspace.slotSwitchDesktopPrevious();
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Left) : selectFirstClient();
                     }
                     break;
                 case Qt.Key_Right:
                     if (event.modifiers & Qt.ShiftModifier) {
-                        workspace.currentDesktop++;
+                        workspace.slotSwitchDesktopNext();
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Right) : selectLastClient();
                     }
                     break;
                 case Qt.Key_Up:
                     if (event.modifiers & Qt.ShiftModifier) {
-                        workspace.currentDesktop--;
+                        workspace.slotSwitchDesktopPrevious();
                     } else {
                         let tmpSelectedClientItem = selectedClientItem;
 
@@ -98,7 +98,7 @@ Window {
                     break;
                 case Qt.Key_Down:
                     if (event.modifiers & Qt.ShiftModifier) {
-                        workspace.currentDesktop++;
+                        workspace.slotSwitchDesktopNext()
                     } else {
                         selectedClientItem ? selectNextClientOn(Enums.Position.Bottom) : selectLastClient();
                     }
